@@ -18,7 +18,7 @@
     "react-scripts": "5.0.0",
     "typescript": "^4.6.2",
     "web-vitals": "^2.1.4",
-    "xrc-schema": "github:umdxrclub/XRCSchema"
+    "xrc-schema": "file:../schema"
   },
   "scripts": {
     "start": "react-scripts start",
