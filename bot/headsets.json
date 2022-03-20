@@ -1,0 +1,49 @@
+{
+    "vendors": [
+        {
+            "name": "Oculus",
+            "headsets": [
+                {
+                    "name": "Rift S",
+                    "discontinued": true
+                },
+                {
+                    "name": "Quest",
+                    "discontinued": true
+                },
+                {
+                    "name": "Quest 2"
+                },
+                {
+                    "name": "Rift S",
+                    "discontinued": true
+                }
+            ]
+        },
+        {
+            "name": "Valve",
+            "headsets": [
+                {
+                    "name": "Index"
+                }
+            ]
+        },
+        {
+            "name": "HTC",
+            "headsets": [
+                {
+                    "name": "Vive"
+                },
+                {
+                    "name": "Vive Cosmos"
+                },
+                {
+                    "name": "Vive Pro"
+                },
+                {
+                    "name": "Vive Pro 2"
+                }
+            ]
+        }
+    ]
+}

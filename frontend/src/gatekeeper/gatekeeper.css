@@ -1,0 +1,106 @@
+.gk-root {
+    font-family: "Bahnschrift", "Roboto", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background: linear-gradient(125.1deg, rgba(165,34,86,1) 0%, rgba(102,21,86,1) 100%);
+    /* flex: 1; */
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+}
+
+.clublogo-parent {
+    width: 150px;
+    height: 150px;
+    background-color: white;
+    border-radius: 100px;
+    box-shadow: 0px 3px 6px rgba(0,0,0,.16);
+    display: flex;
+    margin-top: 64px;
+
+    
+}
+
+.gk-event {
+    flex: 1;
+    color: white;
+    text-align: center;
+    align-items: center;
+    flex-direction: column;
+    display: flex;
+    font-size: 28px;
+}
+
+.gk-terplink {
+    margin:32px;
+}
+
+.spacer { 
+    flex: 1;
+}
+
+.gk-scanner-parent {
+    padding-left: 32px;
+    padding-right: 32px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.gk-scanner {
+    overflow: hidden;
+    width: 500px;
+    height: 750px;
+    border-radius: 32px;
+    text-align: center;
+    color:white;
+    font-size: 28px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 3px 6px rgba(0,0,0,.16);
+    align-items: center;
+}
+
+.gk-scanner h1,h2,h3,h4,h5,h6 {
+    margin: 0;
+}
+
+#status {
+    margin-top: 16px;
+    margin-bottom: 4px;
+}
+
+.gk-scanner svg {
+    width: auto;
+    height: 60px;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.event-text {
+    margin-top: 32px;
+}
+
+.event-text h1,h2,h3,h4,h5,h6 {
+    margin: 0px;
+}
+
+#qr-reader {
+    max-width: 100%;
+    max-height: 100%;
+    width:auto;
+    height:auto;
+}
+
+#clubLogo {
+    margin: 20%;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    flex: 1;
+}
+
+#terplink-qr {
+    width:225px;
+    width:225px;
+
+}

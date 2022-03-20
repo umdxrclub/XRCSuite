@@ -1,2 +1,2 @@
 # XRCSuite
- A frontend/backend that helps to run club activites and services
+ A frontend/backend that helps to run club activities and services
