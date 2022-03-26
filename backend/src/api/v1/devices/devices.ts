@@ -1,6 +1,6 @@
 import { query, Request, Response } from "express";
 import { V1_SCHEMA } from "xrc-schema";
-import { DEVICE_GET_RESPONSE } from "xrc-schema/api/v1-schema";
+import { DEVICE_GET_RESPONSE } from "xrc-schema/src/api/v1-schema";
 import { MODELS } from "../../../data/DatabaseService";
 import { getQueryParams } from "../../api";
 import { respondError, respondSuccess } from "../v1";

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { API } from "xrc-schema";
-import { APISchema, RouteConfig } from "xrc-schema/api/api";
+import { RouteConfig } from "xrc-schema/src/api/api";
 
 /**
  * Represents an API schema with a version name and routes. Each API has all of

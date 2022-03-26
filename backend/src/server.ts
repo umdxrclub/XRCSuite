@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs/promises";
 import https from "https";
-import { HTTPMethod } from "xrc-schema/api/api";
+import { HTTPMethod } from "xrc-schema/src/api/api";
 import { APIImplementation } from "./api/api";
 import { XRCSequelizeDatabase } from "./data/DatabaseService";
 import { BackendService } from "./services/BackendService";

@@ -21,23 +21,24 @@ export class XRCHeartbeatModel extends Model<XRCSchema.DeviceHeartbeat, XRCSchem
 export const XRCHeartbeatModelFactory: ModelFactory = {
     initModel: (sql) => {
         XRCHeartbeatModel.init({
-            serial: {
-                type: STRING,
-                references: {
-                    model: XRCDeviceModel,
-                    key: "serial"
-                }
-            },
             heartbeat: {
                 type: JSON
             },
             externalIp: {
                 type: STRING,
+            },
+            serial: {
+                type: STRING
             }
         },
         {
-            tableName: "heartbeats",
+            tableName: 'heartbeats',
             sequelize: sql,
         })
+    },
+
+    associate: () => {
+        // Define association with Device model
+        XRCHeartbeatModel.belongsTo(XRCDeviceModel, {targetKey: 'serial'})
     }
 }

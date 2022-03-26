@@ -5,4 +5,5 @@ import { Sequelize } from "sequelize";
  */
  export default interface ModelFactory {
     initModel: (sequelize: Sequelize) => void,
+    associate?: () => void
 }

@@ -33,8 +33,15 @@ export const XRCSequelizeDatabase: BackendService = {
 
         await sql.authenticate();
 
+        // Initialize all models
         MODEL_FACTORIES.forEach(model => {
             model.initModel(sql);
+        })
+
+        // Associate all models
+        MODEL_FACTORIES.forEach(model => {
+            if (model.associate)
+                model.associate()
         })
 
         await sql.sync();
