@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { TerpLinkSchema, XRCSchema } from "xrc-schema";
 import { TerpLinkEvent, TerpLinkEventMember, useTerpLink } from "../../../util/terplink";
-import { API, APIRoute, extract } from "../../api";
-import { error, success } from "../v1";
+import { APIRoute } from "../../api";
+import { respondError, respondSuccess } from "../v1";
 
 /**
  * Handles an incoming request that will lookup a TerpLink event. The handle
@@ -22,7 +22,7 @@ async function eventRequest(req: Request, res: Response, handle: (e: TerpLinkEve
         await handle(tle);
     } catch (e) {
         console.error(e);
-        error(res, "The specified event code is invalid!");
+        respondError(res, "The specified event code is invalid!");
         return;
     }
 }
@@ -48,20 +48,20 @@ async function memberRequest(req: Request, res: Response, handle: (m: TerpLinkEv
             try {
                 member = await tle.getMemberFromIssuanceId(req.query.instanceId as string);
             } catch {
-                error(res, "The specified instance id is invalid!");
+                respondError(res, "The specified instance id is invalid!");
                 return;
             }
 
             // Perform the member action
             try {
                 let data = await handle(member);
-                success(res, data);
+                respondSuccess(res, data);
             } catch {
-                error(res, "An internal error occurred while checking the member in", true);
+                respondError(res, "An internal error occurred while checking the member in", true);
             }
         })
     } else {
-        error(res, "No instance id provided!");
+        respondError(res, "No instance id provided!");
     }
 }
 
@@ -74,7 +74,7 @@ export const checkin_post: APIRoute = {
     handler: async (req, res) => {
         memberRequest(req, res, async (member) => {
             await member.checkIn();
-            return extract<TerpLinkSchema.Account>(member.getAccount());
+            return (member.getAccount());
         })
     }
 }
@@ -85,7 +85,7 @@ export const checkout_post: APIRoute = {
     handler: async (req, res) => {
         memberRequest(req, res, async (member) => {
             await member.checkOut();
-            return extract<TerpLinkSchema.Account>(member.getAccount());
+            return (member.getAccount());
         })
     }
 }
@@ -96,7 +96,7 @@ export const remove_post: APIRoute = {
     handler: async (req, res) => {
         memberRequest(req, res, async (member) => {
             await member.remove();
-            return extract<TerpLinkSchema.Account>(member.getAccount());
+            return (member.getAccount());
         })
     }
 }
@@ -112,7 +112,7 @@ export const event_get: APIRoute = {
                 endDate: tle.getEndDate().toUTCString(),
                 imageUrl: tle.getImageURL()
             };
-            success(res, event);
+            respondSuccess(res, event);
         })
     }
 }

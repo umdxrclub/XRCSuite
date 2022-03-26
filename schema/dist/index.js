@@ -28,4 +28,3 @@ const xrc_1 = require("./types/xrc");
 Object.defineProperty(exports, "XRCSchema", { enumerable: true, get: function () { return xrc_1.XRCSchema; } });
 const API = __importStar(require("./api/api"));
 exports.API = API;
-"./api/v1";

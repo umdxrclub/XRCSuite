@@ -12,12 +12,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.xrcv1 = void 0;
+exports.XRCAPI = void 0;
 const axios_1 = __importDefault(require("axios"));
+/**
+ * Provides methods for communicating with a REST API given some APISchema type.
+ * The APISchema generic is used so that the get/post/etc. methods will be typed
+ * checked against the schema. This allows your IDE to force you to specify
+ * valid endpoints and provide all the required parameters.
+ */
 class API {
     constructor(rootPath) {
         this.rootPath = rootPath;
     }
+    /**
+     * Sends an HTTP request to a specified endpoint on the API's schema. This
+     * will return the response object that has the returned data type of the
+     * endpoint.
+     *
+     * @param method The HTTP method to use
+     * @param path The path to post to
+     * @param params The required request parameters
+     * @returns Whatever the path returns.
+     */
     request(method, path, params) {
         return __awaiter(this, void 0, void 0, function* () {
             var requestUrl = this.rootPath + path;
@@ -29,7 +45,7 @@ class API {
             if (params.query) {
                 const query = new URLSearchParams();
                 Object.keys(params.query).forEach(key => {
-                    query.append(key, params.query[key]);
+                    query.append(key, params.query[key].toString());
                 });
                 requestUrl += `?${query.toString()}`;
             }
@@ -57,4 +73,7 @@ class API {
         });
     }
 }
-exports.xrcv1 = new API("https://umdxrc.figsware.net/api/v1");
+exports.XRCAPI = {
+    v1: new API("https://umdxrc.figsware.net/api/v1"),
+    v1_dev: new API("http://localhost:60972/api/v1")
+};

@@ -1,13 +1,24 @@
 import { Sequelize } from "sequelize";
 import { BackendService } from "../services/BackendService";
 import { useXRCHost } from "../util/xrc-host-file";
-import { XRCDeviceModelFactory } from "./models/DeviceModel";
-import { XRCMemberModelFactory } from "./models/MemberModel";
+import { XRCDeviceModel, XRCDeviceModelFactory } from "./models/DeviceModel";
+import { XRCHeartbeatModel, XRCHeartbeatModelFactory } from "./models/HeartbeatModel";
+import { XRCMemberModel, XRCMemberModelFactory } from "./models/MemberModel";
 import ModelFactory from "./models/ModelFactory";
 
 var sql: Sequelize;
 
-const MODELS: ModelFactory[] = [ XRCDeviceModelFactory, XRCMemberModelFactory ]
+const MODEL_FACTORIES: ModelFactory[] = [
+    XRCDeviceModelFactory,
+    XRCMemberModelFactory,
+    XRCHeartbeatModelFactory
+]
+
+export const MODELS = {
+    device: XRCDeviceModel,
+    member: XRCMemberModel,
+    heartbeat: XRCHeartbeatModel
+}
 
 export const XRCSequelizeDatabase: BackendService = {
     init: async function (): Promise<void> {
@@ -22,7 +33,7 @@ export const XRCSequelizeDatabase: BackendService = {
 
         await sql.authenticate();
 
-        MODELS.forEach(model => {
+        MODEL_FACTORIES.forEach(model => {
             model.initModel(sql);
         })
 

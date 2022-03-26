@@ -11,6 +11,11 @@ export declare namespace XRCSchema {
         name: string;
         macAddress: string | null;
     }
+    interface DeviceHeartbeat {
+        serial: string;
+        externalIp: string;
+        heartbeat: Heartbeat;
+    }
     interface Heartbeat {
         type: "boot" | "heartbeat";
         date: string;

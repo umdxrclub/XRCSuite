@@ -1,13 +1,14 @@
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs/promises";
 import https from "https";
-import { HTTPMethod } from "xrc-schema/dist/api/api";
+import { HTTPMethod } from "xrc-schema/api/api";
 import { APIImplementation } from "./api/api";
 import { XRCSequelizeDatabase } from "./data/DatabaseService";
 import { BackendService } from "./services/BackendService";
 import { CASAuth } from "./services/CASAuthService";
 import { serveFrontend } from "./util/frontend";
 import { useXRCHost } from "./util/xrc-host-file";
+import cors from "cors"
 
 export type ExpressRequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 
@@ -39,10 +40,7 @@ export default async function createBackendServer(apis: APIImplementation<any>[]
 
     // Allow Cross-Origin stuff
     if (host.allowCrossOrigin) {
-        app.use((req, res, next) => {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            next();
-        });
+        app.use(cors())
     }
 
     // Create logger

@@ -1,18 +1,18 @@
 import axios, { AxiosResponse } from "axios";
-import V1_SCHEMA from "./v1";
+import V1_SCHEMA from "./v1-schema";
 
 export type HTTPMethod = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';
 export type EMPTY = {};
 
 type APIMethodPaths<A extends APISchema, M extends HTTPMethod> = keyof A[M];
 
-type RouteConfig = {
+export type RouteConfig = {
     parameters: {
         path?: {
             [key: string]: string
         },
         query?: {
-            [query: string]: string
+            [query: string]: string | number
         },
         data?: any
     },
@@ -64,7 +64,7 @@ class API<A extends APISchema> {
         if (params.query) {
             const query = new URLSearchParams();
             Object.keys(params.query).forEach(key => {
-                query.append(key, params.query![key]);
+                query.append(key, params.query![key].toString());
             });
             requestUrl += `?${query.toString()}`
         }
@@ -86,9 +86,12 @@ class API<A extends APISchema> {
         return await this.request("post", path, params);
     }
 
-    async delete<P extends keyof A["delete"]>(path: P, params: ConfigCast<A["delete"]>[P]["response"]): Promise<AxiosResponse<ConfigCast<A["delete"]>[P]["response"]>> {
+    async delete<P extends keyof A["delete"]>(path: P, params: ConfigCast<A["delete"]>[P]["parameters"]): Promise<AxiosResponse<ConfigCast<A["delete"]>[P]["response"]>> {
         return await this.request("delete", path, params);
     }
 }
 
-export const xrcv1 = new API<V1_SCHEMA>("https://umdxrc.figsware.net/api/v1");
+export const XRCAPI = {
+    v1: new API<V1_SCHEMA>("https://umdxrc.figsware.net/api/v1"),
+    v1_dev: new API<V1_SCHEMA>("http://localhost:60972/api/v1")
+}

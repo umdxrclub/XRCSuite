@@ -1,8 +1,8 @@
-import { Model, Sequelize, STRING } from "sequelize";
+import { Model, Optional, Sequelize, STRING } from "sequelize";
 import { XRCSchema } from "xrc-schema";
 import ModelFactory from "./ModelFactory";
 
-export interface XRCDeviceCreationAttributes extends XRCSchema.Device {}
+export interface XRCDeviceCreationAttributes extends Optional<XRCSchema.Device, "macAddress"> {}
 
 export class XRCDeviceModel extends Model<XRCSchema.Device, XRCDeviceCreationAttributes> {
     declare serial: string
@@ -29,7 +29,7 @@ export const XRCDeviceModelFactory: ModelFactory = {
             }
         },
         {
-            tableName: "Devices",
+            tableName: "devices",
             sequelize: sql
         })
     }

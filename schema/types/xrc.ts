@@ -13,6 +13,12 @@ export namespace XRCSchema {
         macAddress: string | null
     }
 
+    export interface DeviceHeartbeat {
+        serial: string,
+        externalIp: string,
+        heartbeat: Heartbeat
+    }
+
     export interface Heartbeat {
         type: "boot" | "heartbeat",
         date: string,

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { API } from "xrc-schema";
+import { APISchema, RouteConfig } from "xrc-schema/api/api";
 
 /**
  * Represents an API schema with a version name and routes. Each API has all of
@@ -22,23 +23,6 @@ export interface APIRoute {
     handler: (req: Request, res: Response) => Promise<void>,
 }
 
-/**
- * Extracts ONLY the keys present in an interface to a new object. Useful for
- * removing extra data that may be returned by abstraction.
- *
- * @param obj The object to extract data from
- * @returns The extracted object
- */
-export function extract<T>(obj: T): T {
-    var extractedObj: T = {} as T;
-    const keys = Object.keys(obj) as Array<keyof T>
-    keys.forEach(property => {
-        extractedObj[property] = obj[property];
-    })
-
-    return extractedObj;
-}
-
 type APIRouteHandler<T> = (req: Request, res: Response) => Promise<void>
 
 export type APIImplementation<A extends API.APISchema> = {
@@ -50,3 +34,25 @@ export type APIImplementation<A extends API.APISchema> = {
     }
 }
 
+/**
+ * Extracts query parameters from a request
+ * @param req 
+ * @param query 
+ * @returns 
+ */
+export function getQueryParams<R extends RouteConfig>(req: Request, query: { [key in keyof (R["parameters"]["query"])]: boolean }): { [key in keyof R["parameters"]["query"]]: R["parameters"]["query"][key] } {
+    const keys = Object.keys(query) as Array<keyof R["parameters"]["query"]>
+    const extractedQuery = {} as any
+    keys.forEach(key => {
+        if (query[key]) {
+            const reqQueryVal = req.query[key as string]
+            if (reqQueryVal === undefined)
+                throw new Error("Missing key: " + key);
+
+            extractedQuery[key] = reqQueryVal
+        } else {
+            extractedQuery[key] = undefined
+        }
+    })
+    return extractedQuery
+}
