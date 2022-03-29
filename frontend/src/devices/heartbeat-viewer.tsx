@@ -1,26 +1,52 @@
-import { Chip, Stack, Typography } from "@mui/material";
-import { XRCSchema } from "xrc-schema";
-
-import BatteryFullIcon from '@mui/icons-material/BatteryFull';
-import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
-import WifiIcon from '@mui/icons-material/Wifi';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { Dialog, DialogContent, DialogTitle, Typography } from "@mui/material"
+import { useEffect, useState } from "react"
+import { XRCSchema } from "xrc-schema"
 
 interface HeartbeatViewerProps {
-    heartbeat: XRCSchema.Heartbeat | undefined
+    heartbeat: XRCSchema.DeviceHeartbeat | null,
+    onClose: () => void,
 }
 
-export const HeartbeatViewer: React.FC<HeartbeatViewerProps> = ({heartbeat, children}) => {
-    if (heartbeat) {
-        let chargingIcon = heartbeat.device.battery.charging ? <BatteryChargingFullIcon /> : <BatteryFullIcon />
-        let wifi = heartbeat.device.wifi
-        let wifiText = `${wifi.ssid} - ${wifi.bssid} - ${wifi.ipAddr} (${wifi.strength} dBm)`
-        return <Stack spacing={2} direction="row">
-            <Chip icon={<AccessTimeIcon/>} label={heartbeat.date} />
-            <Chip icon={chargingIcon} label={heartbeat.device.battery.percentage + "%"}/>
-            <Chip icon={<WifiIcon />} label={wifiText}/>
-        </Stack>
-    } else {
-        return <p>Not Found</p>
+function traverseObj(obj: any): [string, string][] {
+    var keyvals: [string, string][] = []
+    if (typeof obj === "object") {
+        Object.keys(obj).forEach(key => {
+            const val = obj[key]
+            if (val != undefined && val != null) {
+                switch (typeof(val)) {
+                    case "object":
+                        keyvals.push(...traverseObj(val))
+                        break;
+                    default:
+                        keyvals.push([key, val.toString()])
+                }
+            }
+        })
     }
+    return keyvals
+}
+
+export const HeartbeatViewer: React.FC<HeartbeatViewerProps> = ({heartbeat, onClose}) => {
+    const [ heartbeatText, setHeartbeatText ] = useState("")
+
+    useEffect(() => {
+        if (heartbeat != null) {
+            const heartbeatKeyVals = traverseObj(heartbeat)
+            var text = ""
+            heartbeatKeyVals.forEach(item => {
+                text += `${item[0]}: ${item[1]}\n`
+            })
+            setHeartbeatText(text)
+        }
+    }, [heartbeat])
+
+    return <Dialog
+        open={heartbeat !== null}
+        onClose={onClose}
+    >
+        <DialogTitle>Heartbeat</DialogTitle>
+        <DialogContent>
+            <Typography style={{whiteSpace: "pre-line"}}>{heartbeatText}</Typography>
+        </DialogContent>
+    </Dialog>
 }

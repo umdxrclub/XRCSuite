@@ -1,29 +1,32 @@
+import { ThemeProvider } from '@emotion/react';
+import { createTheme, CssBaseline } from '@mui/material';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
+import packageJson from "../package.json";
+import { App } from './core/app';
 import './index.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Gatekeeper } from './gatekeeper/gatekeeper';
-import { Home } from './home/Home';
-import packageJson from "../package.json"
-import { Devices } from './devices/devices';
-import { AppBar, Toolbar, Typography } from '@mui/material';
+
+const xrcTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#a52256"
+    },
+    secondary: {
+      main: "#4d1798"
+    },
+  }
+})
 
 ReactDOM.render(
   <React.StrictMode>
-      <BrowserRouter basename={packageJson.homepage}>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              XRC Management System
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Routes>
-          <Route path="/" element={ <Home /> }/>
-          <Route path="/devices" element={ <Devices /> } />
-          <Route path="/gatekeeper/:eventcode" element={ <Gatekeeper /> }/>
-        </Routes>
-      </BrowserRouter>
+    <ThemeProvider theme={xrcTheme}>
+      <CssBaseline>
+        <BrowserRouter basename={packageJson.homepage}>
+          <App />
+        </BrowserRouter>
+      </CssBaseline>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

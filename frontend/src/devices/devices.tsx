@@ -1,14 +1,17 @@
-import { Button, CircularProgress, Dialog, DialogContent, DialogTitle, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material"
+import { MonitorHeart } from '@mui/icons-material'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { Button, CircularProgress, Container, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useEffect, useState } from "react"
-import { XRCSchema } from "xrc-schema"
+import { XRCSchema } from 'xrc-schema'
+import { DEVICE_GET_RESPONSE } from "xrc-schema/dist/api/v1-schema"
 import { getXRC } from "../xrc-api"
 import { DeviceAddDialog } from "./device-add-dialog"
-import DeleteIcon from '@mui/icons-material/Delete';
-import { DEVICE_GET_RESPONSE } from "xrc-schema/dist/api/v1-schema"
-import { HeartbeatViewer } from "./heartbeat-viewer"
+import { HeartbeatCompactView } from "./heartbeat-compact-viewer"
+import { HeartbeatViewer } from './heartbeat-viewer'
 
 export const Devices: React.FC = ({ children }) => {
     const [ devices, setDevices ] = useState<DEVICE_GET_RESPONSE[] | undefined>(undefined)
+    const [ modalHeartbeat, setModalHeartbeat ] = useState<XRCSchema.DeviceHeartbeat | null>(null);
     const [ deviceDialogOpen, setDeviceDialogOpen ] = useState(false);
 
     async function refreshDevices() {
@@ -26,12 +29,13 @@ export const Devices: React.FC = ({ children }) => {
         refreshDevices();
     }, [])
 
-    return <div>
+    return <Container>
         <DeviceAddDialog
             open={deviceDialogOpen}
             onClose={() => setDeviceDialogOpen(false)}
             onAdd={refreshDevices}
         />
+        <HeartbeatViewer heartbeat={modalHeartbeat} onClose={() => setModalHeartbeat(null)} />
         <TableContainer sx={{maxWidth: 1400}} component={Paper}>
             {devices === undefined ? <CircularProgress /> :
             <Table>
@@ -48,8 +52,11 @@ export const Devices: React.FC = ({ children }) => {
                         <TableRow>
                             <TableCell>{dev.device.name}</TableCell>
                             <TableCell>{dev.device.serial}</TableCell>
-                            <TableCell><HeartbeatViewer heartbeat={dev.latestHeartbeat}/></TableCell>
+                            <TableCell><HeartbeatCompactView heartbeat={dev.latestHeartbeat}/></TableCell>
                             <TableCell>
+                                <IconButton onClick={() => setModalHeartbeat(dev.latestHeartbeat ?? null)}>
+                                    <MonitorHeart />
+                                </IconButton>
                                 <IconButton onClick={() => deleteDevice(dev.device.serial)}>
                                     <DeleteIcon />
                                 </IconButton>
@@ -59,7 +66,9 @@ export const Devices: React.FC = ({ children }) => {
                 </TableBody>
             </Table>}
         </TableContainer>
-        <Button variant="contained" onClick={() => setDeviceDialogOpen(true)}>Add Device</Button>
-        <Button variant="contained" onClick={refreshDevices}>Refresh</Button>
-    </div>
+        <Stack direction="row" spacing={2}>
+            <Button variant="contained" onClick={() => setDeviceDialogOpen(true)}>Add Device</Button>
+            <Button variant="contained" onClick={refreshDevices}>Refresh</Button>
+        </Stack>
+    </Container>
 }

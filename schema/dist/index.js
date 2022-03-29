@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.API = exports.XRCSchema = void 0;
-const xrc_1 = require("./types/xrc");
+const xrc_1 = require("./src/types/xrc");
 Object.defineProperty(exports, "XRCSchema", { enumerable: true, get: function () { return xrc_1.XRCSchema; } });
-const API = __importStar(require("./api/api"));
+const API = __importStar(require("./src/api/api"));
 exports.API = API;

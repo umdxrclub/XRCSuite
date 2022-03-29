@@ -14,7 +14,7 @@ export class XRCHeartbeatModel extends Model<XRCSchema.DeviceHeartbeat, XRCSchem
                 serial: serial,
             },
             order: [ [ 'createdAt', 'DESC' ]]
-        }))?.heartbeat ?? undefined
+        })) as XRCSchema.DeviceHeartbeat | null
     }
 }
 
@@ -39,6 +39,6 @@ export const XRCHeartbeatModelFactory: ModelFactory = {
 
     associate: () => {
         // Define association with Device model
-        XRCHeartbeatModel.belongsTo(XRCDeviceModel, {targetKey: 'serial'})
+        XRCHeartbeatModel.belongsTo(XRCDeviceModel, {targetKey: 'serial', foreignKey: 'serial'})
     }
 }

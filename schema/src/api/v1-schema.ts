@@ -34,7 +34,7 @@ type DEVICE_GET = {
 
 export type DEVICE_GET_RESPONSE = {
     device: XRCSchema.Device,
-    latestHeartbeat?: XRCSchema.Heartbeat
+    latestHeartbeat?: XRCSchema.DeviceHeartbeat
 }
 
 export default interface V1_SCHEMA {

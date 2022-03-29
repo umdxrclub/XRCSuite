@@ -1,8 +1,5 @@
 .home-root {
-    font-family: "Bahnschrift", "Roboto";
-    background: linear-gradient(125.1deg, rgba(165,34,86,1) 0%, rgba(102,21,86,1) 100%);
     min-height: 100vh;
     display: flex;
-    color: white;
     text-align: center;
 }
