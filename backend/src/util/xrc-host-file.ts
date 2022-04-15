@@ -1,6 +1,5 @@
-import fs from "fs";
 import basicAuth from "express-basic-auth";
-import { NextFunction, Request, Response } from "express";
+import fs from "fs";
 import { ExpressRequestHandler } from "../server";
 
 export interface XRCHostConfiguration {
@@ -14,7 +13,9 @@ export interface XRCHostConfiguration {
     },
     cas: {
         username: string,
-        password: string
+        password: string,
+        device: string,
+        hotpSecret: string
     },
     https?: {
         keyPath: string,

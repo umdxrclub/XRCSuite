@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { TerpLinkSchema, XRCSchema } from "xrc-schema";
+import { XRCSchema } from "xrc-schema";
 import { TerpLinkEvent, TerpLinkEventMember, useTerpLink } from "../../../util/terplink";
 import { APIRoute } from "../../api";
 import { respondError, respondSuccess } from "../v1";
@@ -17,14 +17,11 @@ async function eventRequest(req: Request, res: Response, handle: (e: TerpLinkEve
     const { eventcode } = req.params;
 
     // Check to see if the provided TerpLink event code is valid.
-    try  {
-        let tle = await tl.getEvent(eventcode);
+    let tle = await tl.getEvent(eventcode);
+    if (tle)
         await handle(tle);
-    } catch (e) {
-        console.error(e);
+    else
         respondError(res, "The specified event code is invalid!");
-        return;
-    }
 }
 
 /**

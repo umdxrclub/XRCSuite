@@ -5,6 +5,7 @@ import {
 } from "html5-qrcode/esm/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { XRCSchema } from "xrc-schema";
 import { getXRC } from "../xrc-api";
 import "./gatekeeper-display.css";
 import { ReactComponent as ProceedSVG } from "./proceed.svg";
@@ -60,6 +61,7 @@ export const GatekeeperDisplay: React.FC = ({ children }) => {
     status: GatekeeperStatus;
     text: string;
   }>({ status: "scanning", text: STATUS_DESCRIPTION["scanning"] });
+  const [ terpLinkEvent, setTerpLinkEvent ] = useState<XRCSchema.ClubEvent | "err" | undefined>(undefined)
   const [eventName, setEventName] = useState<string>("Event Name");
   const [eventTimeframe, setEventTimeframe] = useState<string>("Event Title");
   const statusColor = STATUS_COLORS[status.status];
@@ -71,10 +73,6 @@ export const GatekeeperDisplay: React.FC = ({ children }) => {
       "qr-reader",
       {
         fps: 10,
-        qrbox: {
-          width: 250,
-          height: 250,
-        },
         formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC],
       },
       false
@@ -106,6 +104,11 @@ export const GatekeeperDisplay: React.FC = ({ children }) => {
         const startTimeText = `${dateText} - ${timeText}`;
         setEventName(event.name);
         setEventTimeframe(startTimeText);
+        setTerpLinkEvent(event);
+      })
+      .catch(err => {
+        setTerpLinkEvent("err")
+        alert("This event is not valid!");
       });
   }, []);
 

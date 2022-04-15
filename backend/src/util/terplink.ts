@@ -17,7 +17,7 @@ export interface TerpLink {
      *
      * @param eventCode The event code to search for
      */
-    getEvent(eventCode: string): Promise<TerpLinkEvent>
+    getEvent(eventCode: string): Promise<TerpLinkEvent | null>
 }
 
 /**
@@ -171,7 +171,6 @@ class TerpLinkProvider implements TerpLink {
             const oidcRes = await axios.post(connectPostUrl, connectQuery, X_WWW_FORM_HEADERS_CONFIG)
             log("(3/3) Got Bearer!")
             bearerRes = oidcRes;
-
         } else {
             log("Already authenticated with CampusLabs!")
         }
@@ -179,7 +178,7 @@ class TerpLinkProvider implements TerpLink {
         return bearerRes.data.split("'")[1]
     }
 
-    async getEvent(eventCode: string): Promise<TerpLinkEvent> {
+    async getEvent(eventCode: string): Promise<TerpLinkEvent | null> {
         // Check and see if the event has already been cached.
         var cachedEvent = this.events.get(eventCode);
         if (cachedEvent) {
@@ -189,16 +188,20 @@ class TerpLinkProvider implements TerpLink {
         const axios = useAxios();
 
         // First get the event data from TerpLink using the access code.
-        const eventRes = await axios.get(CAMPUS_LABS_API_URL + "event", {
-            params: {
-                accesscode: eventCode
-            }
-        })
+        try {
+            var eventRes = await axios.get(CAMPUS_LABS_API_URL + "event", {
+                params: {
+                    accesscode: eventCode
+                }
+            })
+        } catch {
+            // If there was a 400 err, return null.
+            return null;
+        }
 
         let eventData = eventRes.data as TerpLinkSchema.Event;
-        const bearer = await this.getBearer(eventData.authUrl);
 
-        const event = new TerpLinkEventProvider(eventRes.data as TerpLinkSchema.Event, bearer);
+        const event = new TerpLinkEventProvider(eventData);
         this.events.set(eventCode, event);
         return event;
     }
@@ -206,11 +209,10 @@ class TerpLinkProvider implements TerpLink {
 
 class TerpLinkEventProvider implements TerpLinkEvent {
     private event: TerpLinkSchema.Event;
-    private bearer: string;
+    private bearer: string = "";
 
-    constructor(event: TerpLinkSchema.Event, bearer: string) {
+    constructor(event: TerpLinkSchema.Event) {
         this.event = event;
-        this.bearer = bearer
     }
 
     getEventName(): string {
@@ -281,31 +283,84 @@ class TerpLinkEventProvider implements TerpLinkEvent {
         return attendees.map(attendee => new TerpLinkEventMemberProvider(attendee.id, attendee.account, this));
     }
 
-    private async get(path: string): Promise<AxiosResponse> {
+    private async request(method: "get" | "post" | "delete", path: string, data?: any, needBearer?: boolean): Promise<AxiosResponse> {
         const axios = useAxios();
-        return await axios.get(CAMPUS_LABS_API_URL + `event/${this.event.accessToken}/${path}`, {
-            headers: {
-                Authorization: `Bearer ${this.bearer}`
+
+        // Get the bearer token if it is requested or it is currently an empty string
+        if (needBearer || this.bearer == "") {
+            await this.getBearer();
+        }
+
+        // Make the request
+        try {
+            var res = await axios.request({
+                url: CAMPUS_LABS_API_URL + `event/${this.event.accessToken}/${path}`,
+                method: method,
+                data: data,
+                headers: {
+                    Authorization: `Bearer ${this.bearer}`
+                }
+            })
+        } catch {
+            // Try to get a fresh bearer and attempt the request again
+            if (!needBearer) {
+                res = await this.request(method, path, data, true)
+            } else {
+                throw new Error("Could not fetch new bearer!")
             }
-        })
+        }
+
+        return res
+    }
+
+    private async get(path: string): Promise<AxiosResponse> {
+        return await this.request("get", path)
     }
 
     private async post(path: string, data: any): Promise<AxiosResponse> {
-        const axios = useAxios();
-        return await axios.post(CAMPUS_LABS_API_URL + `event/${this.event.accessToken}/${path}`, data, {
-            headers: {
-                Authorization: `Bearer ${this.bearer}`
-            }
-        })
+        return await this.request("post", path, data)
     }
 
     private async delete(path: string): Promise<AxiosResponse> {
+        return await this.request("delete", path)
+    }
+
+    private async getBearer(): Promise<void> {
         const axios = useAxios();
-        return await axios.delete(CAMPUS_LABS_API_URL + `event/${this.event.accessToken}/${path}`, {
-            headers: {
-                Authorization: `Bearer ${this.bearer}`
-            }
-        })
+        // Attempt authentication with CAS. It is assumed that CAS cookie
+        // is already obtained via the CAS init startup service. This will
+        // either bring us to a page where we forward CAS auth with campus
+        // labs or the authenticated campus labs.
+        var bearerRes = await axios.get(this.event.authUrl);
+
+        // Check if already authenticated
+        if ((bearerRes.request.res.responseUrl as string) != SUCCESSFUL_AUTH_URL) {
+            // We are at a redirect page, so scrape and forward the
+            // necessary information.
+            const authRoot = parse(bearerRes.data);
+            var postUrl = authRoot.querySelector("form")!.attributes.action
+            const form = queryStringFromForm(authRoot.querySelector("form")!)
+            const forwardRes = await axios.post(postUrl, form, X_WWW_FORM_HEADERS_CONFIG)
+            log("(1/3) Got CampusLabs response")
+
+            const campusForwardRoot = parse(forwardRes.data);
+            var campusPostURL = campusForwardRoot.querySelector("form")!.attributes.action
+            const campusForm = queryStringFromForm(campusForwardRoot.querySelector("form")!)
+            const connectRes = await axios.post(campusPostURL, campusForm, X_WWW_FORM_HEADERS_CONFIG)
+            log("(2/3) Got connect response")
+
+            const connectRoot = parse(connectRes.data);
+            const connectQuery = queryStringFromForm(connectRoot.querySelector("form")!)
+            var connectPostUrl = connectRoot.querySelector("form")!.attributes.action
+            var oidcRes = await axios.post(connectPostUrl, connectQuery, X_WWW_FORM_HEADERS_CONFIG)
+            log("(3/3) Got Bearer!")
+
+            bearerRes = oidcRes;
+        } else {
+            log("Already authenticated with CampusLabs!")
+        }
+
+        this.bearer = bearerRes.data.split("'")[1]
     }
 }
 
@@ -351,6 +406,16 @@ class TerpLinkEventMemberProvider implements TerpLinkEventMember {
 
     toString(): string {
         return this.account.name;
+    }
+}
+
+function getBaseUrl(url: string) {
+    const split_url = url.split("/")
+    if (split_url.length == 2) {
+        // Just has two slashes, so prob is something like http://google.com
+        return url;
+    } else {
+        return split_url.slice(0,3).join("/")
     }
 }
 

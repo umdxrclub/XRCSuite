@@ -131,3 +131,6 @@ host.json
 
 # Cookies
 cookies.json
+
+# HOTP Counter
+.hotp_counter

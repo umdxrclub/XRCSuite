@@ -5,7 +5,6 @@ import { HTTPMethod } from "xrc-schema/src/api/api";
 import { APIImplementation } from "./api/api";
 import { XRCSequelizeDatabase } from "./data/DatabaseService";
 import { BackendService } from "./services/BackendService";
-import { CASAuth } from "./services/CASAuthService";
 import { serveFrontend } from "./util/frontend";
 import { useXRCHost } from "./util/xrc-host-file";
 import cors from "cors"
@@ -29,7 +28,7 @@ function createLogger(app: express.Express) {
     });
 }
 
-const SERVICES: BackendService[] = [ XRCSequelizeDatabase, CASAuth ]
+const SERVICES: BackendService[] = [ XRCSequelizeDatabase ]
 
 export default async function createBackendServer(apis: APIImplementation<any>[]) {
     const host = useXRCHost();

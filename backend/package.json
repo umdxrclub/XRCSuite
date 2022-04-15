@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "ts-node ./src/run.ts --transpile-only",
     "serve": "node ./dist/run.js",
-    "deploy": "ts-node ./util/deploy.ts"
+    "deploy": "ts-node ./scripts/deploy.ts"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +20,7 @@
     "express-basic-auth": "^1.2.1",
     "node-html-parser": "^5.2.0",
     "openid-client": "^5.1.3",
+    "otplib": "^12.0.1",
     "pg": "^8.7.3",
     "sequelize": "^6.16.1",
     "tough-cookie": "^4.0.0",

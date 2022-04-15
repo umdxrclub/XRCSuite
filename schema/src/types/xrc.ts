@@ -19,6 +19,11 @@ export namespace XRCSchema {
         heartbeat: Heartbeat
     }
 
+    export interface NearbyNetwork {
+        bssid: string,
+        level: number
+    }
+
     export interface Heartbeat {
         type: "boot" | "heartbeat",
         date: string,
@@ -32,6 +37,7 @@ export namespace XRCSchema {
                 ssid: string,
                 bssid: string,
                 strength: number,
+                scan: NearbyNetwork[] | null
             },
             serial: string,
             uptime: string
@@ -41,7 +47,7 @@ export namespace XRCSchema {
     export interface Member {
         id: number,
         discord_id: string | null,
-        uid: string | null,
+        directory_id: string | null,
         name: string | null,
         email: string | null,
         scoresaber_id: string | null,

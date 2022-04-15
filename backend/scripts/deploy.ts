@@ -53,6 +53,9 @@ const DEPLOY_SRC_PATH = DEPLOY_NODE_PATH+"/dist";
     await ssh.execCommand(`npm i --only=prod`, {cwd: DEPLOY_NODE_PATH})
     console.log("Installed NPM packages")
 
+    // Restart service
+    await ssh.execCommand("sudo /usr/bin/systemctl restart xrc.service")
+
     console.log("Successfully deployed!");
 
     // Disconnect.
