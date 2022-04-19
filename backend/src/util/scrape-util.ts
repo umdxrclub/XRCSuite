@@ -7,6 +7,10 @@ export const X_WWW_FORM_HEADERS_CONFIG = {
     }
 }
 
+export function wasRequestRedirectedTo(reqUrl: string, resUrl: string, toUrl: string) {
+    return !reqUrl.startsWith(toUrl) && resUrl.startsWith(toUrl)
+}
+
 export function getValueOfInputFieldWithName(e: HTMLElement, name: string) {
     try {
         return e.querySelector(`input[name=${name}]`)!.attributes.value

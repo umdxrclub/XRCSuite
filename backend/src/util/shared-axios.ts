@@ -1,10 +1,11 @@
 import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
-import { response } from "express";
 import { CookieJar } from "tough-cookie";
-import { FileCookieStore } from "tough-cookie-file-store"
-import { CAS_LOGIN_URLS, loginWithCAS } from "./cas"
-import { TEPRLINK_API_URL } from "./terplink";
+import { FileCookieStore } from "tough-cookie-file-store";
+import { CAS_LOGIN_SSO, CAS_LOGIN_URL, loginWithCAS, loginWithCASUsingSAML } from "./cas";
+import { wasRequestRedirectedTo } from "./scrape-util";
+
+const DEBUG = false
 
 const jar = new CookieJar(new FileCookieStore("./cookies.json"));
 const sharedAxios = wrapper(axios.create({
@@ -22,43 +23,36 @@ sharedAxios.defaults.headers = {
     }
 }
 
-sharedAxios.interceptors.request.use(async req => {
-    console.log(req.url)
-    if (req.url?.startsWith(TEPRLINK_API_URL)) {
-        req.validateStatus = (status: number) => {
-            return status < 300 || status == 401
-        }
-    }
-
-    return req;
-})
-
-// Check for CAS/Terplink Login pages so that we can login to them, if needed.
+// Check for CAS Login pages so that we can login to them, if needed.
 sharedAxios.interceptors.response.use(async res => {
-    let reqUrl = res.config.url
+    var retryRequest = false
+    let reqUrl = res.config.url!
     let responseUrl = res.request.res.responseUrl as string
 
-    console.log(reqUrl, responseUrl)
+    if (DEBUG)
+        console.log(`RES (${res.status}): ${responseUrl}, REQ: ${reqUrl}`)
 
     // See if the request was redirected to the CAS login page, and if so, login
-    const redirectedToCAS = CAS_LOGIN_URLS.find(url => !reqUrl?.startsWith(url) && responseUrl.startsWith(url)) != undefined
-    if (redirectedToCAS) {
-        console.log("CAS login requested!")
+    if (wasRequestRedirectedTo(reqUrl, responseUrl, CAS_LOGIN_URL)) {
+        console.log("Request redirected to CAS Login Page, logging in...")
         await loginWithCAS();
 
         // Retry the request with the CAS login
-        console.log("CAS login done, retrying request...")
-        res = await sharedAxios.request(res.config);
+        retryRequest = true
+    } else if (wasRequestRedirectedTo(reqUrl, responseUrl, CAS_LOGIN_SSO)) {
+        console.log("Request redirected to CAS SAML Login Page, logging in...")
+        res = await loginWithCASUsingSAML(res);
     }
 
-    // // Terplink API
-    // if (reqUrl?.startsWith(TEPRLINK_API_URL) && res.status == 401) {
-    //     let loginRes = await sharedAxios.get(TERPLINK_API_LOGIN_URL)
-    //     console.log(loginRes.data);
-    //     res = await sharedAxios.request(res.config);
-    // }
-
-    return res;
+    if (retryRequest) {
+        console.log("Retrying request...")
+        let config = res.config
+        config.httpAgent = undefined
+        config.httpsAgent = undefined
+        return await sharedAxios.request(config);
+    } else {
+        return res;
+    }
 })
 
 export function useAxios() {

@@ -3,7 +3,7 @@ import { XRCSchema } from "xrc-schema";
 import ModelFactory from "./ModelFactory";
 
 
-export interface XRCMemberCreationAttributes extends Optional<XRCSchema.Member, "uid" | "name" | "email" | "scoresaber_id"> {}
+export interface XRCMemberCreationAttributes extends Optional<XRCSchema.Member, "directory_id" | "name" | "email" | "scoresaber_id"> {}
 export class XRCMemberModel extends Model<XRCSchema.Member, XRCMemberCreationAttributes> {
     declare discord_id: string
     declare uid: string | null
@@ -25,7 +25,7 @@ export const XRCMemberModelFactory: ModelFactory = {
                 type: STRING
             },
 
-            uid:  {
+            directory_id:  {
                 type: STRING
             },
 

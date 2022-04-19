@@ -1,10 +1,11 @@
 import parse from "node-html-parser";
-import { X_WWW_FORM_HEADERS_CONFIG, getValueOfInputFieldWithName } from "./scrape-util";
+import { X_WWW_FORM_HEADERS_CONFIG, getValueOfInputFieldWithName, queryStringFromForm } from "./scrape-util";
 import { useAxios } from "./shared-axios";
 import { useXRCHost } from "./xrc-host-file";
 import fs from "fs/promises"
 import { hotp } from "otplib";
 import querystring from "querystring"
+import { Axios, AxiosResponse } from "axios";
 
 function log(msg: string) {
     console.log(`[CASAuthService] ${msg}`)
@@ -14,10 +15,8 @@ const BASE_AUTH_URL = "https://shib.idm.umd.edu"
 // CAS has a "demo" service that just echos your UID. Can be used for auth.
 const AUTH_URL = "https://shib.idm.umd.edu/shibboleth-idp/profile/cas/login?service=https%3A%2F%2Flogin.umd.edu%2Fdemo%2F"
 const DEMO_URL = "https://login.umd.edu/demo/"
-export const CAS_LOGIN_URLS = [
-    "https://shib.idm.umd.edu/shibboleth-idp/profile/cas/login",
-    "https://shib.idm.umd.edu/shibboleth-idp/profile/SAML2/Redirect/SSO"
-]
+export const CAS_LOGIN_URL = "https://shib.idm.umd.edu/shibboleth-idp/profile/cas/login"
+export const CAS_LOGIN_SSO = "https://shib.idm.umd.edu/shibboleth-idp/profile/SAML2/Redirect/SSO"
 
 interface DuoAuthStatus {
     stat: string,
@@ -89,7 +88,7 @@ export async function loginWithCAS() {
         log("Already logged in to CAS!")
         return;
     }
-
+    
     // Not logged into CAS, so we have to authenticate using Duo.
     const authRoot = parse(authRes.data);
     const csrf = authRoot.querySelector("input[name=csrf_token]")?.attributes.value
@@ -257,4 +256,26 @@ export async function loginWithCAS() {
         await incrementHOTPCounter();
 
     log("(9/9) Completed auth!")
+}
+
+export async function loginWithCASUsingSAML(res: AxiosResponse<any, any>): Promise<AxiosResponse<any, any>> {
+    const axios = useAxios();
+    var root = parse(res.data);
+
+    // Check if the page is asking for a login, or is simply wanting to redirect
+    if (root.querySelector(`input[name=csrf_token]`) != null) {
+        // Not logged in yet, so login now.
+        console.log("CAS Login required for SAML, logging in now...")
+        await loginWithCAS();
+
+        // Retry the SAML request, it'll be intercepted again by the axios handler
+        return await axios.request({...res.config, httpAgent: undefined, httpsAgent: undefined})
+    }
+
+    // Redirect
+    let postUrl = root.querySelector("form")!.attributes.action
+    let form = queryStringFromForm(root.querySelector("form")!)
+    let forwardRes = await axios.post(postUrl, form, X_WWW_FORM_HEADERS_CONFIG)
+
+    return forwardRes
 }
