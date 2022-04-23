@@ -62,10 +62,7 @@ export class UMDDirectory {
      */
     private async directory_intercept(res: AxiosResponse<any, any>) {
         if (res.config.url?.startsWith(UMD_DIRECTORY_URL)) {
-            const body = parse(res.data);
-            const loginButton = body.querySelector(".logout")!
-            const loggedOut = loginButton.attributes["value"] == "Log in"
-            if (loggedOut) {
+            if ((res.data as string).indexOf('value="Log in"') > 0) {
                 console.log("Logging into UMD directory...")
                 await this.login();
                 return await retryRequest(res);
