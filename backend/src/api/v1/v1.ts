@@ -4,6 +4,7 @@ import { APIImplementation } from "../api";
 import { device_add, device_delete, device_get } from "./devices/devices";
 import { heartbeat_get, heartbeat_post } from "./heartbeat/heartbeat";
 import { checkin_post, checkout_post, event_get } from "./terplink/terplink";
+import { member_get, member_post } from "./members/members"
 
 export const APIV1: APIImplementation<V1_SCHEMA> = {
     version: "v1",
@@ -11,14 +12,16 @@ export const APIV1: APIImplementation<V1_SCHEMA> = {
         get: {
             "/heartbeat": heartbeat_get,
             "/terplink/:eventcode": event_get.handler,
-            "/devices": device_get
+            "/devices": device_get,
+            "/members": member_get,
 
         },
         post: {
             "/devices": device_add,
             "/heartbeat": heartbeat_post.handler,
             "/terplink/:eventcode/checkin": checkin_post.handler,
-            "/terplink/:eventcode/checkout": checkout_post.handler
+            "/terplink/:eventcode/checkout": checkout_post.handler,
+            "/members": member_post
         },
         delete: {
             "/devices": device_delete

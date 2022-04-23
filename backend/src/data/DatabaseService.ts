@@ -1,22 +1,24 @@
 import { Sequelize } from "sequelize";
 import { BackendService } from "../services/BackendService";
 import { useXRCHost } from "../util/xrc-host-file";
-import { XRCDeviceModel, XRCDeviceModelFactory } from "./models/DeviceModel";
-import { XRCHeartbeatModel, XRCHeartbeatModelFactory } from "./models/HeartbeatModel";
-import { XRCMemberModel, XRCMemberModelFactory } from "./models/MemberModel";
+import { AttendanceModel, AttendanceModelFactory } from "./models/AttendanceModel";
+import { XRCDeviceModel, DeviceModelFactory } from "./models/DeviceModel";
+import { XRCHeartbeatModel, HeartbeatModelFactory } from "./models/HeartbeatModel";
+import { MemberModel, MemberModelFactory } from "./models/MemberModel";
 import ModelFactory from "./models/ModelFactory";
 
 var sql: Sequelize;
 
 const MODEL_FACTORIES: ModelFactory[] = [
-    XRCDeviceModelFactory,
-    XRCMemberModelFactory,
-    XRCHeartbeatModelFactory
+    DeviceModelFactory,
+    MemberModelFactory,
+    HeartbeatModelFactory,
+    AttendanceModelFactory
 ]
 
 export const MODELS = {
     device: XRCDeviceModel,
-    member: XRCMemberModel,
+    member: MemberModel,
     heartbeat: XRCHeartbeatModel
 }
 

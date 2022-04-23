@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { XRCSchema } from "xrc-schema";
 import { getXRC } from "../xrc-api";
-import "./gatekeeper-display.css";
+import "./terplink-gatekeeper.css";
 import { ReactComponent as ProceedSVG } from "./proceed.svg";
 import { ReactComponent as ProcessingSVG } from "./processing.svg";
 import { ReactComponent as StopSVG } from "./stop.svg";
@@ -52,7 +52,7 @@ const STATUS_SVG: Record<
  */
 const DISPLAY_DELAY = 4 * 1000;
 
-export const GatekeeperDisplay: React.FC = ({ children }) => {
+export const TerpLinkGatekeeper: React.FC = ({ children }) => {
   const { eventcode } = useParams();
 
   const scanner = useRef<Html5QrcodeScanner>();

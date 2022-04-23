@@ -46,6 +46,7 @@ async function locateDevice(heartbeat: XRCSchema.DeviceHeartbeat): Promise<Locat
 
 export const Devices: React.FC = ({ children }) => {
     const [ devices, setDevices ] = useState<DEVICE_GET_RESPONSE[] | undefined>(undefined)
+    const [ currentDevice, setCurrentDevice ] = useState<DEVICE_GET_RESPONSE | null>(null);
     const [ modalHeartbeat, setModalHeartbeat ] = useState<XRCSchema.DeviceHeartbeat | null>(null);
     const [ deviceDialogOpen, setDeviceDialogOpen ] = useState(false);
     const [ deleteConfirmationOpen, setDeleteConfirmationOpen ] = useState(false);
@@ -77,7 +78,10 @@ export const Devices: React.FC = ({ children }) => {
             <DialogTitle>Are you sure?</DialogTitle>
             <DialogActions>
                 <Button onClick={() => setDeleteConfirmationOpen(false)}>Cancel</Button>
-                <Button onClick={() => setDeleteConfirmationOpen(false)}>Close</Button>
+                <Button onClick={() => {
+                    deleteDevice(currentDevice!.device.serial)
+                    setDeleteConfirmationOpen(false)
+                }}>Delete</Button>
             </DialogActions>
         </Dialog>
         <HeartbeatViewer heartbeat={modalHeartbeat} onClose={() => setModalHeartbeat(null)} />
@@ -112,7 +116,10 @@ export const Devices: React.FC = ({ children }) => {
                                         <LocationOnIcon />
                                     </IconButton>
                                     : null}
-                                <IconButton onClick={() => setDeleteConfirmationOpen(true)}>
+                                <IconButton onClick={() => {
+                                    setCurrentDevice(dev);
+                                    setDeleteConfirmationOpen(true)
+                                }}>
                                     <DeleteIcon />
                                 </IconButton>
                             </TableCell>
@@ -121,9 +128,9 @@ export const Devices: React.FC = ({ children }) => {
                 </TableBody>
             </Table>}
         </TableContainer>
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row-reverse" spacing={2} sx={{paddingTop: 2}}>
             <Button variant="contained" onClick={() => setDeviceDialogOpen(true)}>Add Device</Button>
-            <Button variant="contained" onClick={refreshDevices}>Refresh</Button>
+            <Button onClick={refreshDevices}>Refresh</Button>
         </Stack>
     </Container>
 }

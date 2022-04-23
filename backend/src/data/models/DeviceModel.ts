@@ -1,5 +1,6 @@
 import { Model, Optional, STRING } from "sequelize";
 import { XRCSchema } from "xrc-schema";
+import { XRCHeartbeatModel } from "./HeartbeatModel";
 import ModelFactory from "./ModelFactory";
 
 export interface XRCDeviceCreationAttributes extends Optional<XRCSchema.Device, "macAddress"> {}
@@ -10,7 +11,7 @@ export class XRCDeviceModel extends Model<XRCSchema.Device, XRCDeviceCreationAtt
     declare name: string
 }
 
-export const XRCDeviceModelFactory: ModelFactory = {
+export const DeviceModelFactory: ModelFactory = {
     initModel: (sql) => {
         XRCDeviceModel.init({
             serial: {
@@ -32,5 +33,8 @@ export const XRCDeviceModelFactory: ModelFactory = {
             tableName: 'devices',
             sequelize: sql,
         })
+    },
+    associate: () => {
+        XRCDeviceModel.hasMany(XRCHeartbeatModel, { foreignKey: "serial", onDelete: "CASCADE" })
     }
 }

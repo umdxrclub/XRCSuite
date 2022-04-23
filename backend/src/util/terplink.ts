@@ -25,9 +25,10 @@ function log(msg: string) {
  * provider. A TerpLink provider may include a controller that runs an emulator
  * that manages the Check-in app, or something that makes the API calls directly.
 */
-class TerpLink {
+export class TerpLink {
     private events: Map<string, TerpLinkEvent> = new Map();
     private bearer: string | undefined = undefined
+    static singleton: TerpLink = new TerpLink()
 
     constructor() {
         const axios = useAxios();
@@ -143,6 +144,41 @@ class TerpLink {
         const event = new TerpLinkEvent(eventData);
         this.events.set(eventCode, event);
         return event;
+    }
+
+    async getRosterPage(page: number) {
+        const axios = useAxios()
+        const res = await axios.get("https://terplink.umd.edu/actioncenter/organization/xr-club/roster?Direction=Ascending&Page=" + page, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        });
+
+        const body = parse(res.data);
+        const matches = body.querySelectorAll(`input[type=checkbox]`)
+        const pagination = body.querySelector('div[class=pagination]')!
+        const navLinks = pagination.querySelectorAll("a")
+        const last = navLinks[navLinks.length - 1].attributes["href"].split("Page=")[1]
+        return {
+            members: matches.map(e => {
+                const membercard = e.attributes["value"]
+                const name = e.attributes["title"].split("Select ")[1]
+                
+                return {
+                    communityId: membercard,
+                    name: name.slice(1,name.length-1)
+                }
+            }),
+            lastPage: last
+        }
+    }
+
+    async getEmailFromCommunityId(communityId: string) {
+        const axios = useAxios();
+        const res = await axios.get(`https://terplink.umd.edu/actioncenter/organization/xr-club/roster/users/membercard/${communityId}`)
+        const body = parse(res.data);
+        const email = body.querySelector("a[class=email]")?.attributes["href"].split("mailto:")[1]
+        return email!
     }
 
     async getEventPage(eventId: number) {
@@ -463,19 +499,4 @@ export class TerpLinkEventMember {
     toString(): string {
         return this.account.name;
     }
-}
-
-function getBaseUrl(url: string) {
-    const split_url = url.split("/")
-    if (split_url.length == 2) {
-        // Just has two slashes, so prob is something like http://google.com
-        return url;
-    } else {
-        return split_url.slice(0,3).join("/")
-    }
-}
-
-const tl = new TerpLink();
-export function useTerpLink(): TerpLink {
-    return tl;
 }

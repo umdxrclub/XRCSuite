@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { XRCSchema } from "xrc-schema";
-import { TerpLinkEvent, TerpLinkEventMember, useTerpLink } from "../../../util/terplink";
+import { TerpLinkEvent, TerpLinkEventMember, TerpLink } from "../../../util/terplink";
 import { APIRoute } from "../../api";
 import { respondError, respondSuccess } from "../v1";
 
@@ -13,7 +13,7 @@ import { respondError, respondSuccess } from "../v1";
  * @param handle A handler for the TerpLink event once processed
  */
 async function eventRequest(req: Request, res: Response, handle: (e: TerpLinkEvent) => Promise<void>) {
-    const tl = useTerpLink();
+    const tl = TerpLink.singleton;
     const { eventcode } = req.params;
 
     // Check to see if the provided TerpLink event code is valid.

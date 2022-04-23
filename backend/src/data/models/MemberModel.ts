@@ -1,10 +1,11 @@
 import { BOOLEAN, INTEGER, Model, NUMBER, Optional, STRING } from "sequelize";
 import { XRCSchema } from "xrc-schema";
 import ModelFactory from "./ModelFactory";
+import { AttendanceModel } from "./AttendanceModel"
 
 
-export interface XRCMemberCreationAttributes extends Optional<XRCSchema.Member, "directory_id" | "name" | "email" | "scoresaber_id"> {}
-export class XRCMemberModel extends Model<XRCSchema.Member, XRCMemberCreationAttributes> {
+export type MemberCreationAttributes = Partial<XRCSchema.Member>
+export class MemberModel extends Model<XRCSchema.Member, MemberCreationAttributes> {
     declare discord_id: string
     declare uid: string | null
     declare name: string | null
@@ -12,9 +13,9 @@ export class XRCMemberModel extends Model<XRCSchema.Member, XRCMemberCreationAtt
     declare scoresaber_id: string | null
 }
 
-export const XRCMemberModelFactory: ModelFactory = {
+export const MemberModelFactory: ModelFactory = {
     initModel: (sequelize) => {
-        XRCMemberModel.init({
+        MemberModel.init({
             id: {
                 primaryKey: true,
                 type: INTEGER,
@@ -22,7 +23,7 @@ export const XRCMemberModelFactory: ModelFactory = {
             },
 
             discord_id: {
-                type: STRING
+                type: STRING,
             },
 
             directory_id:  {
@@ -42,12 +43,30 @@ export const XRCMemberModelFactory: ModelFactory = {
             },
 
             terplink_id: {
+                type: STRING,
+                unique: true
+            },
+
+            steam_id: {
                 type: STRING
+            },
+
+            oculus_id: {
+                type: STRING
+            },
+
+            signed_waiver: {
+                type: BOOLEAN,
+                defaultValue: false
             }
         },
         {
             tableName: "members",
-            sequelize: sequelize
+            sequelize: sequelize,
         });
+    },
+
+    associate: () => {
+        MemberModel.hasMany(AttendanceModel, { foreignKey: "member_id", onDelete: "CASCADE" })
     }
 }

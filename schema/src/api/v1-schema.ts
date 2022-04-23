@@ -52,6 +52,12 @@ export default interface V1_SCHEMA {
             response: XRCSchema.ClubEvent
         }
         "/devices": DEVICE_GET
+        "/members": {
+            parameters: {
+                data: Partial<XRCSchema.Member>
+            },
+            response: XRCSchema.Member
+        }
     },
 
     post: {
@@ -59,6 +65,12 @@ export default interface V1_SCHEMA {
         "/heartbeat": {
             parameters: {
                 data: XRCSchema.Heartbeat
+            },
+            response: EMPTY
+        },
+        "/members": {
+            parameters: {
+                data: XRCSchema.Member
             },
             response: EMPTY
         }

@@ -13,12 +13,12 @@ export class XRCHeartbeatModel extends Model<XRCSchema.DeviceHeartbeat, XRCSchem
             where: {
                 serial: serial,
             },
-            order: [ [ 'createdAt', 'DESC' ]]
+            order: [[ 'createdAt', 'DESC' ]]
         })) as XRCSchema.DeviceHeartbeat | null
     }
 }
 
-export const XRCHeartbeatModelFactory: ModelFactory = {
+export const HeartbeatModelFactory: ModelFactory = {
     initModel: (sql) => {
         XRCHeartbeatModel.init({
             heartbeat: {

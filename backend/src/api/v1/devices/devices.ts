@@ -66,6 +66,7 @@ export async function device_delete(req: Request, res: Response) {
             serial: true,
         })
     } catch (err) {
+        console.log(err)
         respondError(res, (err as Error).message)
         return;
     }
@@ -76,6 +77,7 @@ export async function device_delete(req: Request, res: Response) {
         }})
         respondSuccess(res, result)
     } catch (err) {
+        console.log(err)
         respondError(res, (err as Error).message)
         return;
     }

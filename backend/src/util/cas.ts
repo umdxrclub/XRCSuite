@@ -1,5 +1,5 @@
 import parse from "node-html-parser";
-import { X_WWW_FORM_HEADERS_CONFIG, getValueOfInputFieldWithName, queryStringFromForm } from "./scrape-util";
+import { X_WWW_FORM_HEADERS_CONFIG, getValueOfInputFieldWithName, queryStringFromForm, retryRequest } from "./scrape-util";
 import { useAxios } from "./shared-axios";
 import { useXRCHost } from "./xrc-host-file";
 import fs from "fs/promises"
@@ -269,7 +269,7 @@ export async function loginWithCASUsingSAML(res: AxiosResponse<any, any>): Promi
         await loginWithCAS();
 
         // Retry the SAML request, it'll be intercepted again by the axios handler
-        return await axios.request({...res.config, httpAgent: undefined, httpsAgent: undefined})
+        return await retryRequest(res);
     }
 
     // Redirect

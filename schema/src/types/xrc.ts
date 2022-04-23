@@ -46,12 +46,15 @@ export namespace XRCSchema {
 
     export interface Member {
         id: number,
-        discord_id: string | null,
-        directory_id: string | null,
         name: string | null,
         email: string | null,
-        scoresaber_id: string | null,
+        directory_id: string | null,
+        discord_id: string | null,
         terplink_id: string | null,
+        scoresaber_id: string | null,
+        steam_id: string | null
+        oculus_id: string | null
+        signed_waiver: boolean
     }
 
     export interface ClubEvent {
@@ -59,5 +62,12 @@ export namespace XRCSchema {
         startDate: string,
         endDate: string,
         imageUrl?: string,
+    }
+
+    export interface AttendanceEvent {
+        id: number,
+        member_id: number,
+        type: "checkin" | "checkout",
+        location: string
     }
 }

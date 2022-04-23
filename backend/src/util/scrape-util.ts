@@ -1,5 +1,7 @@
+import { AxiosResponse } from "axios";
 import { HTMLElement } from "node-html-parser";
 import querystring from "querystring"
+import { useAxios } from "./shared-axios";
 
 export const X_WWW_FORM_HEADERS_CONFIG = {
     headers: {
@@ -31,4 +33,9 @@ export function queryStringFromForm(e: HTMLElement) {
     })
 
     return querystring.stringify(inputObj)
+}
+
+export async function retryRequest(res: AxiosResponse<any, any>) {
+    const axios = useAxios();
+    return await axios.request({...res.config, httpAgent: undefined, httpsAgent: undefined})
 }

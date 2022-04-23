@@ -1,7 +1,11 @@
-import { useTerpLink, XR_CLUB_ID } from "../src/util/terplink";
+import { UMDDirectory } from "../src/util/umd-directory";
 
 (async () => {
-    const tl = useTerpLink();
-
-    console.log(await tl.getEvents(XR_CLUB_ID))
+    // const result = await UMDDirectory.singleton.advancedSearch({
+    //     middleName: "Joseph",
+    //     student: true,
+    //     umd: true
+    // })
+    const result = await UMDDirectory.singleton.search("Luke")
+    console.log(result)
 })();
