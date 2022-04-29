@@ -1,8 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { XRCSchema } from "xrc-schema"
 import { ReactComponent as ProceedSVG } from "./proceed.svg";
 import { ReactComponent as ProcessingSVG } from "./processing.svg";
 import { ReactComponent as StopSVG } from "./stop.svg";
+import { Html5Qrcode } from "html5-qrcode";
+import { Html5QrcodeCameraScanConfig } from "html5-qrcode/esm/html5-qrcode";
+import { Html5QrcodeResult, Html5QrcodeSupportedFormats, QrcodeResultFormat } from "html5-qrcode/esm/core";
+import { Paper, Typography } from "@mui/material";
+import "./gatekeeper-scanner.css";
+import { getXRC } from "../xrc-api";
+
+const QR_SCANNER_CONFIG: Html5QrcodeCameraScanConfig = {
+    fps: 5,
+}
 
 type ScannerStatus = "scanning" | "processing" | "found" | "error";
 type ScannerConfig = {
@@ -12,7 +22,7 @@ type ScannerConfig = {
     icons: Record<ScannerStatus, React.FunctionComponent<React.SVGProps<SVGSVGElement>>>,
     statusDisplayTime: number
 }
-type ScanResultHandler = (member: XRCSchema.Member) => void
+type ScanResultHandler = (member: XRCSchema.Member | null) => void
 
 export const DefaultScannerConfig: ScannerConfig = {
     colors: {
@@ -47,21 +57,36 @@ export const DefaultScannerConfig: ScannerConfig = {
 }
 
 type GatekeeperScannerProps = {
-    onScan?: ScanResultHandler
+    onMemberResolve?: ScanResultHandler
     config?: ScannerConfig
 }
 
 const SWIPECARD_TRACK_LENGTH = 15
 const SWIPECARD_TIMEOUT = 1000;
 
-export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onScan}) => {
+export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onMemberResolve}) => {
     // Swipe card
     const keystrokes = useRef<string[]>([]);
     const recordingKeystrokes = useRef(false);
     const swipeTimeout = useRef<NodeJS.Timeout | null>(null);
 
+    // QR
+    const qr = useRef<Html5Qrcode>();
+
+    // Audio
+    const ding = useRef<HTMLAudioElement>();
+
+    // State
+    const [ scannerStatus, setScannerStatus ] = useState<ScannerStatus>("scanning");
+
     // Load default scanner config if one wasn't provided.
     config ??= DefaultScannerConfig;
+
+    // Current scanner status metadata.
+    const STATUS_TITLE = config!.titles[scannerStatus];
+    const STATUS_COLOR = config!.colors[scannerStatus];
+    const STATUS_ICON = config!.icons[scannerStatus];
+    const STATUS_DESCRIPTION = config!.descriptions[scannerStatus];
 
     /**
      * Processes the key presses from the document to search for the output of a
@@ -108,20 +133,78 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onS
         }
     }
 
+    function configureQRScanner() {
+        qr.current = new Html5Qrcode("scanner");
+        qr.current!.start({ facingMode: "user"}, QR_SCANNER_CONFIG, onQRScan, onQRError);
+    }
+
+    function onQRScan(text: string, result: Html5QrcodeResult) {
+        // Only allow 
+        if (result.result.format?.format == Html5QrcodeSupportedFormats.AZTEC && scannerStatus == "scanning") {
+            console.log(text);
+            showResultStatus("found");
+        }
+    }
+
+    function onQRError(err: string) {
+
+    }
+
+    function onSwipe(cardId: string) {
+        showResultStatus("found");
+    }
+
+    function showResultStatus(status: ScannerStatus) {
+        setScannerStatus(status);
+        ding.current?.play();
+
+        setTimeout(() => {
+            setScannerStatus("scanning");
+        }, config?.statusDisplayTime)
+    }
+
+    async function lookupMember(params: Partial<XRCSchema.Member>) {
+        if (onMemberResolve) {
+            const xrc = getXRC();
+            var member: XRCSchema.Member | null = null;
+            try  {
+                const res = await xrc.get("/members", { data: params })
+                member = res.data;
+            } catch {
+                
+            }
+
+            onMemberResolve(member);
+        }
+        
+    }
+
     useEffect(() => {
         // Process key presses for handling a swipe login.
         document.addEventListener("keypress", keypressHandler);
 
+        // Create the QR code scanner
+        configureQRScanner();
+
+        // Get "ding" sound
+        ding.current = new Audio("/frontend/static/sound/ding.mp3");
+
         return () => {
             document.removeEventListener("keypress", keypressHandler);
+            if (qr.current) {
+                qr.current.stop();
+            }
         }
     }, [])
 
-    function onSwipe(cardId: string) {
-        setTimeout(() => alert("Your card id: " + cardId), 500);
-    }
-
-    return <div>
-
-    </div>
+    return <Paper className="scanner-paper">
+        <div className="scanner-status-bg" style={{backgroundColor: STATUS_COLOR}}>
+            <Typography variant="h4" fontWeight="bold">{STATUS_TITLE}</Typography>
+            <STATUS_ICON />
+        </div>
+        <div id="scanner"/>
+        <div className="scanner-text">
+            <Typography variant="h5">{STATUS_DESCRIPTION}</Typography>
+        </div>
+    </Paper>
 }
