@@ -50,7 +50,8 @@ export namespace XRCSchema {
         email: string | null,
         directory_id: string | null,
         discord_id: string | null,
-        terplink_id: string | null,
+        tl_account_id: string | null,
+        tl_issuance_id: string | null,
         scoresaber_id: string | null,
         steam_id: string | null
         oculus_id: string | null

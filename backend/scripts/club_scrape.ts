@@ -24,7 +24,7 @@ import { TerpLink } from "../src/util/terplink"
                 members.push({
                     name: tlMember.getName(),
                     email: email,
-                    terplink_id: tlMember.getMemberId()
+                    tl_account_id: tlMember.getMemberId()
                 })
             })())
         })

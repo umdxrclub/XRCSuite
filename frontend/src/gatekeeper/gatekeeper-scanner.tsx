@@ -141,8 +141,8 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
     function onQRScan(text: string, result: Html5QrcodeResult) {
         // Only allow 
         if (result.result.format?.format == Html5QrcodeSupportedFormats.AZTEC && scannerStatus == "scanning") {
-            console.log(text);
             showResultStatus("found");
+            console.log(text)
         }
     }
 
@@ -171,12 +171,11 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
                 const res = await xrc.get("/members", { data: params })
                 member = res.data;
             } catch {
-                
-            }
 
+            }
+                
             onMemberResolve(member);
         }
-        
     }
 
     useEffect(() => {

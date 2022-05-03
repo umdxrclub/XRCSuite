@@ -2,8 +2,10 @@ import { AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
 import parse from "node-html-parser";
 import querystring from "querystring";
 import { TerpLinkSchema } from "xrc-schema";
+import { MODELS } from "../data/DatabaseService";
 import { queryStringFromForm, wasRequestRedirectedTo, X_WWW_FORM_HEADERS_CONFIG } from "./scrape-util";
 import { useAxios } from "./shared-axios";
+import { useXRCHost } from "./xrc-host-file";
 
 const CAMPUS_LABS_API_URL = "https://se-app-checkins.campuslabs.com/v4.0/";
 const TERPLINK_FEDERATION_URL = "https://federation.campuslabs.com"
@@ -34,6 +36,18 @@ export class TerpLink {
         const axios = useAxios();
         axios.interceptors.request.use(this.terplinkRequestInterceptor.bind(this));
         axios.interceptors.response.use(this.terplinkResponseInterceptor.bind(this));
+    }
+
+    /**
+     * Gets the semester-long lab event that can be used for searching members. 
+     */
+    async getLabEvent() {
+        const host = useXRCHost();
+        if (host.terplink.labEventCode) {
+            return await this.getEvent(host.terplink.labEventCode);
+        }
+
+        throw new Error("Could not get lab event!");
     }
 
     /**
@@ -269,10 +283,6 @@ export class TerpLink {
 
         return res.data
     }
-
-    private async request() {
-
-    }
 }
 
 /**
@@ -373,8 +383,17 @@ export class TerpLinkEvent {
     async getMemberFromIssuanceId(issuanceId: string): Promise<TerpLinkEventMember> {
         const res = await this.get(`member?issuanceId=${issuanceId}&skip=0&take=10`)
         if ((res.data.items as any[]).length > 0) {
-            const member = res.data.items[0] as TerpLinkSchema.Member;
-            return new TerpLinkEventMember(member.attendanceId, member.account, this);
+            const tlMember = res.data.items[0] as TerpLinkSchema.Member;
+
+            // If there is an account ID in the database, store the issuance
+            // id with it for faster lookup
+            await MODELS.member.update({ tl_issuance_id: issuanceId }, {
+                where: {
+                    tl_account_id: tlMember.account.id
+                }
+            })
+
+            return new TerpLinkEventMember(tlMember.attendanceId, tlMember.account, this);
         }
 
         throw new Error("No member found!");

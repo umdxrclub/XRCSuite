@@ -28,6 +28,9 @@ export interface XRCHostConfiguration {
     logins: {
         [key: string]: string
     },
+    terplink: {
+        labEventCode?: string
+    }
     redirect?: string,
     allowCrossOrigin?: boolean
 }

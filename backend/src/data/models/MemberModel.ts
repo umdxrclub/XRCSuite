@@ -42,7 +42,12 @@ export const MemberModelFactory: ModelFactory = {
                 type: STRING
             },
 
-            terplink_id: {
+            tl_account_id: {
+                type: STRING,
+                unique: true
+            },
+
+            tl_issuance_id: {
                 type: STRING,
                 unique: true
             },
