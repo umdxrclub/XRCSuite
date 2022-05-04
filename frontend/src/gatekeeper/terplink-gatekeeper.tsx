@@ -64,6 +64,7 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
   const [ terpLinkEvent, setTerpLinkEvent ] = useState<XRCSchema.ClubEvent | "err" | undefined>(undefined)
   const [eventName, setEventName] = useState<string>("Event Name");
   const [eventTimeframe, setEventTimeframe] = useState<string>("Event Title");
+  const [eventImg, setEventImg ] = useState<string>("");
   const statusColor = STATUS_COLORS[status.status];
   const StatusSVG = STATUS_SVG[status.status];
 
@@ -105,6 +106,7 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
         setEventName(event.name);
         setEventTimeframe(startTimeText);
         setTerpLinkEvent(event);
+        setEventImg(event.imageUrl ?? "");
       })
       .catch(err => {
         setTerpLinkEvent("err")
@@ -176,19 +178,11 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
   return (
     <div className="gk-root">
       <div className="gk-event">
-        <div className="clublogo-parent">
-          <img id="clubLogo" src="/frontend/static/img/clublogo.png" />
-        </div>
-        <div className="event-text">
-          <h1>{eventName}</h1>
-          <h3>{eventTimeframe}</h3>
-        </div>
-        <div className="spacer" />
+        <img src={eventImg} />
+        {/* <div className="spacer" /> */}
         <div className="gk-terplink">
           <p>
-            Don't have a TerpLink event pass?
-            <br />
-            Scan the following QR Code to create one (it's free!).
+            Scan the following QR Code to access your TerpLink event pass.
           </p>
           <img id="terplink-qr" src={terplinkCode} />
         </div>

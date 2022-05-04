@@ -1,12 +1,8 @@
 import React from "react";
-import { GatekeeperScanner } from "./gatekeeper-scanner";
+import { TerpLinkScanner } from "./terplink-scanner";
 
 export const LabGatekeeper: React.FC = ({ children }) => {
     return <div>
-      <GatekeeperScanner onMemberResolve={(member) => {
-        if (member) {
-          
-        }
-      }} />
+      <TerpLinkScanner eventcode="XE7M9EN" />
     </div>
 };

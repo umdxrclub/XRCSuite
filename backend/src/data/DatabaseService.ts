@@ -22,6 +22,8 @@ export const MODELS = {
     heartbeat: XRCHeartbeatModel
 }
 
+
+
 export const XRCSequelizeDatabase: BackendService = {
     init: async function (): Promise<void> {
         const host = useXRCHost();
