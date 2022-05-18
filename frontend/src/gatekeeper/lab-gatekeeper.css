@@ -1,0 +1,7 @@
+.gk-root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(125.1deg, rgba(165,34,86,1) 0%, rgba(102,21,86,1) 100%);
+    color: white;
+}
