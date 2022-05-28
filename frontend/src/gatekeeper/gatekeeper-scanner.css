@@ -1,8 +1,11 @@
 #scanner {
     width: "100%";
     height: 300px;
-    background-color: green;
+    background-color: black;
     overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
 .scanner-paper {

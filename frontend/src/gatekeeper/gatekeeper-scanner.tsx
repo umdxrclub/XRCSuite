@@ -24,7 +24,11 @@ type ScannerConfig = {
 }
 
 type ScanMethodType = "terplink" | "swipecard";
-export type GatekeeperResolver = (method: ScanMethodType, value: string) => Promise<string | null>
+export type ResolverResult = {
+    name: string,
+    type: "checkin" | "checkout"
+}
+export type GatekeeperResolver = (method: ScanMethodType, value: string) => Promise<ResolverResult | null>
 
 export const DefaultScannerConfig: ScannerConfig = {
     colors: {
@@ -148,12 +152,12 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
             const issuanceId = eventPassObj.issuanceId;
             if (issuanceId) {
                 setScannerStatus("processing");
-                resolve("terplink", issuanceId).then(name => {
-                    if (name) {
-                        setCheckedInMemberName(name);
+                resolve("terplink", issuanceId).then(result => {
+                    if (result) {
+                        setCheckedInMemberName(result.name);
                     }
 
-                    showResultStatus(name ? "found" : "error");
+                    showResultStatus(result ? "found" : "error");
                 })
             }
         }
