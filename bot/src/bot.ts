@@ -3,25 +3,28 @@ import { BOT_COMMANDS } from "./commands/command";
 import { BOT_ROUTINES } from "./routines/routine";
 import * as fs from "fs/promises";
 import { XRCBotService } from "./service";
+import { createRoleReactMessage } from "./roles";
+import { getDiscordConfig } from "./config";
 
 const BOT_SERVICES: XRCBotService[] = [
     
 ];
 
 // Create the bot client.
-const client = new Client({ intents: [ Intents.FLAGS.GUILDS ]});
+const client = new Client({
+    intents: [ Intents.FLAGS.GUILDS ],
+    partials: ["CHANNEL", "MESSAGE", "USER"]
+});
 
 client.once('ready', async (client) => {
     console.log("Logged in as " + client.user.username);
-
-    // // Get guilds to work on
-    // var guilds = await fs.readFile("./credentials/guilds.json", "utf-8");
-    // var guildsObj: Record<string, string> = JSON.parse(guilds);
 
     // Start bot routines
     BOT_ROUTINES.forEach(routine => {
         setInterval(() => routine.execute(client), routine.intervalMs);
     });
+
+    await createRoleReactMessage(client, "980181387904684082");
 });
 
 // Add slash command handlers
@@ -37,10 +40,9 @@ client.on("interactionCreate", async interaction => {
 });
 
 async function startBot() {
-    var tokens = await fs.readFile("./credentials/tokens.json", "utf8");
-    var tokenObj = JSON.parse(tokens);
-    const token: string | undefined = tokenObj.token;
-    if (token) {
+    let config = await getDiscordConfig();
+
+    if (config) {
         console.log("Starting bot services...");
         // Start all bot services.
         let servicePromises = BOT_SERVICES.map(service => service.init());
@@ -50,12 +52,10 @@ async function startBot() {
         console.log("Services ready!");
 
         // Login to the Discord bot.
-        await client.login(token);
+        await client.login(config.token);
     } else {
-        console.error("No token provided!");
+        console.error("No config available!");
     }
 }
 
 startBot();
-
-

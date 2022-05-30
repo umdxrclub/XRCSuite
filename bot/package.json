@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start": "ts-node ./src/bot.ts",
-    "register": "ts-node ./src/register_slash.ts",
+    "register": "ts-node ./scripts/register_slash.ts",
     "fetch-uids": "ts-node ./util/fetch_uids.ts"
   },
   "devDependencies": {
