@@ -1,19 +1,24 @@
 import { Client, Intents } from "discord.js";
 import { BOT_COMMANDS } from "./commands/command";
 import { BOT_ROUTINES } from "./routines/routine";
-import * as fs from "fs/promises";
 import { XRCBotService } from "./service";
-import { createRoleReactMessage } from "./roles";
-import { getDiscordConfig } from "./config";
+import { createRoleReactMessage, onReactionAdd } from "./roles";
+import { getDiscordConfig } from "./data";
 
 const BOT_SERVICES: XRCBotService[] = [
-    
+
 ];
+
+const BOT_INTENTS = [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+]
 
 // Create the bot client.
 const client = new Client({
-    intents: [ Intents.FLAGS.GUILDS ],
-    partials: ["CHANNEL", "MESSAGE", "USER"]
+    intents: BOT_INTENTS,
+    partials: ["CHANNEL", "MESSAGE", "REACTION"]
 });
 
 client.once('ready', async (client) => {
@@ -38,6 +43,10 @@ client.on("interactionCreate", async interaction => {
     if (command)
         await command.onInvoke(interaction);
 });
+
+client.on("messageReactionAdd", async (reaction, user) => {
+    await onReactionAdd(reaction, user);
+})
 
 async function startBot() {
     let config = await getDiscordConfig();

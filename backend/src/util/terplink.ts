@@ -12,6 +12,7 @@ const TERPLINK_FEDERATION_URL = "https://federation.campuslabs.com"
 const TERPLINK_TOKEN_URL = "https://terplink.umd.edu/account/login?ReturnUrl=%2Faccount%2Ftokens%3FisMobile%3Dtrue"
 const TERPLINK_API_URLS = [
     "https://terplink.umd.edu/api",
+    "https://terplink.umd.edu/actioncenter",
     CAMPUS_LABS_API_URL
 ]
 
