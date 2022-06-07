@@ -22,7 +22,13 @@ type ScannerConfig = {
     icons: Record<ScannerStatus, React.FunctionComponent<React.SVGProps<SVGSVGElement>>>,
     statusDisplayTime: number
 }
-type ScanResultHandler = (member: XRCSchema.Member | null) => void
+
+type ScanMethodType = "terplink" | "swipecard";
+export type ResolverResult = {
+    name: string,
+    type: "checkin" | "checkout"
+}
+export type GatekeeperResolver = (method: ScanMethodType, value: string) => Promise<ResolverResult | null>
 
 export const DefaultScannerConfig: ScannerConfig = {
     colors: {
@@ -57,14 +63,14 @@ export const DefaultScannerConfig: ScannerConfig = {
 }
 
 type GatekeeperScannerProps = {
-    onMemberResolve?: ScanResultHandler
+    resolve: GatekeeperResolver
     config?: ScannerConfig
 }
 
 const SWIPECARD_TRACK_LENGTH = 15
 const SWIPECARD_TIMEOUT = 1000;
 
-export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onMemberResolve}) => {
+export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, resolve}) => {
     // Swipe card
     const keystrokes = useRef<string[]>([]);
     const recordingKeystrokes = useRef(false);
@@ -78,6 +84,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
 
     // State
     const [ scannerStatus, setScannerStatus ] = useState<ScannerStatus>("scanning");
+    const [ checkedInMemberName, setCheckedInMemberName ] = useState("");
 
     // Load default scanner config if one wasn't provided.
     config ??= DefaultScannerConfig;
@@ -86,7 +93,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
     const STATUS_TITLE = config!.titles[scannerStatus];
     const STATUS_COLOR = config!.colors[scannerStatus];
     const STATUS_ICON = config!.icons[scannerStatus];
-    const STATUS_DESCRIPTION = config!.descriptions[scannerStatus];
+    const STATUS_DESCRIPTION = config!.descriptions[scannerStatus].replace("{NAME}", checkedInMemberName);
 
     /**
      * Processes the key presses from the document to search for the output of a
@@ -141,8 +148,18 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
     function onQRScan(text: string, result: Html5QrcodeResult) {
         // Only allow 
         if (result.result.format?.format == Html5QrcodeSupportedFormats.AZTEC && scannerStatus == "scanning") {
-            showResultStatus("found");
-            console.log(text)
+            const eventPassObj = JSON.parse(text);
+            const issuanceId = eventPassObj.issuanceId;
+            if (issuanceId) {
+                setScannerStatus("processing");
+                resolve("terplink", issuanceId).then(result => {
+                    if (result) {
+                        setCheckedInMemberName(result.name);
+                    }
+
+                    showResultStatus(result ? "found" : "error");
+                })
+            }
         }
     }
 
@@ -163,21 +180,6 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
         }, config?.statusDisplayTime)
     }
 
-    async function lookupMember(params: Partial<XRCSchema.Member>) {
-        if (onMemberResolve) {
-            const xrc = getXRC();
-            var member: XRCSchema.Member | null = null;
-            try  {
-                const res = await xrc.get("/members", { data: params })
-                member = res.data;
-            } catch {
-
-            }
-                
-            onMemberResolve(member);
-        }
-    }
-
     useEffect(() => {
         // Process key presses for handling a swipe login.
         document.addEventListener("keypress", keypressHandler);
@@ -196,8 +198,8 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, onM
         }
     }, [])
 
-    return <Paper className="scanner-paper">
-        <div className="scanner-status-bg" style={{backgroundColor: STATUS_COLOR}}>
+    return <Paper className="scanner-paper" sx={{backgroundColor: STATUS_COLOR}}>
+        <div className="scanner-status-bg" >
             <Typography variant="h4" fontWeight="bold">{STATUS_TITLE}</Typography>
             <STATUS_ICON />
         </div>

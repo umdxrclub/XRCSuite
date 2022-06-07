@@ -1,6 +1,5 @@
 import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CacheType, CommandInteraction } from "discord.js";
-import { headset } from "./headset";
 import { mentor } from "./mentor";
 import { link } from "./link";
 
@@ -16,5 +15,5 @@ export interface Command {
  * All commands that the bot will register and process.
  */
 export const BOT_COMMANDS: Command[] = [
-    headset, link, //mentor
+    link, //mentor
 ]

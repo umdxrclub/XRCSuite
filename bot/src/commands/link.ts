@@ -4,18 +4,14 @@ import { Command } from "./command";
 
 async function onLinkInvoke(interaction: CommandInteraction<CacheType>) {
     switch (interaction.options.getSubcommand()) {
-        case "umd": // Used to link a UMD email to a Discord account.
-            // Create verification request
-            // const cas = useCAS();
-            // let verification = cas.verify(interaction.user.id);
-
+        case "umd": 
             // Send verification information.
             const row = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
-                        .setLabel("Verify UID")
+                        .setLabel("Verify you're a UMD student")
                         .setStyle("LINK")
-                        .setURL("TODO INSERT URL")
+                        .setURL("https://google.com")
                 )
             await interaction.reply({ content: "Click the following button to verify your UID",
                 components: [row], ephemeral: true })

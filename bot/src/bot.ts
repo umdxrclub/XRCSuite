@@ -1,27 +1,35 @@
 import { Client, Intents } from "discord.js";
 import { BOT_COMMANDS } from "./commands/command";
 import { BOT_ROUTINES } from "./routines/routine";
-import * as fs from "fs/promises";
 import { XRCBotService } from "./service";
+import { createRoleReactMessage, onReactionAdd } from "./roles";
+import { getDiscordConfig } from "./data";
 
 const BOT_SERVICES: XRCBotService[] = [
-    
+
 ];
 
+const BOT_INTENTS = [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+]
+
 // Create the bot client.
-const client = new Client({ intents: [ Intents.FLAGS.GUILDS ]});
+const client = new Client({
+    intents: BOT_INTENTS,
+    partials: ["CHANNEL", "MESSAGE", "REACTION"]
+});
 
 client.once('ready', async (client) => {
     console.log("Logged in as " + client.user.username);
-
-    // // Get guilds to work on
-    // var guilds = await fs.readFile("./credentials/guilds.json", "utf-8");
-    // var guildsObj: Record<string, string> = JSON.parse(guilds);
 
     // Start bot routines
     BOT_ROUTINES.forEach(routine => {
         setInterval(() => routine.execute(client), routine.intervalMs);
     });
+
+    await createRoleReactMessage(client, "980181387904684082");
 });
 
 // Add slash command handlers
@@ -36,11 +44,14 @@ client.on("interactionCreate", async interaction => {
         await command.onInvoke(interaction);
 });
 
+client.on("messageReactionAdd", async (reaction, user) => {
+    await onReactionAdd(reaction, user);
+})
+
 async function startBot() {
-    var tokens = await fs.readFile("./credentials/tokens.json", "utf8");
-    var tokenObj = JSON.parse(tokens);
-    const token: string | undefined = tokenObj.token;
-    if (token) {
+    let config = await getDiscordConfig();
+
+    if (config) {
         console.log("Starting bot services...");
         // Start all bot services.
         let servicePromises = BOT_SERVICES.map(service => service.init());
@@ -50,12 +61,10 @@ async function startBot() {
         console.log("Services ready!");
 
         // Login to the Discord bot.
-        await client.login(token);
+        await client.login(config.token);
     } else {
-        console.error("No token provided!");
+        console.error("No config available!");
     }
 }
 
 startBot();
-
-

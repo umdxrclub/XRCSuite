@@ -6,14 +6,8 @@
     background: linear-gradient(125.1deg, rgba(165,34,86,1) 0%, rgba(102,21,86,1) 100%);
 }
 
-.clublogo-parent {
-    width: 150px;
-    height: 150px;
-    background-color: white;
-    border-radius: 100px;
-    box-shadow: 0px 3px 6px rgba(0,0,0,.16);
-    display: flex;
-    margin-top: 64px;
+body::-webkit-scrollbar {
+    display: none;
 }
 
 .gk-event {
@@ -26,8 +20,20 @@
     font-size: 28px;
 }
 
+.gk-event img {
+    max-width: 100%;
+    padding: 16px;
+}
+
 .gk-terplink {
-    margin:32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.gk-terplink p {
+    margin:0px;
 }
 
 .spacer { 
@@ -85,15 +91,6 @@
     max-height: 100%;
     width:auto;
     height:auto;
-}
-
-#clubLogo {
-    margin: 20%;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    flex: 1;
 }
 
 #terplink-qr {

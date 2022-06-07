@@ -76,6 +76,10 @@ export default interface V1_SCHEMA {
         }
         "/terplink/:eventcode/checkin": TERPLINK_MEMBER_CONFIG
         "/terplink/:eventcode/checkout": TERPLINK_MEMBER_CONFIG,
+        "/lab": {
+            parameters: EMPTY,
+            response: EMPTY
+        }
     },
 
     delete: {

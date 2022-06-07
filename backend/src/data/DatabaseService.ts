@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
 import { BackendService } from "../services/BackendService";
 import { useXRCHost } from "../util/xrc-host-file";
-import { AttendanceModel, AttendanceModelFactory } from "./models/AttendanceModel";
-import { XRCDeviceModel, DeviceModelFactory } from "./models/DeviceModel";
-import { XRCHeartbeatModel, HeartbeatModelFactory } from "./models/HeartbeatModel";
+import { AttendanceModelFactory } from "./models/AttendanceModel";
+import { DeviceModelFactory, XRCDeviceModel } from "./models/DeviceModel";
+import { HeartbeatModelFactory, XRCHeartbeatModel } from "./models/HeartbeatModel";
 import { MemberModel, MemberModelFactory } from "./models/MemberModel";
 import ModelFactory from "./models/ModelFactory";
 
@@ -21,6 +21,8 @@ export const MODELS = {
     member: MemberModel,
     heartbeat: XRCHeartbeatModel
 }
+
+
 
 export const XRCSequelizeDatabase: BackendService = {
     init: async function (): Promise<void> {

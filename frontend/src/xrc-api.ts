@@ -1,5 +1,5 @@
 import { XRCAPI } from "xrc-schema/dist/src/api/api";
 
 export function getXRC() {
-    return XRCAPI.v1_dev;
+    return XRCAPI.v1;
 }
