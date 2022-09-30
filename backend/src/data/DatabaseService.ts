@@ -1,32 +1,27 @@
 import { Sequelize } from "sequelize";
-import { BackendService } from "../services/BackendService";
-import { useXRCHost } from "../util/xrc-host-file";
-import { AttendanceModelFactory } from "./models/AttendanceModel";
-import { DeviceModelFactory, XRCDeviceModel } from "./models/DeviceModel";
-import { HeartbeatModelFactory, XRCHeartbeatModel } from "./models/HeartbeatModel";
+import XRC from "../data/XRC";
+import { AttendanceModel, AttendanceModelFactory } from './models/AttendanceModel';
+import { EventModel, EventModelFactory } from './models/EventModel';
+import { JSONStoreFactory, JSONStoreModel } from './models/KeyValueModel';
 import { MemberModel, MemberModelFactory } from "./models/MemberModel";
-import ModelFactory from "./models/ModelFactory";
 
 var sql: Sequelize;
 
-const MODEL_FACTORIES: ModelFactory[] = [
-    DeviceModelFactory,
-    MemberModelFactory,
-    HeartbeatModelFactory,
-    AttendanceModelFactory
-]
-
-export const MODELS = {
-    device: XRCDeviceModel,
-    member: MemberModel,
-    heartbeat: XRCHeartbeatModel
-}
-
-
-
-export const XRCSequelizeDatabase: BackendService = {
+export const XRCDatabase = {
+    factories: [
+        MemberModelFactory,
+        JSONStoreFactory,
+        EventModelFactory,
+        AttendanceModelFactory
+    ],
+    models: {
+        members: MemberModel,
+        store: JSONStoreModel,
+        events: EventModel,
+        attendance: AttendanceModel
+    },
     init: async function (): Promise<void> {
-        const host = useXRCHost();
+        const host = XRC.host;
 
         sql = new Sequelize(host.db.database, host.db.username, host.db.password, {
             host: "127.0.0.1",
@@ -38,12 +33,12 @@ export const XRCSequelizeDatabase: BackendService = {
         await sql.authenticate();
 
         // Initialize all models
-        MODEL_FACTORIES.forEach(model => {
+        this.factories.forEach(model => {
             model.initModel(sql);
         })
 
         // Associate all models
-        MODEL_FACTORIES.forEach(model => {
+        this.factories.forEach(model => {
             if (model.associate)
                 model.associate()
         })

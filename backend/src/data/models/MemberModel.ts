@@ -1,77 +1,44 @@
-import { BOOLEAN, INTEGER, Model, NUMBER, Optional, STRING } from "sequelize";
-import { XRCSchema } from "xrc-schema";
-import ModelFactory from "./ModelFactory";
-import { AttendanceModel } from "./AttendanceModel"
+import { XRCSchema } from "@xrc/XRCSchema";
+import { INTEGER, STRING } from "sequelize";
+import { AttendanceModel } from "./AttendanceModel";
+import ModelFactory, {
+  createColumn, OmitId, XRCModel
+} from "./ModelFactory";
 
-
-export type MemberCreationAttributes = Partial<XRCSchema.Member>
-export class MemberModel extends Model<XRCSchema.Member, MemberCreationAttributes> {
-    declare discord_id: string
-    declare uid: string | null
-    declare name: string | null
-    declare email: string | null
-    declare scoresaber_id: string | null
-}
+export type MemberCreationAttributes = OmitId<XRCSchema.MemberAttributes>;
+export class MemberModel extends XRCModel<
+  XRCSchema.MemberAttributes,
+  MemberCreationAttributes
+> {}
 
 export const MemberModelFactory: ModelFactory = {
-    initModel: (sequelize) => {
-        MemberModel.init({
-            id: {
-                primaryKey: true,
-                type: INTEGER,
-                autoIncrement: true
-            },
-
-            discord_id: {
-                type: STRING,
-            },
-
-            directory_id:  {
-                type: STRING
-            },
-
-            name: {
-                type: STRING
-            },
-
-            email: {
-                type: STRING
-            },
-
-            scoresaber_id: {
-                type: STRING
-            },
-
-            tl_account_id: {
-                type: STRING,
-                unique: true
-            },
-
-            tl_issuance_id: {
-                type: STRING,
-                unique: true
-            },
-
-            steam_id: {
-                type: STRING
-            },
-
-            oculus_id: {
-                type: STRING
-            },
-
-            signed_waiver: {
-                type: BOOLEAN,
-                defaultValue: false
-            }
+  initModel: (sequelize) => {
+    MemberModel.init(
+      {
+        id: {
+          primaryKey: true,
+          type: INTEGER,
+          autoIncrement: true,
         },
-        {
-            tableName: "members",
-            sequelize: sequelize,
-        });
-    },
+        discordId: createColumn(STRING, true, "discord_id"),
+        scoresaberId: createColumn(STRING, true, "scoresaber_id"),
+        steamId: createColumn(STRING, true, "steam_id"),
+        oculusId: createColumn(STRING, true, "oculus_id"),
+        terplinkAccountId: createColumn(STRING, true, "terplink_account_id"),
+        terplinkIssuanceId: createColumn(STRING, true, "terplink_issuance_id"),
+        name: createColumn(STRING, true, "name"),
+        email: createColumn(STRING, true, "email"),
+        directoryId: createColumn(STRING, true, "directory_id")
+      },
+      {
+        tableName: "members",
+        sequelize: sequelize,
+      }
+    );
+  },
 
-    associate: () => {
-        MemberModel.hasMany(AttendanceModel, { foreignKey: "member_id", onDelete: "CASCADE" })
-    }
-}
+  associate: () => {
+    MemberModel.hasMany(AttendanceModel, { foreignKey: "member_id", onDelete: "CASCADE" })
+    //MemberModel.hasMany(AttendanceModel, { foreignKey: "member_id", onDelete: "CASCADE" })
+  },
+};

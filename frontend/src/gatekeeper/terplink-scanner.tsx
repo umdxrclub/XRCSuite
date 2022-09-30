@@ -1,4 +1,3 @@
-import { getXRC } from "../xrc-api";
 import { GatekeeperResolver, GatekeeperScanner, ResolverResult } from "./gatekeeper-scanner"
 
 export type TerpLinkScannerProps = {
@@ -12,15 +11,15 @@ export const TerpLinkScanner: React.FC<TerpLinkScannerProps> = ({eventcode}) => 
         
         // Attempt to check the member in.
         try {
-            const res = await getXRC().post("/terplink/:eventcode/checkin", {
-              path: { eventcode: eventcode! },
-              query: { instanceId: value },
-            });
-            const checkedInMember = res.data;
-            result = {
-                name: checkedInMember.name,
-                type: "checkin"
-            }
+            // const res = await getXRC().post("/terplink/:eventcode/checkin", {
+            //   path: { eventcode: eventcode! },
+            //   query: { instanceId: value },
+            // });
+            // const checkedInMember = res.data;
+            // result = {
+            //     name: checkedInMember.name,
+            //     type: "checkin"
+            // }
         } catch {
 
         }

@@ -1,16 +1,15 @@
+import { XRCSchema } from "@xrc/XRCSchema";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import {
   Html5QrcodeResult,
-  Html5QrcodeSupportedFormats,
+  Html5QrcodeSupportedFormats
 } from "html5-qrcode/esm/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { XRCSchema } from "xrc-schema";
-import { getXRC } from "../xrc-api";
-import "./terplink-gatekeeper.css";
 import { ReactComponent as ProceedSVG } from "./proceed.svg";
 import { ReactComponent as ProcessingSVG } from "./processing.svg";
 import { ReactComponent as StopSVG } from "./stop.svg";
+import "./terplink-gatekeeper.css";
 import terplinkCode from "./terplink.png";
 
 type GatekeeperStatus = "scanning" | "processing" | "found" | "error";
@@ -61,10 +60,10 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
     status: GatekeeperStatus;
     text: string;
   }>({ status: "scanning", text: STATUS_DESCRIPTION["scanning"] });
-  const [ terpLinkEvent, setTerpLinkEvent ] = useState<XRCSchema.ClubEvent | "err" | undefined>(undefined)
-  const [eventName, setEventName] = useState<string>("Event Name");
-  const [eventTimeframe, setEventTimeframe] = useState<string>("Event Title");
-  const [eventImg, setEventImg ] = useState<string>("");
+  const [ terpLinkEvent, setTerpLinkEvent ] = useState<XRCSchema.Event | "err" | undefined>(undefined)
+  const [ eventName, setEventName] = useState<string>("Event Name");
+  const [ eventTimeframe, setEventTimeframe] = useState<string>("Event Title");
+  const [ eventImg, setEventImg ] = useState<string>("");
   const statusColor = STATUS_COLORS[status.status];
   const StatusSVG = STATUS_SVG[status.status];
 
@@ -74,7 +73,7 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
       "qr-reader",
       {
         fps: 10,
-        formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC],
+        formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC]
       },
       false
     );
@@ -82,36 +81,6 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
     scanner.current.render(success, error);
     ding.current = new Audio("/frontend/static/sound/ding.mp3");
 
-    getXRC()
-      .get("/terplink/:eventcode", {
-        path: { eventcode: eventcode! },
-      })
-      .then((res) => {
-        const event = res.data;
-        const startDate = new Date(event.startDate);
-        const dateText = startDate.toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-
-        const timeText = startDate.toLocaleTimeString("en-US", {
-          hour12: true,
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        const startTimeText = `${dateText} - ${timeText}`;
-        setEventName(event.name);
-        setEventTimeframe(startTimeText);
-        setTerpLinkEvent(event);
-        setEventImg(event.imageUrl ?? "");
-      })
-      .catch(err => {
-        setTerpLinkEvent("err")
-        alert("This event is not valid!");
-      });
   }, []);
 
   /**
@@ -145,21 +114,22 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
 
         // Attempt to check the member in.
         try {
-          const res = await getXRC().post("/terplink/:eventcode/checkin", {
-            path: { eventcode: eventcode! },
-            query: { instanceId: code.issuanceId },
-          });
-          const checkedInMember = res.data;
+          // // const res = await getXRC().post("/terplink/:eventcode/checkin", {
+          // //   path: { eventcode: eventcode! },
+          // //   query: { instanceId: code.issuanceId },
+          // // });
+          // const checkedInMember = res.data;
 
-          if (ding.current) ding.current.play();
+          // if (ding.current)
+          //   ding.current.play();
 
-          setStatus({
-            status: "found",
-            text: STATUS_DESCRIPTION["found"].replace(
-              "{NAME}",
-              checkedInMember.name
-            ),
-          });
+          // setStatus({
+          //   status: "found",
+          //   text: STATUS_DESCRIPTION["found"].replace(
+          //     "{NAME}",
+          //     checkedInMember.name
+          //   ),
+          // });
         } catch {
           setStatus({
             status: "error",

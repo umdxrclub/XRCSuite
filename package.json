@@ -1,0 +1,27 @@
+{
+  "name": "xrcsuite",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umdxrclub/XRCSuite.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/umdxrclub/XRCSuite/issues"
+  },
+  "homepage": "https://github.com/umdxrclub/XRCSuite#readme",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "dependencies": {
+    "node-ssh": "^13.0.0",
+    "typescript": "^4.7.4"
+  }
+}
