@@ -1,5 +1,5 @@
 import { Gatekeeper } from "gatekeeper/gatekeeper"
-import { LabGatekeeper } from "gatekeeper/lab-gatekeeper"
+import { LabGatekeeper } from "gatekeeper/lab/lab-gatekeeper"
 import React, { useState } from "react"
 import { matchRoutes, Route, Routes, useLocation } from "react-router-dom"
 import { TerpLinkGatekeeper } from "../gatekeeper/terplink-gatekeeper"

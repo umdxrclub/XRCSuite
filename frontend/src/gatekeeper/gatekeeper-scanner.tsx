@@ -196,14 +196,18 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         }
     }, [])
 
-    return <Paper className="scanner-paper" sx={{backgroundColor: STATUS_COLOR}}>
+    return <div className="scanner-bar" style={{backgroundColor: STATUS_COLOR}}>
         <div className="scanner-status-bg" >
-            <Typography variant="h4" fontWeight="bold">{STATUS_TITLE}</Typography>
-            <STATUS_ICON />
+            <h4>{STATUS_TITLE}</h4>
+            <div className="scanner-status-icon">
+                <STATUS_ICON />
+            </div>
         </div>
-        <div id="scanner"/>
         <div className="scanner-text">
-            <Typography variant="h5">{STATUS_DESCRIPTION}</Typography>
+            <h5>{STATUS_DESCRIPTION}</h5>
         </div>
-    </Paper>
+        <div className="scanner-bg">
+            <div id="scanner"/>
+        </div>
+    </div>
 }

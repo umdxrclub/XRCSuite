@@ -1,0 +1,11 @@
+.gradient-card {
+    background: linear-gradient(#a52256, #661556);
+    width: 384px;
+    height: 400px;
+    border-radius: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    display: flex;
+    filter: drop-shadow(0px 3px 6px #00000022);
+}

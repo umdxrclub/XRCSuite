@@ -1,0 +1,72 @@
+.lab-gk-root {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    background: #111111;
+    color: white;
+}
+
+.lab-info {
+    padding: 32px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.lab-rules {
+    margin-top: 48px;
+}
+
+.lab-gk {
+    width: 450px;
+    background-color: red;
+}
+
+.lab-header h1 {
+    background: linear-gradient(90deg, #E21755, #5F0080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+    font-size: 9em;
+    margin: 0;
+    line-height: 1;
+}
+
+.lab-gk-root h2 {
+    margin: 0;
+    font-size: 3em;
+    line-height: 100%;
+}
+
+.lab-gk-root h3 {
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.lab-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:flex-start;
+    margin-top: 16px;
+}
+
+.lab-rules-group {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    font-size: 2em;
+}
+
+.lab-rules-group img {
+    max-width: 80%;
+}
+
+.lab-rules-group > * {
+    margin-right: 32px;
+ }
+
+#lab-title {
+    margin: 16px;
+}
