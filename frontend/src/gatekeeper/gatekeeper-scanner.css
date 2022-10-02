@@ -1,6 +1,4 @@
 .scanner-bar {
-    width: 400px;
-    align-items: stretch;
     display: flex;
     overflow: hidden;
     flex-direction: column;

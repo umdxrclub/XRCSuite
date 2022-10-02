@@ -1,9 +1,6 @@
 import { XRCSchema } from "@xrc/XRCSchema";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import {
-  Html5QrcodeResult,
-  Html5QrcodeSupportedFormats
-} from "html5-qrcode/esm/core";
+import { Html5QrcodeScanner, Html5QrcodeScanType, Html5QrcodeSupportedFormats } from "html5-qrcode";
+import { Html5QrcodeResult } from "html5-qrcode/esm/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ReactComponent as ProceedSVG } from "./proceed.svg";
@@ -73,7 +70,8 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
       "qr-reader",
       {
         fps: 10,
-        formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC]
+        formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC],
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA ]
       },
       false
     );
