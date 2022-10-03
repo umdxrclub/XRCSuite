@@ -22,7 +22,17 @@
     margin-top: 48px;
 }
 
+.lab-header {
+    display: flex;
+}
+
 .lab-header h1 {
+    margin: 0;
+    font-size: 3em;
+    line-height: 100%;
+}
+
+.lab-welcome h1 {
     background: linear-gradient(90deg, #E21755, #5F0080);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -44,34 +54,31 @@
     margin-bottom: 8px;
 }
 
-.lab-header {
+.lab-welcome {
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items:flex-start;
-    margin-top: 16px;
+    margin-top: 16pxg;
 }
 
 .lab-rules-group {
     display: flex;
     text-align: center;
-    align-items: stretch;
-    align-content: flex-start;
-    justify-content: space-around;
     font-size: 2em;
     max-height: 35vh;
     gap: 2%
 }
 
 .lab-rules-group > .gradient-card {
-    aspect-ratio: 1 / 1;
-    flex: 1 0;
-
+    width: 25%;
+    display: flex;
 }
 
-
 .lab-rules-group img {
-    max-width: 80%;
+    max-height: 35%;
+    margin: 6%;
 }
 
 #lab-title {

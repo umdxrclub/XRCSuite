@@ -1,5 +1,5 @@
 import { Axios, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
-import XRC from "../../data/XRC";
+import XRC from "../data/XRC";
 import parse from "node-html-parser";
 import querystring from "querystring";
 import { TerpLinkSchema } from "@xrc/TerpLinkSchema"

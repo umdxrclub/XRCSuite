@@ -10,7 +10,7 @@ import fs from "fs/promises";
 import { hotp } from "otplib";
 import querystring from "querystring";
 import { Axios, AxiosResponse } from "axios";
-import XRC from "../../data/XRC";
+import XRC from "../data/XRC";
 import { exit } from "process";
 
 function log(msg: string) {

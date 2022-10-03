@@ -2,8 +2,8 @@ import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { FileCookieStore } from "tough-cookie-file-store";
-import { CAS_LOGIN_SSO, CAS_LOGIN_URL, loginWithCAS, loginWithCASUsingSAML } from "../web/util/cas";
-import { wasRequestRedirectedTo } from "../web/util/scrape-util";
+import { CAS_LOGIN_SSO, CAS_LOGIN_URL, loginWithCAS, loginWithCASUsingSAML } from "../util/cas";
+import { wasRequestRedirectedTo } from "./scrape-util";
 
 const DEBUG = false
 

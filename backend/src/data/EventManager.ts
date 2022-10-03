@@ -1,5 +1,5 @@
 import { XRCSchema } from "@xrc/XRCSchema";
-import { TerpLink } from "../web/util/terplink";
+import { TerpLink } from "../util/terplink";
 import { Member } from "./MemberManager";
 import { AttendanceModel } from "./models/AttendanceModel";
 import { EventModel } from "./models/EventModel";

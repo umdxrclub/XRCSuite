@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import { HTMLElement } from "node-html-parser";
 import querystring from "querystring"
-import { useAxios } from "../../util/axios";
+import { useAxios } from "./axios";
 
 export const X_WWW_FORM_HEADERS_CONFIG = {
     headers: {

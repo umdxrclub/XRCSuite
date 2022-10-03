@@ -1,6 +1,6 @@
 import { XRCSchema } from "@xrc/XRCSchema";
 import { WhereOptions } from "sequelize/types";
-import { TerpLink, TerpLinkEvent } from "web/util/terplink";
+import { TerpLink, TerpLinkEvent } from "util/terplink";
 import { XRCDatabase } from "./DatabaseService";
 import { OmitId } from "./models/ModelFactory";
 

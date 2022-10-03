@@ -44,6 +44,7 @@ export interface XRCHostConfiguration {
         [key: string]: string
     },
     labEventId: number,
+    labOdooContractId: number
     redirect?: string,
     allowCrossOrigin?: boolean
 }

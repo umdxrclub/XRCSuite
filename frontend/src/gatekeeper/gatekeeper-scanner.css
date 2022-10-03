@@ -1,4 +1,14 @@
 .scanner-bar {
+    overflow: hidden;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    /* padding: 2%; */
+}
+
+.scanner-content {
+    height: 100%;
+    padding: 8%;
     display: flex;
     overflow: hidden;
     flex-direction: column;
@@ -8,12 +18,11 @@
 
 .scanner-bar h4 {
     font-size: 5em;
+    line-height: 100%;
 }
 
 .scanner-status-bg {
     color: white;
-    padding-top: 8px;
-    padding-bottom: 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -47,7 +56,6 @@
     height: 300px;
     display: flex;
     align-items: stretch;
-    margin: 32px;
 }
 
 #scanner {
