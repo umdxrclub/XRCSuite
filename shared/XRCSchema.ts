@@ -35,7 +35,10 @@ export namespace XRCSchema {
         terplinkIssuanceId?: string,
         scoresaberId?: string,
         steamId?: string,
-        oculusId?: string
+        oculusId?: string,
+        signedContract: boolean,
+        wasSentContract: boolean,
+        signedContractUrl?: string
     }
 
     /**

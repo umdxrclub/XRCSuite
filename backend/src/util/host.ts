@@ -43,6 +43,7 @@ export interface XRCHostConfiguration {
     logins: {
         [key: string]: string
     },
+    labTerpLinkCode: string,
     labEventId: number,
     labOdooContractId: number
     redirect?: string,

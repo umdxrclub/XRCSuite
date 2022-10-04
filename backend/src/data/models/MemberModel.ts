@@ -1,5 +1,5 @@
 import { XRCSchema } from "@xrc/XRCSchema";
-import { INTEGER, STRING } from "sequelize";
+import { BOOLEAN, INTEGER, STRING } from "sequelize";
 import { AttendanceModel } from "./AttendanceModel";
 import ModelFactory, {
   createColumn, OmitId, XRCModel
@@ -28,7 +28,10 @@ export const MemberModelFactory: ModelFactory = {
         terplinkIssuanceId: createColumn(STRING, true, "terplink_issuance_id"),
         name: createColumn(STRING, true, "name"),
         email: createColumn(STRING, true, "email"),
-        directoryId: createColumn(STRING, true, "directory_id")
+        directoryId: createColumn(STRING, true, "directory_id"),
+        signedContract: { ...createColumn(BOOLEAN, false, "signed_contract"), defaultValue: false },
+        wasSentContract: { ...createColumn(BOOLEAN, false, "was_sent_contract"), defaultValue: false },
+        signedContractUrl: createColumn(STRING, true, "signed_contract_url")
       },
       {
         tableName: "members",

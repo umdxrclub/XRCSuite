@@ -16,7 +16,7 @@ export class MemberManager {
         this.memberCache = new Map();
     }
 
-    public async createMember(attributes: XRCSchema.MemberAttributes): Promise<Member>
+    public async createMember(attributes: OmitId<XRCSchema.MemberAttributes>): Promise<Member>
     {
         let dbMember = await XRCDatabase.models.members.create(attributes)
         let data = dbMember.getData()

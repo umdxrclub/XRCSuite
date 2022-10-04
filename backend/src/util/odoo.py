@@ -54,21 +54,32 @@ def send_sign_request(request_id):
         if not ("cannot marshal None unless allow_none is enabled" in e.faultString):
             raise e
 
-def get_signers(template_id):
-    results = exec_kw("sign.request", "search_read", [["&", ["template_id.id", "in", [template_id]], ["state", "=", "signed"]]], {"fields": ["request_item_infos"]})
+def get_signers(template_id, email = None):
+    filters = [["template_id.id", "in", [template_id]], ["state", "=", "signed"]]
+    
+    # todo: fix email filter
+    # if email is not None:
+    #     filters.append([("request_item_infos.partner_name", "=", email)])
+
+    params = [["&", *filters]]
+    results = exec_kw("sign.request", "search_read", params, {"fields": ["request_item_infos"]})
     return results
 
 def show_usage():
-    print ("usage: odoo.py get_signers [template_id]")
+    print ("usage: odoo.py get_signers [template_id] [email?]")
     print ("       odoo.py send [template_id] [email] [subject] [filename]")
 
 if len(sys.argv) <= 2:
     show_usage()
 else:
     cmd = sys.argv[1]
-    if cmd == "get_signers" and len(sys.argv) == 3:
+    num_args = len(sys.argv) - 2
+    if cmd == "get_signers" and (num_args == 1 or num_args == 2):
         template_id = sys.argv[2]
-        print (json.dumps(get_signers(template_id)))
+        email = None
+        if (num_args == 2):
+            email = sys.argv[3]
+        print (json.dumps(get_signers(template_id, email=email)))
     elif cmd == "send" and len(sys.argv) == 6:
         template_id = sys.argv[2]
         email = sys.argv[3]

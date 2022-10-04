@@ -4,6 +4,7 @@ import parse from "node-html-parser";
 import querystring from "querystring";
 import { TerpLinkSchema } from "@xrc/TerpLinkSchema"
 import { queryStringFromForm, wasRequestRedirectedTo, X_WWW_FORM_HEADERS_CONFIG } from "./scrape-util";
+import { request } from "http";
 
 const CAMPUS_LABS_API_URL = "https://se-app-checkins.campuslabs.com/v4.0/";
 const TERPLINK_FEDERATION_URL = "https://federation.campuslabs.com"
@@ -18,6 +19,32 @@ export const XR_CLUB_ID = 279233
 
 function log(msg: string) {
     console.log(`[TerpLink] ${msg}`)
+}
+
+/**
+ * Represents a roster member retrieved from TerpLink.
+ */
+class RosterMember {
+    public communityId: string
+    public name: string
+    private _axios: Axios
+
+    constructor(communityId: string, name: string, axios: Axios) {
+        this.communityId = communityId;
+        this.name = name;
+        this._axios = axios;
+    }
+
+    public async fetchEmail(): Promise<string> {
+        const res = await this._axios.get(`https://terplink.umd.edu/actioncenter/organization/xr-club/roster/users/membercard/${this.communityId}`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        });
+        const body = parse(res.data);
+        const email = body.querySelector("a[class=email]")?.attributes["href"].split("mailto:")[1]
+        return email!
+    }
 }
 
 /**
@@ -143,30 +170,91 @@ export class TerpLink {
         return event;
     }
 
-    public async getRosterPage(page: number) {
-        const res = await this.axios.get("https://terplink.umd.edu/actioncenter/organization/xr-club/roster?Direction=Ascending&Page=" + page, {
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        });
-
-        const body = parse(res.data);
-        const matches = body.querySelectorAll(`input[type=checkbox]`)
-        const pagination = body.querySelector('div[class=pagination]')!
-        const navLinks = pagination.querySelectorAll("a")
-        const last = navLinks[navLinks.length - 1].attributes["href"].split("Page=")[1]
-        return {
-            members: matches.map(e => {
-                const membercard = e.attributes["value"]
-                const name = e.attributes["title"].split("Select ")[1]
-                
-                return {
-                    communityId: membercard,
-                    name: name.slice(1,name.length-1)
-                }
-            }),
-            lastPage: last
+    /**
+     * Gets roster members from the page.
+     * 
+     * @param name The name to filter by.
+     * @returns List of roster members
+     */
+    public async getRosterMembers(name?: string): Promise<RosterMember[]> {
+        // TerpLink is dumb and it can only search by first/last name. So, store
+        // the full name, and search by last name first, then filter by the full
+        // name.
+        let fullName = name;
+        if (name) {
+            let splitName = name.split(' ')
+            name = splitName[splitName.length - 1]
         }
+
+        let requestForPage = async (page: number) => { 
+            let obj: any = {
+                Direction: "Ascending",
+                Page: page,
+            }
+
+            if (name) {
+                obj["SearchValue"] = name;
+            }
+
+            let query = "?" + new URLSearchParams(obj).toString();
+            let url = "https://terplink.umd.edu/actioncenter/organization/xr-club/roster" + query;
+            return await this.axios.get(url, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+        }
+
+        let extractMembers = (page: string) => {
+            const body = parse(page);
+            const matches = body.querySelectorAll(`input[type=checkbox]`)
+            const pagination = body.querySelector('div[class=pagination]')
+            var last: number | undefined = undefined;
+            if (pagination) {
+                const navLinks = pagination.querySelectorAll("a")
+                if (navLinks.length > 0) {
+                    last = parseInt(navLinks[navLinks.length - 1].attributes["href"].split("Page=")[1])
+                }
+            }
+            
+            return {
+                members: matches.map(e => {
+                    const membercard = e.attributes["value"]
+                    const name = e.attributes["title"].split("Select ")[1]
+
+                    return new RosterMember(
+                        membercard,
+                        name.trim(), this.axios)
+                }),
+                lastPage: last
+            }
+        }
+
+        // Get initial page
+        const initialRes = await requestForPage(1);
+        var initExtraction = extractMembers(initialRes.data);
+        let lastPage = initExtraction.lastPage ?? -1;
+
+        // Fetch remaining pages
+        var promises: Promise<RosterMember[]>[] = []
+        for (var i = 2; i <= lastPage; i++) {
+            let pageI = i;
+            promises.push(new Promise<RosterMember[]>(async (resolve, reject) => {
+                let pageRes = await requestForPage(pageI);   
+                initExtraction = extractMembers(pageRes.data);
+                resolve(initExtraction.members);
+            }))
+        }
+
+        let pageMembers = await Promise.all(promises);
+        let members: RosterMember[] = [...initExtraction.members, ...pageMembers.flat()]
+
+        if (fullName) {
+            // Now filter by the full name.
+            members = members.filter(m => m.name.includes(fullName!));
+        }
+
+        return members;
     }
 
     public async getEmailFromCommunityId(communityId: string) {
