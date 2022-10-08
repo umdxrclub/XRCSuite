@@ -21,7 +21,9 @@ export class Odoo {
     private async execPythonScript(cmd: OdooPythonScriptCommand, args: string[]) {
         return await new Promise<OdooSigner[]>((resolve, reject) => {
             let quoted_args = args.map(arg => `\"${arg}\"`)
-            exec(`python ./src/util/odoo.py ${cmd} ${quoted_args.join(" ")}`, (err, stdout, stderr) => {
+            let fullCmd = `python ./src/util/odoo.py ${cmd} ${quoted_args.join(" ")}`
+            console.log(fullCmd)
+            exec(fullCmd, (err, stdout, stderr) => {
                 if (err) {
                     reject(err);
                 } else {

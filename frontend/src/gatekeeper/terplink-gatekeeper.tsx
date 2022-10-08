@@ -70,7 +70,8 @@ export const TerpLinkGatekeeper: React.FC = ({ children }) => {
       "qr-reader",
       {
         fps: 10,
-        formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC]
+        formatsToSupport: [Html5QrcodeSupportedFormats.AZTEC],
+        supportedScanTypes: []
       },
       false
     );

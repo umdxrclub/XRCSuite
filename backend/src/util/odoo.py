@@ -36,7 +36,7 @@ def create_sign_request(template_id, partner_id, subject, filename):
         "signer_id": False,
         "signers_count": 1,
         "has_default_template": True,
-        "follower_ids": [[ 6, False, [ 1 ] ]], # 1 designates the XR Club account CC
+        "follower_ids": [[ 6, False, [  ] ]], # 1 designates the XR Club account CC
         "subject": subject,
         "filename": filename,
         "refusal_allowed": False,
@@ -62,7 +62,7 @@ def get_signers(template_id, email = None):
     #     filters.append([("request_item_infos.partner_name", "=", email)])
 
     params = [["&", *filters]]
-    results = exec_kw("sign.request", "search_read", params, {"fields": ["request_item_infos"]})
+    results = [ item["request_item_infos"][0] for item in exec_kw("sign.request", "search_read", params, {"fields": ["request_item_infos"]})]
     return results
 
 def show_usage():

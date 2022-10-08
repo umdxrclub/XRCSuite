@@ -12,7 +12,7 @@ const QR_SCANNER_CONFIG: Html5QrcodeCameraScanConfig = {
     fps: 5,
 }
 
-type ScannerStatus = "scanning" | "processing" | "found" | "error";
+type ScannerStatus = "scanning" | "processing" | "checkin" | "checkout" | "error";
 type ScannerConfig = {
     colors: Record<ScannerStatus, string>,
     titles: Record<ScannerStatus, string>,
@@ -23,41 +23,48 @@ type ScannerConfig = {
 
 type ScanMethodType = "terplink" | "swipecard";
 export type ResolverResult = {
-    name: string,
-    type: "checkin" | "checkout"
+    error: string | undefined,
+    member?: {
+        name: string,
+        type: "checkin" | "checkout"
+    }
 }
-export type GatekeeperResolver = (method: ScanMethodType, value: string) => Promise<ResolverResult | null>
+export type GatekeeperResolver = (method: ScanMethodType, value: string) => Promise<ResolverResult>
 
 export const DefaultScannerConfig: ScannerConfig = {
     colors: {
-        found: "#54B845",
+        checkin: "#54B845",
+        checkout: "#54B845",
         processing: "#DCAC13",
         scanning: "#E61A31",
         error: "red",
     },
 
     titles: {
-        found: "PROCEED",
+        checkin: "PROCEED",
+        checkout: "FAREWELL",
         processing: "STANDBY",
         scanning: "STOP",
         error: "ERROR",
     },
 
     descriptions: {
-        found: "Welcome, {NAME}!",
+        checkin: "Welcome, {NAME}!",
+        checkout: "See you later, {NAME}!",
         processing: "Hang tight! We are currently checking you in.",
         scanning: "Please scan your event pass before proceeding.",
-        error: "Something went wrong. Please try again or find a XR Club staff member.",
+        error: "{ERROR}",
     },
 
     icons: {
-        found: ProceedSVG,
+        checkin: ProceedSVG,
+        checkout: ProceedSVG,
         processing: ProcessingSVG,
         error: StopSVG,
         scanning: StopSVG,
     },
 
-    statusDisplayTime: 2 * 1000
+    statusDisplayTime: 5 * 1000
 }
 
 type GatekeeperScannerProps = {
@@ -73,6 +80,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     const keystrokes = useRef<string[]>([]);
     const recordingKeystrokes = useRef(false);
     const swipeTimeout = useRef<NodeJS.Timeout | null>(null);
+    const isScanning = useRef<boolean>(true);
 
     // QR
     const qr = useRef<Html5Qrcode>();
@@ -83,6 +91,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     // State
     const [ scannerStatus, setScannerStatus ] = useState<ScannerStatus>("scanning");
     const [ checkedInMemberName, setCheckedInMemberName ] = useState("");
+    const [ errorString, setErrorString ] = useState("");
 
     // Load default scanner config if one wasn't provided.
     config ??= DefaultScannerConfig;
@@ -91,7 +100,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     const STATUS_TITLE = config!.titles[scannerStatus];
     const STATUS_COLOR = config!.colors[scannerStatus];
     const STATUS_ICON = config!.icons[scannerStatus];
-    const STATUS_DESCRIPTION = config!.descriptions[scannerStatus].replace("{NAME}", checkedInMemberName);
+    const STATUS_DESCRIPTION = config!.descriptions[scannerStatus].replace("{NAME}", checkedInMemberName).replace("{ERROR}", errorString);
 
     /**
      * Processes the key presses from the document to search for the output of a
@@ -145,17 +154,20 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
 
     function onQRScan(text: string, result: Html5QrcodeResult) {
         // Only allow 
-        if (result.result.format?.format == Html5QrcodeSupportedFormats.AZTEC && scannerStatus == "scanning") {
+        if (result.result.format?.format == Html5QrcodeSupportedFormats.AZTEC && isScanning.current) {
             const eventPassObj = JSON.parse(text);
             const issuanceId = eventPassObj.issuanceId;
             if (issuanceId) {
+                isScanning.current = false;
                 setScannerStatus("processing");
                 resolve("terplink", issuanceId).then(result => {
-                    if (result) {
-                        setCheckedInMemberName(result.name);
+                    if (result.member) {
+                        setCheckedInMemberName(result.member.name);
+                    } else {
+                        setErrorString(result.error!);
                     }
 
-                    showResultStatus(result ? "found" : "error");
+                    showResultStatus(result.member ? result.member.type : "error");
                 })
             }
         }
@@ -166,7 +178,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     }
 
     function onSwipe(cardId: string) {
-        showResultStatus("found");
+        // showResultStatus("found");
     }
 
     function showResultStatus(status: ScannerStatus) {
@@ -175,6 +187,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
 
         setTimeout(() => {
             setScannerStatus("scanning");
+            isScanning.current = true;
         }, config?.statusDisplayTime)
     }
 

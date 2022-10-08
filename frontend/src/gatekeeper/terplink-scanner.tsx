@@ -7,8 +7,6 @@ export type TerpLinkScannerProps = {
 export const TerpLinkScanner: React.FC<TerpLinkScannerProps> = ({eventcode}) => {
 
     const resolve: GatekeeperResolver = async (method, value) => {
-        var result: ResolverResult | null = null;
-        
         // Attempt to check the member in.
         try {
             // const res = await getXRC().post("/terplink/:eventcode/checkin", {
@@ -24,7 +22,9 @@ export const TerpLinkScanner: React.FC<TerpLinkScannerProps> = ({eventcode}) => 
 
         }
         
-        return result;
+        return {
+            error: "Not implemented"
+        };
     };
 
     return <GatekeeperScanner resolve={resolve} />

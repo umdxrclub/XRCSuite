@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "ts-node ./deploy.ts"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   ],
   "dependencies": {
     "node-ssh": "^13.0.0",
+    "ssh2-streams": "^0.4.10",
     "typescript": "^4.7.4"
   }
 }

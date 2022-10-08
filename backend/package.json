@@ -5,7 +5,7 @@
   "main": "backend.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc",
+    "build": "tsc ./src/run.ts --outDir ./dist",
     "start": "ts-node ./src/run.ts --transpile-only",
     "serve": "node ./dist/run.js",
     "deploy": "ts-node ./scripts/deploy.ts"

@@ -1,5 +1,5 @@
 import { XRCSchema } from "@xrc/XRCSchema";
-import { TerpLink } from "../util/terplink";
+import { TerpLink, TerpLinkEvent } from "../util/terplink";
 import { Member } from "./MemberManager";
 import { AttendanceModel } from "./models/AttendanceModel";
 import { EventModel } from "./models/EventModel";
@@ -91,7 +91,7 @@ export class EventManager {
     }
 
     async addAllTerpLinkEvents(organizationId: number): Promise<Event[] | undefined> {
-        let terplinkEvents = await this._terplink.getEvents(279233)
+        let terplinkEvents = await this._terplink.getEvents(organizationId)
         if (terplinkEvents) {
             let newEvents = terplinkEvents.filter(e => !this._eventCache.has(e.id))
 
@@ -119,6 +119,7 @@ export class EventManager {
 
 export class Event {
     private _attributes: XRCSchema.Event;
+    private _terplinkEvent: TerpLinkEvent | null | undefined = undefined
 
     constructor(attributes: XRCSchema.Event) {
         this._attributes = attributes;
@@ -136,8 +137,9 @@ export class Event {
         let latestCheckIn = await AttendanceModel.findOne({
             where: {
                 memberId: member.getAttributes().id,
-                id: this.getAttributes().id
-            }
+                eventId: this.getAttributes().id
+            },
+            order: [["id", "DESC"]]
         })
 
         return latestCheckIn?.getData().type == 0 ?? false
@@ -148,49 +150,59 @@ export class Event {
 
         var result: "in" | "out" | undefined = undefined;
         if (checkedIn) {
-            result = await this.checkOut(member) ? "out" : undefined;
+            await this.checkOut(member)
+            result = "out"
         } else {
-            result = await this.checkIn(member) ? "in" : undefined;
+            await this.checkIn(member)
+            result = "in"
         }
 
         return result;
     }
 
-    async checkIn(member: Member): Promise<boolean> {
-        let checkedIn = await this.isCheckedIn(member);
-        if (!checkedIn) {
-            await AttendanceModel.create({
-                eventId: this._attributes.id,
-                memberId: member.getAttributes().id,
-                date: new Date(),
-                type: 0
-            })
+    async checkIn(member: Member) {
+        await AttendanceModel.create({
+            eventId: this._attributes.id,
+            memberId: member.getAttributes().id,
+            date: new Date(),
+            type: 0
+        })
 
-            // If this event has an associated TerpLink access code, use it to 
-            // check the member in.
+        // If this event has an associated TerpLink access code, use it to 
+        // check the member out.
+        let tlEvent = await this.getTerpLinkEvent();
+        if (tlEvent) {
+            await member.checkInOnTerpLink(tlEvent);
+        }
+    }
+
+    async checkOut(member: Member) {
+        await AttendanceModel.create({
+            eventId: this._attributes.id,
+            memberId: member.getAttributes().id,
+            date: new Date(),
+            type: 1
+        })
+
+        // If this event has an associated TerpLink access code, use it to 
+        // check the member out.
+        let tlEvent = await this.getTerpLinkEvent();
+        if (tlEvent) {
+            await member.checkOutOnTerplink(tlEvent);
+        }
+    }
+
+    private async getTerpLinkEvent(): Promise<TerpLinkEvent | null | undefined> {
+        if (this._terplinkEvent === undefined) {
             if (this._attributes.terplinkEventCode) {
-                let tlEvent = await XRC.terplink.getEvent(this._attributes.terplinkEventCode);
-
-                if (tlEvent) {
-                    await member.checkInOnTerpLink(tlEvent);
-                }
+                this._terplinkEvent = await XRC.terplink.getEvent(this._attributes.terplinkEventCode);    
+            } else {
+                // no event code
+                this._terplinkEvent = null;
             }
         }
 
-        return !checkedIn;
+        return this._terplinkEvent;
     }
-
-    async checkOut(member: Member): Promise<boolean> {
-        let checkedIn = await this.isCheckedIn(member);
-        if (checkedIn) {
-            await AttendanceModel.create({
-                eventId: this._attributes.id,
-                memberId: member.getAttributes().id,
-                date: new Date(),
-                type: 1
-            })
-        }
-
-        return checkedIn;
-    }
+    
 }

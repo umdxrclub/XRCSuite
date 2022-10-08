@@ -11,7 +11,7 @@ import { TerpLink, TerpLinkEvent } from "util/terplink";
 export class LabManager {
 
     private _open: boolean = false;
-    private _members: Member[] = []
+    private _members: Set<Member> = new Set<Member>();
     private _labEvent: Event | undefined
     private _labTerpLinkEvent: TerpLinkEvent | undefined
     private _eventManager: EventManager
@@ -20,29 +20,35 @@ export class LabManager {
         this._eventManager = eventManager;
     }
 
-    public async addMember(member: Member)
-    {
-        this._members.push(member)
+    public async addMember(member: Member) {
+        this._members.add(member)
         let event = await this.getLabEvent();
-        event.checkIn(member);
+        await event.checkIn(member);
     }
 
-    public async removeMember(member: Member)
-    {
-        let index = this._members.indexOf(member);
-        if (index > -1) {
-            this._members = this._members.splice(index, 1)
+    public async removeMember(member: Member) {
+        if (this._members.has(member)) {
+            this._members.delete(member);
             let event = await this.getLabEvent();
-            event.checkOut(member);
+            await event.checkOut(member);
+        }
+    }
+
+    public async addOrRemoveMember(member: Member) {
+        if (this._members.has(member)) {
+            await this.removeMember(member);
+            return "checkout"
+        } else {
+            await this.addMember(member);
+            return "checkin"
         }
     }
 
     public getMembersInLab() {
-        return [...this._members];
+        return Array.from(this._members.values());
     }
 
-    public isOpen()
-    {
+    public isOpen() {
         return this._open;
     }
 
@@ -56,7 +62,7 @@ export class LabManager {
             open: this._open,
             availableStaffNames: [],
             schedule: [],
-            totalCheckedIn: this._members.length
+            totalCheckedIn: this._members.size
         }
     }
 

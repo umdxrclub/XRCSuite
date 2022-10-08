@@ -6,6 +6,7 @@ import NoFoodImage from "./no-food.png";
 import SecurityCameraSVG from "./security-camera-svgrepo-com.svg";
 import ContractSVG from "./contract-svgrepo-com.svg";
 import moment from "moment";
+import { XRCSchema } from "@xrc/XRCSchema";
 
 function getCurrentTimeString(): string {
   return moment().format("h:mm A");
@@ -56,8 +57,33 @@ export const LabGatekeeper: React.FC = ({ children }) => {
       </div>
     </div>
     <GatekeeperScanner resolve={ async (method, value) => {
-      console.log("HELLO THERE");
-      return null;
+      if (method == "terplink") {
+        try {
+          var res = await fetch(`https://umdxrc.figsware.net/api/v1/lab/checkin?tlIssuanceId=${value}&validateAgreement=0`, {
+            method: "POST"
+          })
+        } catch {
+          return {
+            error: "Could not connect to server!"
+          };
+        }
+        
+        let j = await res.json() as XRCSchema.Response<XRCSchema.LabCheckInResult>
+        console.log(j)
+        if (j.success) {
+          return {
+            error: undefined,
+            member: j.data!
+          }
+        } else {
+          return {
+            error: j.error
+          };
+        }
+      }
+      return {
+        error: "Failed to resolve member!"
+      };
     } } />
   </div>
 };

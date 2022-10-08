@@ -130,11 +130,14 @@ export namespace XRCSchema {
         type: "in" | "out"
     }
 
-    export type Response = {
+    export type Response<T> = {
         success: boolean,
         error?: string,
-        data: any | null
+        data: T | null
     }
 
-
+    export type LabCheckInResult = {
+        name: string,
+        type: "checkin" | "checkout"
+    }
 }

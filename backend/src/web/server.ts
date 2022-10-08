@@ -5,6 +5,7 @@ import { serveFrontend } from "./util/frontend";
 import { getXRCHost } from "../util/host";
 import cors from "cors"
 import { API } from "./api/api";
+import XRC from "../data/XRC";
 
 export type ExpressRequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 

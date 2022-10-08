@@ -443,14 +443,6 @@ export class TerpLinkEvent {
         if ((res.data.items as any[]).length > 0) {
             const tlMember = res.data.items[0] as TerpLinkSchema.Member;
 
-            // // If there is an account ID in the database, store the issuance
-            // // id with it for faster lookup
-            // await MODELS.member.update({ tl_issuance_id: issuanceId }, {
-            //     where: {
-            //         tl_account_id: tlMember.account.id
-            //     }
-            // })
-
             return new TerpLinkEventMember(tlMember.attendanceId, tlMember.account, this);
         }
 
@@ -480,7 +472,7 @@ export class TerpLinkEvent {
         attendees = attendees.filter(attendee => filter.includes(attendee.lastLogAction)
             && (includeRemoved || attendee.status === "Attended"))
 
-        return attendees.map(attendee => new TerpLinkEventMember(attendee.id, attendee.account, this));
+        return attendees.map(attendee => new TerpLinkEventMember(attendee.id, attendee.account, this, attendee.lastLogAction));
     }
 
     private async request(method: "get" | "post" | "delete", path: string, data?: any, needBearer?: boolean): Promise<AxiosResponse> {
@@ -515,11 +507,13 @@ export class TerpLinkEventMember {
     private event: TerpLinkEvent;
     private id: number | null;
     private account: TerpLinkSchema.Account;
+    private lastLogAction: string | undefined;
 
-    constructor(id: number | null, account: TerpLinkSchema.Account, event: TerpLinkEvent) {
+    constructor(id: number | null, account: TerpLinkSchema.Account, event: TerpLinkEvent, lastLogAction?: string) {
         this.id = id;
         this.account = account;
         this.event = event;
+        this.lastLogAction = lastLogAction;
     }
 
     /**
@@ -535,6 +529,13 @@ export class TerpLinkEventMember {
     getName(): string {
         return this.account.name;
     }
+
+    /**
+     * Gets the name as it would appear in a roster (First + Last name).
+     */
+    getRosterName(): string {
+        return this.account.firstName + " " + this.account.lastName;
+    }   
 
     /**
      * Gets the member ID of the member.

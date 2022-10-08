@@ -14,8 +14,8 @@ export interface API {
 }
 
 type HTTPMethod = 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';
-type RequestHandler = (req: Request, res: Response) => Promise<XRCSchema.Response>
-type ResponseHandler = (req: Request, res: Response, routeResponse: XRCSchema.Response) => Promise<void>
+type RequestHandler = (req: Request, res: Response) => Promise<XRCSchema.Response<any>>
+type ResponseHandler = (req: Request, res: Response, routeResponse: XRCSchema.Response<any>) => Promise<void>
 
 /**
  * Represents an API route on a specified path. Each route has a associated path
@@ -25,3 +25,4 @@ export interface APIRoute {
     path: string,
     handlers: Partial<Record<HTTPMethod, RequestHandler>>
 }
+
