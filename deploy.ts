@@ -13,7 +13,6 @@ const BACKEND_DEPLOY_PATH = "/home/xrc/suite/backend";
 const FRONTEND_DEPLOY_PATH = "/home/xrc/suite/frontend";
 const SHARED_DEPLOY_PATH = "/home/xrc/suite/shared";
 
-
 const BACKEND_SRC_DEPLOY_PATH = BACKEND_DEPLOY_PATH+"/src";
 
 async function uploadDirectory(ssh: NodeSSH, localSrc: string, deployDir: string) {

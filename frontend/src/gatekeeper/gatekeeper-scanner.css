@@ -17,8 +17,9 @@
 }
 
 .scanner-bar h4 {
-    font-size: 5em;
+    font-size: 4em;
     line-height: 100%;
+    margin-bottom: 10%;
 }
 
 .scanner-status-bg {
