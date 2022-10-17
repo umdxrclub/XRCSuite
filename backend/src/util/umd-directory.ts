@@ -1,7 +1,6 @@
-import { AxiosResponse } from "axios";
+import { Axios, AxiosResponse } from "axios";
 import parse from "node-html-parser";
 import { retryRequest, X_WWW_FORM_HEADERS_CONFIG } from "./scrape-util";
-import { useAxios } from "./shared-axios";
 import querystring from "querystring"
 
 type DirectoryResult = {
@@ -37,11 +36,12 @@ export type AdvancedSearchParameters = {
  * the directory to allow you to perform searches.
  */
 export class UMDDirectory {
-    static singleton = new UMDDirectory();
-    
-    private constructor() {
-        const axios = useAxios();
-        axios.interceptors.response.use(this.directory_intercept.bind(this));
+    private axios: Axios
+
+
+    constructor(axios: Axios) {
+        this.axios = axios;
+        this.axios.interceptors.response.use(this.directory_intercept.bind(this));
     }
 
     /**
@@ -49,8 +49,7 @@ export class UMDDirectory {
      * student listings in the search results.
      */
     private async login() {
-        const axios = useAxios()
-        await axios.post(UMD_DIRECTORY_URL, querystring.stringify({
+        await this.axios.post(UMD_DIRECTORY_URL, querystring.stringify({
             login: "Log in"
         }), X_WWW_FORM_HEADERS_CONFIG)
     }
@@ -94,10 +93,8 @@ export class UMDDirectory {
      * search parameters.
      */
     private async searchWithForm(form: any): Promise<DirectoryResult[]> {
-        const axios = useAxios()
-
         // Create the form data used to search up the student
-        const res = await axios.post(UMD_DIRECTORY_URL, querystring.stringify(form), X_WWW_FORM_HEADERS_CONFIG)
+        const res = await this.axios.post(UMD_DIRECTORY_URL, querystring.stringify(form), X_WWW_FORM_HEADERS_CONFIG)
 
         // Parse the body, and for each found student, parse their name/email.
         return this.parseBody(res.data);
@@ -109,7 +106,7 @@ export class UMDDirectory {
      * @param name The name to search
      * @returns A list of found results
      */
-    async search(name: string): Promise<DirectoryResult[]> {
+    public async search(name: string): Promise<DirectoryResult[]> {
         return await this.searchWithForm({
             basicSearchInput: name,
             basicSearch: "Search",
@@ -125,7 +122,7 @@ export class UMDDirectory {
      * @param config The advanced search config to use
      * @returns A list of found results
      */
-    async advancedSearch(config: Partial<AdvancedSearchParameters>): Promise<DirectoryResult[]> {
+    public async advancedSearch(config: Partial<AdvancedSearchParameters>): Promise<DirectoryResult[]> {
         return await this.searchWithForm({
             advancedSearch: true,
             "advancedSearchInputs.firstName": config.firstName,

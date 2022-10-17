@@ -1,8 +1,12 @@
 {
-    "extends": "@tsconfig/node16/tsconfig.json",
-    "include": ["./src/*"],
-    "compilerOptions": {
-        "resolveJsonModule": true,
-        "outDir": "./dist"
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "include": ["./src/**/*.ts" ],
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "paths": {
+        "@xrc/*": ["../../shared/*"]
     }
+  }
 }

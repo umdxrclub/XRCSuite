@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import { HTMLElement } from "node-html-parser";
 import querystring from "querystring"
-import { useAxios } from "./shared-axios";
+import { useAxios } from "./axios";
 
 export const X_WWW_FORM_HEADERS_CONFIG = {
     headers: {
@@ -38,4 +38,21 @@ export function queryStringFromForm(e: HTMLElement) {
 export async function retryRequest(res: AxiosResponse<any, any>) {
     const axios = useAxios();
     return await axios.request({...res.config, httpAgent: undefined, httpsAgent: undefined})
+}
+
+export function parseForm(e: HTMLElement) {
+    var action = e.attributes["action"] ?? ""
+    const inputs = e.querySelectorAll("input")
+    const inputObj: Record<string, any> = {}
+    inputs.forEach(input => {
+        if (typeof(input.attributes.name) === "string") {
+            const inputName = input.attributes.name
+            inputObj[inputName] = input.attributes.value
+        }
+    })
+
+    return {
+        action: action,
+        inputs: inputObj
+    }
 }

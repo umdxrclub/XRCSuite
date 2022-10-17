@@ -1,11 +1,11 @@
+import { XRCSchema } from "@xrc/XRCSchema";
 import { Model, Optional, STRING } from "sequelize";
-import { XRCSchema } from "xrc-schema";
 import { XRCHeartbeatModel } from "./HeartbeatModel";
 import ModelFactory from "./ModelFactory";
 
-export interface XRCDeviceCreationAttributes extends Optional<XRCSchema.Device, "macAddress"> {}
+export interface XRCDeviceCreationAttributes extends Optional<XRCSchema.DeviceAttributes, "macAddress"> {}
 
-export class XRCDeviceModel extends Model<XRCSchema.Device, XRCDeviceCreationAttributes> {
+export class XRCDeviceModel extends Model<XRCSchema.DeviceAttributes, XRCDeviceCreationAttributes> {
     declare serial: string
     declare macAddress: string | null
     declare name: string
@@ -17,11 +17,6 @@ export const DeviceModelFactory: ModelFactory = {
             serial: {
                 primaryKey: true,
                 type: STRING
-            },
-
-            macAddress: {
-                type: STRING,
-                allowNull: true
             },
 
             name: {

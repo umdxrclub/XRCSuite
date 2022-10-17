@@ -1,43 +1,27 @@
-import { BOOLEAN, ENUM, INET, INTEGER, Model, NUMBER, Optional, STRING } from "sequelize";
-import ModelFactory from "./ModelFactory";
-import { MemberModel } from "./MemberModel";
-import { XRCSchema } from "xrc-schema";
-export class AttendanceModel extends Model<XRCSchema.AttendanceEvent, XRCSchema.AttendanceEvent> {
-    declare id: number
-    declare member_id: number
-    declare type: "checkin" | "checkout"
-    declare location: string
-}
+import { XRCSchema } from "@xrc/XRCSchema";
+import { DATE, INTEGER } from "sequelize";
+import ModelFactory, { createColumn, XRCModel } from "./ModelFactory";
+
+export class AttendanceModel extends XRCModel<XRCSchema.Attendance, XRCSchema.Attendance> {}
 
 export const AttendanceModelFactory: ModelFactory = {
     initModel: (sequelize) => {
-        AttendanceModel.init({
-            id: {
-                primaryKey: true,
-                type: INTEGER,
-                autoIncrement: true
+        AttendanceModel.init(
+            {
+                id: {
+                    primaryKey: true,
+                    type: INTEGER,
+                    autoIncrement: true
+                },
+                eventId: createColumn(INTEGER, false, "event_id"),
+                memberId: createColumn(INTEGER, false, "member_id"),
+                date: createColumn(DATE, false, "date"),
+                type: createColumn(INTEGER, false, "type")
             },
-
-            member_id: {
-                type: INTEGER,
-                allowNull: false
-            },
-
-            type: {
-                type: ENUM("checkin", "checkout")
-            },
-
-            location: {
-                type: STRING
+            {
+                tableName: "attendance",
+                sequelize: sequelize
             }
-        },
-        {
-            tableName: "attendance",
-            sequelize: sequelize,
-        });
-    },
-
-    associate: () => {
-        AttendanceModel.belongsTo(MemberModel, {targetKey: "id", foreignKey: "member_id"});
+        )
     }
 }

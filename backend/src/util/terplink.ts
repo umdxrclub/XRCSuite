@@ -1,11 +1,10 @@
-import { AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
+import { Axios, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
+import XRC from "../data/XRC";
 import parse from "node-html-parser";
 import querystring from "querystring";
-import { TerpLinkSchema } from "xrc-schema";
-import { MODELS } from "../data/DatabaseService";
+import { TerpLinkSchema } from "@xrc/TerpLinkSchema"
 import { queryStringFromForm, wasRequestRedirectedTo, X_WWW_FORM_HEADERS_CONFIG } from "./scrape-util";
-import { useAxios } from "./shared-axios";
-import { useXRCHost } from "./xrc-host-file";
+import { request } from "http";
 
 const CAMPUS_LABS_API_URL = "https://se-app-checkins.campuslabs.com/v4.0/";
 const TERPLINK_FEDERATION_URL = "https://federation.campuslabs.com"
@@ -23,6 +22,32 @@ function log(msg: string) {
 }
 
 /**
+ * Represents a roster member retrieved from TerpLink.
+ */
+class RosterMember {
+    public communityId: string
+    public name: string
+    private _axios: Axios
+
+    constructor(communityId: string, name: string, axios: Axios) {
+        this.communityId = communityId;
+        this.name = name;
+        this._axios = axios;
+    }
+
+    public async fetchEmail(): Promise<string> {
+        const res = await this._axios.get(`https://terplink.umd.edu/actioncenter/organization/xr-club/roster/users/membercard/${this.communityId}`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        });
+        const body = parse(res.data);
+        const email = body.querySelector("a[class=email]")?.attributes["href"].split("mailto:")[1]
+        return email!
+    }
+}
+
+/**
  * TerpLink is a UMD service used by clubs to manage events and rosters. This
  * interface provides the methods that should be implemented by some TerpLink
  * provider. A TerpLink provider may include a controller that runs an emulator
@@ -31,25 +56,14 @@ function log(msg: string) {
 export class TerpLink {
     private events: Map<string, TerpLinkEvent> = new Map();
     private bearer: string | undefined = undefined
-    static singleton: TerpLink = new TerpLink()
+    private axios: Axios
 
-    constructor() {
-        const axios = useAxios();
+    constructor(axios: Axios) {
+        this.axios = axios
         axios.interceptors.request.use(this.terplinkRequestInterceptor.bind(this));
         axios.interceptors.response.use(this.terplinkResponseInterceptor.bind(this));
     }
 
-    /**
-     * Gets the semester-long lab event that can be used for searching members. 
-     */
-    async getLabEvent() {
-        const host = useXRCHost();
-        if (host.terplink.labEventCode) {
-            return await this.getEvent(host.terplink.labEventCode);
-        }
-
-        throw new Error("Could not get lab event!");
-    }
 
     /**
      * Intercepts requests going to the TerpLink API to add the Bearer token.
@@ -86,7 +100,6 @@ export class TerpLink {
      * @returns 
      */
     private async terplinkResponseInterceptor(res: AxiosResponse<any, any>) {
-        const axios = useAxios();
         let reqUrl = res.config.url!
         let responseUrl = res.request.res.responseUrl as string
 
@@ -95,14 +108,14 @@ export class TerpLink {
             const identityRoot = parse(res.data);
             var campusPostURL = identityRoot.querySelector("form")!.attributes.action
             const campusForm = queryStringFromForm(identityRoot.querySelector("form")!)
-            const connectRes = await axios.post(campusPostURL, campusForm, X_WWW_FORM_HEADERS_CONFIG)
+            const connectRes = await this.axios.post(campusPostURL, campusForm, X_WWW_FORM_HEADERS_CONFIG)
             log("(1/2) Got Identity Response")
 
             const connectRoot = parse(connectRes.data);
             const connectForm = connectRoot.querySelector("form")!
             const connectQuery = queryStringFromForm(connectForm)
             var connectPostUrl = connectRoot.querySelector("form")!.attributes.action
-            var oidcRes = await axios.post(connectPostUrl, connectQuery, X_WWW_FORM_HEADERS_CONFIG)
+            var oidcRes = await this.axios.post(connectPostUrl, connectQuery, X_WWW_FORM_HEADERS_CONFIG)
             log("(2/2) Signed in to OIDC!")
 
             res = oidcRes
@@ -113,7 +126,7 @@ export class TerpLink {
             await this.getBearer()
 
             // Try the request again, but fail if the status isn't 200
-            res = await axios.request({...res.config,
+            res = await this.axios.request({...res.config,
                 validateStatus: status => status == 200,
                 httpAgent: undefined, httpsAgent: undefined})
         }
@@ -122,27 +135,23 @@ export class TerpLink {
     }
     
     private async getBearer(): Promise<void> {
-        const axios = useAxios();
-
         // Get the bearer from the token url
-        var bearerRes = await axios.get(TERPLINK_TOKEN_URL);
+        var bearerRes = await this.axios.get(TERPLINK_TOKEN_URL);
 
         // Extract bearer
         this.bearer = bearerRes.data.split("'")[1]
     }
 
-    async getEvent(eventCode: string): Promise<TerpLinkEvent | null> {
+    public async getEvent(eventCode: string): Promise<TerpLinkEvent | null> {
         // Check and see if the event has already been cached.
         var cachedEvent = this.events.get(eventCode);
         if (cachedEvent) {
             return cachedEvent;
         }
 
-        const axios = useAxios();
-
         // First get the event data from TerpLink using the access code.
         try {
-            var eventRes = await axios.get(CAMPUS_LABS_API_URL + "event", {
+            var eventRes = await this.axios.get(CAMPUS_LABS_API_URL + "event", {
                 params: {
                     accesscode: eventCode
                 }
@@ -154,77 +163,131 @@ export class TerpLink {
             return null;
         }
 
-        let eventData = eventRes.data as TerpLinkSchema.Event;
+        let eventData = eventRes.data as TerpLinkSchema.EventDetails;
 
-        const event = new TerpLinkEvent(eventData);
+        const event = new TerpLinkEvent(eventData, this.axios);
         this.events.set(eventCode, event);
         return event;
     }
 
-    async getRosterPage(page: number) {
-        const axios = useAxios()
-        const res = await axios.get("https://terplink.umd.edu/actioncenter/organization/xr-club/roster?Direction=Ascending&Page=" + page, {
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        });
-
-        const body = parse(res.data);
-        const matches = body.querySelectorAll(`input[type=checkbox]`)
-        const pagination = body.querySelector('div[class=pagination]')!
-        const navLinks = pagination.querySelectorAll("a")
-        const last = navLinks[navLinks.length - 1].attributes["href"].split("Page=")[1]
-        return {
-            members: matches.map(e => {
-                const membercard = e.attributes["value"]
-                const name = e.attributes["title"].split("Select ")[1]
-                
-                return {
-                    communityId: membercard,
-                    name: name.slice(1,name.length-1)
-                }
-            }),
-            lastPage: last
+    /**
+     * Gets roster members from the page.
+     * 
+     * @param name The name to filter by.
+     * @returns List of roster members
+     */
+    public async getRosterMembers(name?: string): Promise<RosterMember[]> {
+        // TerpLink is dumb and it can only search by first/last name. So, store
+        // the full name, and search by last name first, then filter by the full
+        // name.
+        let fullName = name;
+        if (name) {
+            let splitName = name.split(' ')
+            name = splitName[splitName.length - 1]
         }
+
+        let requestForPage = async (page: number) => { 
+            let obj: any = {
+                Direction: "Ascending",
+                Page: page,
+            }
+
+            if (name) {
+                obj["SearchValue"] = name;
+            }
+
+            let query = "?" + new URLSearchParams(obj).toString();
+            let url = "https://terplink.umd.edu/actioncenter/organization/xr-club/roster" + query;
+            return await this.axios.get(url, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+        }
+
+        let extractMembers = (page: string) => {
+            const body = parse(page);
+            const matches = body.querySelectorAll(`input[type=checkbox]`)
+            const pagination = body.querySelector('div[class=pagination]')
+            var last: number | undefined = undefined;
+            if (pagination) {
+                const navLinks = pagination.querySelectorAll("a")
+                if (navLinks.length > 0) {
+                    last = parseInt(navLinks[navLinks.length - 1].attributes["href"].split("Page=")[1])
+                }
+            }
+            
+            return {
+                members: matches.map(e => {
+                    const membercard = e.attributes["value"]
+                    const name = e.attributes["title"].split("Select ")[1]
+
+                    return new RosterMember(
+                        membercard,
+                        name.trim(), this.axios)
+                }),
+                lastPage: last
+            }
+        }
+
+        // Get initial page
+        const initialRes = await requestForPage(1);
+        var initExtraction = extractMembers(initialRes.data);
+        let lastPage = initExtraction.lastPage ?? -1;
+
+        // Fetch remaining pages
+        var promises: Promise<RosterMember[]>[] = []
+        for (var i = 2; i <= lastPage; i++) {
+            let pageI = i;
+            promises.push(new Promise<RosterMember[]>(async (resolve, reject) => {
+                let pageRes = await requestForPage(pageI);   
+                initExtraction = extractMembers(pageRes.data);
+                resolve(initExtraction.members);
+            }))
+        }
+
+        let pageMembers = await Promise.all(promises);
+        let members: RosterMember[] = [...initExtraction.members, ...pageMembers.flat()]
+
+        if (fullName) {
+            // Now filter by the full name.
+            members = members.filter(m => m.name.includes(fullName!));
+        }
+
+        return members;
     }
 
-    async getEmailFromCommunityId(communityId: string) {
-        const axios = useAxios();
-        const res = await axios.get(`https://terplink.umd.edu/actioncenter/organization/xr-club/roster/users/membercard/${communityId}`)
+    public async getEmailFromCommunityId(communityId: string) {
+        const res = await this.axios.get(`https://terplink.umd.edu/actioncenter/organization/xr-club/roster/users/membercard/${communityId}`)
         const body = parse(res.data);
         const email = body.querySelector("a[class=email]")?.attributes["href"].split("mailto:")[1]
         return email!
     }
 
-    async getEventPage(eventId: number) {
-        const axios = useAxios();
+    public async getAccessCode(eventId: number) {
+        let page = await this.getEventPage(eventId);
+        if (page) {
+            let dom = parse(page);
+            let accesssCodeInput = dom.querySelector("#copytextAcessCode")
+            if (accesssCodeInput) {
+                let accessCode = accesssCodeInput.getAttribute("value")
+                if (accessCode) {
+                    return accessCode;
+                }
+            }
+        }
 
-        const pageUrl = `https://terplink.umd.edu/actioncenter/organization/xr-club/events/calendar/details/${eventId}`
-        const res = await axios.get(pageUrl)
-
-        console.log(res.data)
+        return undefined;
     }
 
-    async getEvents(organizationId: number) {
-        const axios = useAxios();
+    private async getEventPage(eventId: number) {
+        const pageUrl = `https://terplink.umd.edu/actioncenter/organization/xr-club/events/calendar/details/${eventId}`
+        const res = await this.axios.get(pageUrl)
+        return res.status == 200 ? res.data : undefined;
+    }
 
-        const res = await axios.post("https://terplink.umd.edu/api/comp-events/graphql/getEvents", {
-            data: {
-                query: `query () {
-                    __schema() {
-                        types {
-                          name
-                        }
-                      }
-                }`,
-
-                variables: {}
-            }
-        });
-
-        return res.data;
-
-        const res2 = await axios.get("https://terplink.umd.edu/api/comp-events/graphql/getEvents", {
+    public async getEvents(organizationId: number) {
+        const res = await this.axios.get("https://terplink.umd.edu/api/comp-events/graphql/getEvents", {
             data: {
                 query: `query ($skip: Int, $take: Int, $organizationIds: [Int], $startsAfter: String, $endsBefore: String, $nameContains: String, $status: String, $themes: [String], $isOnline: String, $orderByField: String, $orderByDirection: String, $forceOrderBy: Boolean) {
                     getEvents(
@@ -245,32 +308,13 @@ export class TerpLink {
                       items {
                         id
                         name
-                        description
                         startsOn
                         endsOn
-                        state {
-                          status
-                          __typename
-                        }
-                        rsvpStatistics {
-                          invitedUserCount
-                          yesUserCount
-                          yesGuestCount
-                          __typename
-                        }
-                        organization {
-                          id
-                          name
-                          websiteKey
-                          __typename
-                        }
-                        __typename
                       }
-                      __typename
                     }
                   }`,
                 variables: {
-                    "take": 10,
+                    "take": 1000,
                     "organizationIds": [
                       organizationId
                     ],
@@ -282,7 +326,11 @@ export class TerpLink {
             }
         })
 
-        return res.data
+        if (res.status == 200) {
+            return res.data.data.getEvents.items as TerpLinkSchema.Event[];
+        }
+
+        return undefined
     }
 }
 
@@ -291,10 +339,19 @@ export class TerpLink {
  * Members are checked in/out of the event as it progresses.
  */
 export class TerpLinkEvent {
-    private event: TerpLinkSchema.Event;
+    private event: TerpLinkSchema.EventDetails;
+    private axios: Axios
 
-    constructor(event: TerpLinkSchema.Event) {
+    constructor(event: TerpLinkSchema.EventDetails, axios: Axios) {
         this.event = event;
+        this.axios = axios;
+    }
+
+    /**
+     * Returns the ID of the event.
+     */
+    getEventId(): number {
+        return this.event.id;
     }
 
     /**
@@ -386,14 +443,6 @@ export class TerpLinkEvent {
         if ((res.data.items as any[]).length > 0) {
             const tlMember = res.data.items[0] as TerpLinkSchema.Member;
 
-            // If there is an account ID in the database, store the issuance
-            // id with it for faster lookup
-            await MODELS.member.update({ tl_issuance_id: issuanceId }, {
-                where: {
-                    tl_account_id: tlMember.account.id
-                }
-            })
-
             return new TerpLinkEventMember(tlMember.attendanceId, tlMember.account, this);
         }
 
@@ -423,13 +472,11 @@ export class TerpLinkEvent {
         attendees = attendees.filter(attendee => filter.includes(attendee.lastLogAction)
             && (includeRemoved || attendee.status === "Attended"))
 
-        return attendees.map(attendee => new TerpLinkEventMember(attendee.id, attendee.account, this));
+        return attendees.map(attendee => new TerpLinkEventMember(attendee.id, attendee.account, this, attendee.lastLogAction));
     }
 
     private async request(method: "get" | "post" | "delete", path: string, data?: any, needBearer?: boolean): Promise<AxiosResponse> {
-        const axios = useAxios();
-
-        var res = await axios.request({
+        var res = await this.axios.request({
             url: CAMPUS_LABS_API_URL + `event/${this.event.accessToken}/${path}`,
             method: method,
             data: data,
@@ -460,11 +507,13 @@ export class TerpLinkEventMember {
     private event: TerpLinkEvent;
     private id: number | null;
     private account: TerpLinkSchema.Account;
+    private lastLogAction: string | undefined;
 
-    constructor(id: number | null, account: TerpLinkSchema.Account, event: TerpLinkEvent) {
+    constructor(id: number | null, account: TerpLinkSchema.Account, event: TerpLinkEvent, lastLogAction?: string) {
         this.id = id;
         this.account = account;
         this.event = event;
+        this.lastLogAction = lastLogAction;
     }
 
     /**
@@ -480,6 +529,13 @@ export class TerpLinkEventMember {
     getName(): string {
         return this.account.name;
     }
+
+    /**
+     * Gets the name as it would appear in a roster (First + Last name).
+     */
+    getRosterName(): string {
+        return this.account.firstName + " " + this.account.lastName;
+    }   
 
     /**
      * Gets the member ID of the member.

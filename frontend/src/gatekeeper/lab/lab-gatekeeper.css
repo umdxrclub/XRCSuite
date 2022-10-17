@@ -1,0 +1,86 @@
+.lab-gk-root {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background: #111111;
+    color: white;
+    overflow: hidden;
+}
+
+.lab-gk-root .scanner-bar {
+    flex: 1;
+}
+
+.lab-info {
+    padding: 32px;
+    flex: 3.5;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.lab-rules {
+    margin-top: 48px;
+}
+
+.lab-header {
+    display: flex;
+}
+
+.lab-header h1 {
+    margin: 0;
+    font-size: 3em;
+    line-height: 100%;
+}
+
+.lab-welcome h1 {
+    background: linear-gradient(90deg, #E21755, #5F0080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
+    font-size: 20vh;
+    margin: 0;
+    line-height: 1;
+}
+
+.lab-gk-root h2 {
+    margin: 0;
+    font-size: 3em;
+    line-height: 100%;
+}
+
+.lab-gk-root h3 {
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.lab-welcome {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:flex-start;
+    margin-top: 16pxg;
+}
+
+.lab-rules-group {
+    display: flex;
+    text-align: center;
+    font-size: 2em;
+    max-height: 35vh;
+    gap: 2%
+}
+
+.lab-rules-group > .gradient-card {
+    width: 25%;
+    display: flex;
+}
+
+.lab-rules-group img {
+    max-height: 35%;
+    margin: 6%;
+}
+
+#lab-title {
+    margin: 16px;
+}
