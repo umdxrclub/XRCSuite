@@ -2,7 +2,7 @@ import { Gatekeeper } from "gatekeeper/gatekeeper"
 import { LabGatekeeper } from "gatekeeper/lab/lab-gatekeeper"
 import React, { useState } from "react"
 import { matchRoutes, Route, Routes, useLocation } from "react-router-dom"
-import { TerpLinkGatekeeper } from "../gatekeeper/terplink-gatekeeper"
+import { EventGatekeeper } from "../gatekeeper/event-gatekeeper"
 import { NotFound } from "./not-found"
 import { XRCAppBar } from "./xrc-app-bar"
 import { XRCDrawer } from "./xrc-drawer"
@@ -26,7 +26,7 @@ const AppRoutes = [
     },
     {
         path: "/gatekeeper/terplink/:eventcode",
-        element: TerpLinkGatekeeper,
+        element: EventGatekeeper,
         showAppBar: false
     },
     {

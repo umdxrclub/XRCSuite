@@ -57,7 +57,7 @@ export const LabGatekeeper: React.FC = ({ children }) => {
       </div>
     </div>
     <GatekeeperScanner resolve={ async (method, value) => {
-      if (method == "terplink") {
+      if (method == "eventPass") {
         try {
           var res = await fetch(`https://umdxrc.figsware.net/api/v1/lab/checkin?tlIssuanceId=${value}&validateAgreement=0`, {
             method: "POST"

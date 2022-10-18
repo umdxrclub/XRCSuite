@@ -192,7 +192,7 @@ export class Event {
         }
     }
 
-    private async getTerpLinkEvent(): Promise<TerpLinkEvent | null | undefined> {
+    public async getTerpLinkEvent(): Promise<TerpLinkEvent | null | undefined> {
         if (this._terplinkEvent === undefined) {
             if (this._attributes.terplinkEventCode) {
                 this._terplinkEvent = await XRC.terplink.getEvent(this._attributes.terplinkEventCode);    

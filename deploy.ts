@@ -68,7 +68,7 @@ async function uploadDirectory(ssh: NodeSSH, localSrc: string, deployDir: string
     await uploadDirectory(ssh, SHARED_SRC_PATH, SHARED_DEPLOY_PATH);
 
     // Restart service
-    // await ssh.execCommand("sudo /usr/bin/systemctl restart xrc.service")
+    await ssh.execCommand("sudo /usr/bin/systemctl restart xrc.service")
 
     console.log("Successfully deployed!");
 

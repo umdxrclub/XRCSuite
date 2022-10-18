@@ -1,4 +1,5 @@
 import { XRCSchema } from '@xrc/XRCSchema';
+import { Member } from 'data/MemberManager';
 import XRC from '../../../data/XRC';
 import { APIRoute } from '../api';
 
@@ -6,29 +7,27 @@ const events_checkIn: APIRoute = {
     path: "events/checkin",
     handlers: {
         "post": async (req, res) => {
-            let body = req.body as XRCSchema.EventsCheckInBody;
-            let member = await XRC.members.getMember(body);
+            // Check if TerpLink issuance ID was provided 
+            if (req.query.tlIssuanceId && req.query.tlEventCode) {
+                let issuanceId = req.query.tlIssuanceId as string;
+                let tlEventCode = req.query.tlEventCode as string;
 
-            if (member) {
-                let query = req.query as XRCSchema.EventsCheckInQueryParameters;
+                let event = await XRC.events.getEventByAccessCode(tlEventCode);
+                if (event) {
+                    let tlEvent = await event.getTerpLinkEvent();
+                    let tlMember = await tlEvent?.getMemberFromIssuanceId(issuanceId)
 
-                if (query.tlEventCode) {
-                    let event = await XRC.events.getEventByAccessCode(query.tlEventCode);
-                    if (event) {
-                        let type = await event.checkInOrOut(member)
+                    if (tlMember) {
+                        await tlMember.checkIn()
 
-                        if (type) {
-                            let memberAttributes = member.getAttributes()
-                            let data: XRCSchema.CheckInResult = {
-                                name: memberAttributes.name ?? "unknown",
-                                isClubMember: true,
-                                type: type
-                            }
+                        let response: XRCSchema.LabCheckInResult = {
+                            name: tlMember.getRosterName(),
+                            type: "checkin"
+                        }
 
-                            return {
-                                success: true,
-                                data: data
-                            }
+                        return {
+                            success: true,
+                            data: response
                         }
                     }
                 }

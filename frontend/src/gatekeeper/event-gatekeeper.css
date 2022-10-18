@@ -1,9 +1,13 @@
-.gk-root {
-    /* flex: 1; */
+.event-gk-root {
+    cursor: none;
     display: flex;
     flex-direction: row;
     min-height: 100vh;
     background: linear-gradient(125.1deg, rgba(165,34,86,1) 0%, rgba(102,21,86,1) 100%);
+}
+
+.event-gk-root .scanner-bar {
+    flex: 1;
 }
 
 body::-webkit-scrollbar {
@@ -11,7 +15,7 @@ body::-webkit-scrollbar {
 }
 
 .gk-event {
-    flex: 1;
+    flex: 4;
     color: white;
     text-align: center;
     align-items: center;
@@ -23,17 +27,6 @@ body::-webkit-scrollbar {
 .gk-event img {
     max-width: 100%;
     padding: 16px;
-}
-
-.gk-terplink {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.gk-terplink p {
-    margin:0px;
 }
 
 .spacer { 

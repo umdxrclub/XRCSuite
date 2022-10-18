@@ -21,7 +21,7 @@ type ScannerConfig = {
     statusDisplayTime: number
 }
 
-type ScanMethodType = "terplink" | "swipecard";
+type ScanMethodType = "eventPass" | "swipeCardMagnetic" | "swipeCardBarcode";
 export type ResolverResult = {
     error: string | undefined,
     member?: {
@@ -155,64 +155,13 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         }
     }
 
-    /**
-     * Processes the key presses from the document to search for the output of a
-     * magnetic card scanner or a barcode scanner.
-     */
-    function keypressHandler(e: KeyboardEvent) {
-        const key = e.key;
-        if (!recordingKeystrokes.current) {
-            // The ";" indicates the start of a Track 1 sequence on a
-            // magnetic swipe card.
-            if (key == ";") {
-                recordingKeystrokes.current = true;
-                keystrokes.current = [];
-
-                // Set a timeout to stop recording keystrokes if the card
-                // wasn't scanned in time.
-                keypressTimeout.current = setTimeout(() => {
-                    if (recordingKeystrokes.current) {
-                        recordingKeystrokes.current = false;
-                        console.warn("Can't process card swipe: swipe took too long.");
-                    }
-                    // Reset timeout.
-                    keypressTimeout.current = undefined;
-                }, SWIPECARD_TIMEOUT)
-            }
-        } else {
-            // The "?" indicates the end of a track sequence on a magnetic
-            // swipe card.
-            if (key == "?") {
-                // Join all the individual key presses to get the entire card id.
-                const cardId = keystrokes.current.join("");
-                recordingKeystrokes.current = false;
-
-                // Send the card ID to the swipe handler.
-                onSwipe(cardId);
-            } else if (keystrokes.current.length > SWIPECARD_TRACK_LENGTH) {
-                // Track is too long, so it is not a valid swipe card number.
-                // Therefore, stop recording keystrokes.
-                recordingKeystrokes.current = false;
-                console.warn("Can't process card swipe: track is too long!");
-            } else {
-                keystrokes.current.push(key);
-            } 
-        }
-    }
-
-    function configureQRScanner() {
-        qr.current = new Html5Qrcode("scanner");
-        qr.current!.start({ facingMode: "user"}, QR_SCANNER_CONFIG, onQRScan, onQRError);
-    }
-
     function onEventPassScan(text: string) {
-        console.log(text)
         const eventPassObj = JSON.parse(text);
         const issuanceId = eventPassObj.issuanceId;
         if (issuanceId) {
             isScanning.current = false;
             setScannerStatus("processing");
-            resolve("terplink", issuanceId).then(result => {
+            resolve("eventPass", issuanceId).then(result => {
                 if (result.member) {
                     setCheckedInMemberName(result.member.name);
                 } else {
