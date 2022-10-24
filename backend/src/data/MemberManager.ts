@@ -198,6 +198,7 @@ export class Member {
         if (this._attributes.email && (allowRepeatSend || !this._attributes.wasSentContract)) {
             // Send contract
             await XRC.odoo.sendSignatureRequest(XRC.host.labOdooContractId, 
+                this._attributes.name ?? this._attributes.email,
                 this._attributes.email, 
                 "XR Lab Agreement", 
                 "LabAgreement.pdf")

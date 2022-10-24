@@ -14,8 +14,8 @@ export class Odoo {
         return await this.execPythonScript("get_signers", [templateId.toString()]) as OdooSigner[]
     }
 
-    public async sendSignatureRequest(templateId: number, email: string, subject: string, filename: string) {
-        await this.execPythonScript("send", [templateId.toString(), email, subject, filename])
+    public async sendSignatureRequest(templateId: number, name: string, email: string, subject: string, filename: string) {
+        await this.execPythonScript("send", [templateId.toString(), name, email, subject, filename])
     }
 
     private async execPythonScript(cmd: OdooPythonScriptCommand, args: string[]) {

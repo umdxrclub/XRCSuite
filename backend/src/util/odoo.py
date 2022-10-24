@@ -19,15 +19,15 @@ def search_email(email):
     "limit":1
 })
 
-def create_email(email):
-    return exec_kw("res.partner", "name_create", [email])
+def create_email(name, email):
+    return exec_kw("res.partner", "create", [{"name": name, "email": email}])
 
-def find_or_create_partner_id(email):
+def find_or_create_partner_id(name, email):
     partners = search_email(email)
     if len(partners) > 0:
         return partners[0][0]
     else:
-        return create_email(email)[0]
+        return create_email(name, email)
 
 def create_sign_request(template_id, partner_id, subject, filename):
     args = {
@@ -67,7 +67,7 @@ def get_signers(template_id, email = None):
 
 def show_usage():
     print ("usage: odoo.py get_signers [template_id] [email?]")
-    print ("       odoo.py send [template_id] [email] [subject] [filename]")
+    print ("       odoo.py send [template_id] [name] [email] [subject] [filename]")
 
 if len(sys.argv) <= 2:
     show_usage()
@@ -80,13 +80,14 @@ else:
         if (num_args == 2):
             email = sys.argv[3]
         print (json.dumps(get_signers(template_id, email=email)))
-    elif cmd == "send" and len(sys.argv) == 6:
+    elif cmd == "send" and len(sys.argv) == 7:
         template_id = sys.argv[2]
-        email = sys.argv[3]
-        subject = sys.argv[4]
-        filename = sys.argv[5]
+        name = sys.argv[3]
+        email = sys.argv[4]
+        subject = sys.argv[5]
+        filename = sys.argv[6]
 
-        partner_id = find_or_create_partner_id(email)
+        partner_id = find_or_create_partner_id(name, email)
         request_id = create_sign_request(template_id, partner_id, subject, filename)
         send_sign_request(request_id)
         print ("{}")
