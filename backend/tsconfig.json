@@ -1,12 +1,28 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
-  "include": ["./src/**/*.ts" ],
   "compilerOptions": {
-    "resolveJsonModule": true,
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
     "outDir": "./dist",
-    "baseUrl": "./src",
-    "paths": {
-        "@xrc/*": ["../../shared/*"]
-    }
+    "rootDir": "./src",
+    "jsx": "react"
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+  ],
+  "ts-node": {
+    "transpileOnly": true
   }
 }

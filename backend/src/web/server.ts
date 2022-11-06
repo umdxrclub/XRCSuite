@@ -1,11 +1,11 @@
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs/promises";
 import https from "https";
-import { serveFrontend } from "./util/frontend";
+import payload from "payload";
 import { getXRCHost } from "../util/host";
-import cors from "cors"
 import { API } from "./api/api";
-import XRC from "../data/XRC";
+import { serveFrontend } from "./util/frontend";
 
 export type ExpressRequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 
@@ -72,6 +72,14 @@ export default async function startWebServer(apis: API[]) {
     const callback = (https: boolean) => {
         console.log(`XRC Backend running on port ${host.port} (https=${https})`);
     }
+
+    // Start payload
+
+    payload.init({
+        secret: "fas8dfus89aufeanf",
+        mongoURL: "mongodb://127.0.0.1/xrc-debug",
+        express: app
+    })
 
     if (host.https) {
         https.createServer({
