@@ -1,9 +1,15 @@
 import { CollectionConfig } from "payload/types";
+import ActionList from "../components/ActionList";
 
 const Events: CollectionConfig = {
     slug: 'events',
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        components: {
+            views: {
+                List: ActionList
+            }
+        }
     },
     fields: [
         {

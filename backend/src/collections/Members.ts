@@ -15,7 +15,8 @@ const Members: CollectionConfig = {
             type: 'text',
         },
         {
-            name: 'UMD',
+            name: 'umd',
+            label: 'UMD',
             type: 'group',
             fields: [
                 {

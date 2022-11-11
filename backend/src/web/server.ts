@@ -33,11 +33,6 @@ export default async function startWebServer(apis: API[]) {
     // Enable JSON parsing for requests.
     app.use(express.json());
 
-    // Allow Cross-Origin stuff
-    if (host.allowCrossOrigin) {
-        app.use(cors())
-    }
-
     // Create logger
     createLogger(app);
 
@@ -65,7 +60,6 @@ export default async function startWebServer(apis: API[]) {
         });
     });
 
-
     // Load the XRC client (if available)
     await serveFrontend(app);
 
@@ -74,7 +68,6 @@ export default async function startWebServer(apis: API[]) {
     }
 
     // Start payload
-
     payload.init({
         secret: "fas8dfus89aufeanf",
         mongoURL: "mongodb://127.0.0.1/xrc-debug",

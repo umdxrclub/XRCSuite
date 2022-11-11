@@ -5,7 +5,7 @@ import startWebServer from "./web/server";
 import { startDiscordBot } from "./discord/bot"
 
 const SERVICES: BackendService[] = [
-    XRCDatabase
+    // XRCDatabase
 ];
 
 (async () => {

@@ -6,21 +6,42 @@ import Leadership from './src/collections/Leadership'
 import Users from './src/collections/Users'
 import Events from './src/collections/Events'
 import Attendances from './src/collections/Attendances'
+import Heartbeats from './src/collections/Heartbeats'
 import Lab from './src/globals/Lab'
 import Discord from './src/globals/Discord'
 import CAS from './src/globals/CAS'
+import UMDLoginButton from './src/components/UMDLoginButton'
+import XRCLogo from './src/components/XRCLogo'
 
 export default buildConfig({
     admin: {
         user: Users.slug,
+        components: {
+            afterLogin: [UMDLoginButton],
+            graphics: {
+                Icon: XRCLogo
+            }
+        },
+        webpack: (config) => ({
+            ...config,
+            resolve: {
+                ...config.resolve,
+                fallback: {
+                    ...config.resolve?.fallback,
+                    util: require.resolve('util')
+                }
+            }
+        }),
     },
+    cors: '*',
     collections: [
-        Devices,
+        Users,
         Members,
         Leadership,
+        Devices,
+        Heartbeats,
         Events,
-        Attendances,
-        Users
+        Attendances
     ],
     globals: [
         Lab,

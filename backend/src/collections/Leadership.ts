@@ -21,7 +21,7 @@ const Leadership: CollectionConfig = {
         plural: 'Leadership'
     },
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'member'
     },
     fields: [
         {

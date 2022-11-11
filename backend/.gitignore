@@ -134,3 +134,6 @@ cookies.json
 
 # HOTP Counter
 .hotp_counter
+
+# HTTPS Certs
+https/
