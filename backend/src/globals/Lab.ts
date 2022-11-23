@@ -24,7 +24,11 @@ const Lab: GlobalConfig = {
                     relationTo: Members.slug,
                     unique: true
                 }
-            ]
+            ],
+            validate: (value) => {
+                console.log(value)
+                return true
+            }
         }
     ]
 };
