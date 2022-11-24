@@ -11,8 +11,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "jsx": "react"
+    "jsx": "react",
+    "paths": {
+      "@xrc/*": ["../../shared/*"]
+    }
   },
   "include": [
     "src"

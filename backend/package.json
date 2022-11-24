@@ -9,7 +9,8 @@
     "start": "ts-node ./src/run.ts --transpile-only",
     "serve": "node ./dist/run.js",
     "deploy": "ts-node ./scripts/deploy.ts",
-    "dev": "nodemon ./src/run.ts"
+    "dev": "nodemon ./src/run.ts",
+    "types": "payload generate:types"
   },
   "author": "",
   "license": "ISC",

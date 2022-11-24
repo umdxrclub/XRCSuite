@@ -14,13 +14,7 @@ function createLogger(app: express.Express) {
         const date = new Date().toISOString();
         const method = req.method.toUpperCase();
         console.log(`[${date}] ${req.socket.remoteAddress} ${method} ${req.url}`);
-        const send = res.send.bind(res);
-        res.send = (body) => {
-            const date = new Date().toISOString();
-            console.log(`[${date}] ${res.statusCode} -> ${req.socket.remoteAddress} ${method} ${req.url}`);
-            return send(body);
-        }
-
+        
         // Pass request.
         next();
     });
@@ -68,7 +62,7 @@ export default async function startWebServer(apis: API[]) {
     }
 
     // Start payload
-    payload.init({
+    await payload.initAsync({
         secret: "fas8dfus89aufeanf",
         mongoURL: "mongodb://127.0.0.1/xrc-debug",
         express: app

@@ -137,3 +137,6 @@ cookies.json
 
 # HTTPS Certs
 https/
+
+# Media
+media/

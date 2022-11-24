@@ -1,12 +1,12 @@
-import { LabManager } from './Lab';
+import { Axios } from 'axios';
 import { useAxios } from "../util/axios";
 import { getXRCHost, XRCHostConfiguration } from "../util/host";
-import { UMDDirectory } from '../util/umd-directory';
-import { Axios } from 'axios';
-import { MemberManager } from './MemberManager';
-import { TerpLink } from '../util/terplink';
-import { EventManager } from './EventManager';
 import { Odoo } from '../util/odoo';
+import { TerpLink } from '../util/terplink';
+import { UMDDirectory } from '../util/umd-directory';
+import { EventManager } from './EventManager';
+import { LabManager } from './Lab';
+import { MemberManager } from './MemberManager';
 
 class XRCManager
 {

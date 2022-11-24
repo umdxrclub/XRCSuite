@@ -2,7 +2,7 @@ import { API_V1 } from './web/api/v1/v1';
 import { XRCDatabase } from './data/DatabaseService';
 import { BackendService } from './services/BackendService';
 import startWebServer from "./web/server";
-import { startDiscordBot } from "./discord/bot"
+import { serveDiscordBot } from "./discord/bot"
 
 const SERVICES: BackendService[] = [
     // XRCDatabase
@@ -17,8 +17,10 @@ const SERVICES: BackendService[] = [
 
     console.log("Backend services ready, starting web server...")
     await startWebServer([ API_V1 ]);
-    // console.log("Backend server ready, starting Discord bot...")
-    // await startDiscordBot();
+
+    console.log("Backend server ready, starting Discord bot...")
+    await serveDiscordBot();
+
     console.log("XRCSuite is now ready.")
 })();
 

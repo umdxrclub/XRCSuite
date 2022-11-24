@@ -1,10 +1,8 @@
-import { Axios, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from "axios";
-import XRC from "../data/XRC";
+import { TerpLinkSchema } from "@xrc/TerpLinkSchema";
+import { Axios, AxiosRequestConfig, AxiosResponse } from "axios";
 import parse from "node-html-parser";
 import querystring from "querystring";
-import { TerpLinkSchema } from "@xrc/TerpLinkSchema"
 import { queryStringFromForm, wasRequestRedirectedTo, X_WWW_FORM_HEADERS_CONFIG } from "./scrape-util";
-import { request } from "http";
 
 const CAMPUS_LABS_API_URL = "https://se-app-checkins.campuslabs.com/v4.0/";
 const TERPLINK_FEDERATION_URL = "https://federation.campuslabs.com"
@@ -24,7 +22,7 @@ function log(msg: string) {
 /**
  * Represents a roster member retrieved from TerpLink.
  */
-class RosterMember {
+export class RosterMember {
     public communityId: string
     public name: string
     private _axios: Axios
@@ -142,9 +140,9 @@ export class TerpLink {
         this.bearer = bearerRes.data.split("'")[1]
     }
 
-    public async getEvent(eventCode: string): Promise<TerpLinkEvent | null> {
+    public async getEvent(accessCode: string): Promise<TerpLinkEvent | null> {
         // Check and see if the event has already been cached.
-        var cachedEvent = this.events.get(eventCode);
+        var cachedEvent = this.events.get(accessCode);
         if (cachedEvent) {
             return cachedEvent;
         }
@@ -153,7 +151,7 @@ export class TerpLink {
         try {
             var eventRes = await this.axios.get(CAMPUS_LABS_API_URL + "event", {
                 params: {
-                    accesscode: eventCode
+                    accesscode: accessCode
                 }
             })
         } catch (e) {
@@ -166,7 +164,7 @@ export class TerpLink {
         let eventData = eventRes.data as TerpLinkSchema.EventDetails;
 
         const event = new TerpLinkEvent(eventData, this.axios);
-        this.events.set(eventCode, event);
+        this.events.set(accessCode, event);
         return event;
     }
 
@@ -240,7 +238,7 @@ export class TerpLink {
         for (var i = 2; i <= lastPage; i++) {
             let pageI = i;
             promises.push(new Promise<RosterMember[]>(async (resolve, reject) => {
-                let pageRes = await requestForPage(pageI);   
+                let pageRes = await requestForPage(pageI);
                 initExtraction = extractMembers(pageRes.data);
                 resolve(initExtraction.members);
             }))
@@ -310,6 +308,8 @@ export class TerpLink {
                         name
                         startsOn
                         endsOn
+                        imageUrl
+                        description
                       }
                     }
                   }`,
@@ -345,6 +345,10 @@ export class TerpLinkEvent {
     constructor(event: TerpLinkSchema.EventDetails, axios: Axios) {
         this.event = event;
         this.axios = axios;
+    }
+
+    getAccessToken(): string {
+        return this.event.accessToken
     }
 
     /**

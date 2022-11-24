@@ -22,7 +22,9 @@ export namespace TerpLinkSchema {
         name: string,
         startsOn: string,
         endsOn: string,
-        id: number
+        id: number,
+        imageUrl: string,
+        description: string
     }
 
     export interface Account {

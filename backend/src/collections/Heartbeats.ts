@@ -1,8 +1,12 @@
 import { CollectionConfig } from "payload/types";
+import { CollectionSlugs } from "../slugs";
 import Devices from "./Devices";
 
 const Heartbeats: CollectionConfig = {
-    slug: 'heartbeats',
+    slug: CollectionSlugs.Heartbeats,
+    admin: {
+        group: "Audit",
+    },
     fields: [
         {
             name: 'device',

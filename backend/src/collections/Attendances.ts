@@ -1,11 +1,18 @@
 import { CollectionConfig } from "payload/types";
+import AuditMessagesHook from "../endpoints/Attendance/AuditMessages";
+import { CollectionSlugs } from "../slugs";
 import Events from "./Events";
 import Members from "./Members";
 
 const Attendances: CollectionConfig = {
-    slug: 'attendances',
+    slug: CollectionSlugs.Attendances,
     admin: {
-        useAsTitle: 'member'
+        useAsTitle: 'member',
+        group: "Audit",
+        defaultColumns: [ 'member', 'date', 'event', 'type' ],
+    },
+    hooks: {
+        afterChange: [ AuditMessagesHook ]
     },
     fields: [
         {
@@ -24,8 +31,17 @@ const Attendances: CollectionConfig = {
         },
         {
             name: 'type',
-            type: 'select',
-            options: [ "in", "out" ]
+            type: 'radio',
+            options: [
+                {
+                    label: 'In',
+                    value: 'in'
+                },
+                {
+                    label: 'Out',
+                    value: 'out'
+                }
+            ]
         }
     ]
 }

@@ -1,9 +1,20 @@
 import { GlobalConfig } from "payload/types";
-import Members from "../collections/Members";
+import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
+import { GlobalSlugs } from "../slugs";
 
-const Discord: GlobalConfig = {
-    slug: 'discord',
+const Bot: GlobalConfig = {
+    slug: GlobalSlugs.Discord,
+    admin: {
+        group: 'Discord'
+    },
     fields: [
+        {
+            name: 'enabled',
+            type: 'checkbox',
+            hooks: {
+                afterChange: [BotUpdateHook]
+            }
+        },
         {
             name: 'auth',
             type: 'group',
@@ -21,18 +32,8 @@ const Discord: GlobalConfig = {
                     type: 'text'
                 }
             ]
-        },
-        {
-            name: 'guilds',
-            type: 'array',
-            fields: [
-                {
-                    name: 'guildId',
-                    type: 'text'
-                }
-            ]
         }
     ]
 };
 
-export default Discord;
+export default Bot;

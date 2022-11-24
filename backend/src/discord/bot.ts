@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits, Partials } from "discord.js";
-import { getXRCHost } from "../util/host";
+import payload from "payload";
+import { GlobalSlugs } from "../slugs";
 import { BOT_COMMANDS } from "./commands/command";
 
 const BOT_INTENTS = [
@@ -9,38 +10,57 @@ const BOT_INTENTS = [
 ]
 
 // Create the bot client.
-const client = new Client({
-    intents: BOT_INTENTS,
-    partials: [Partials.Channel, Partials.Message, Partials.Reaction]
-});
+var discordClient: Client | undefined = undefined
 
-client.once('ready', async (client) => {
-    console.log("Logged in as " + client.user.username);
-});
+function onCreateClient() {
+    if (discordClient) {
+        discordClient.once('ready', async (client) => {
+            console.log("Logged in as " + client.user.username);
+        });
 
-// Add slash command handlers
-client.on("interactionCreate", async interaction => {
-    // Only process commands.
-    if (!interaction.isChatInputCommand())
-        return;
+        // Add slash command handlers
+        discordClient.on("interactionCreate", async interaction => {
+            // Only process commands.
+            if (!interaction.isChatInputCommand())
+                return;
 
-    // Find the associated command and execute its handler.
-    const command = BOT_COMMANDS.find((cmd) => cmd.data.name === interaction.commandName);
-    if (command)
-        await command.onInvoke(interaction);
-});
+            // Find the associated command and execute its handler.
+            const command = BOT_COMMANDS.find((cmd) => cmd.data.name === interaction.commandName);
+            if (command)
+                await command.onInvoke(interaction);
+        });
 
-// client.on("messageReactionAdd", async (reaction, user) => {
-//     await onReactionAdd(reaction, user);
-// })
+        // client.on("messageReactionAdd", async (reaction, user) => {
+        //     await onReactionAdd(reaction, user);
+        // })
+    }
+}
 
-export async function startDiscordBot() {
-    let config = getXRCHost().discord;
+export function getDiscordClient(): Client | undefined {
+    return discordClient;
+}
 
-    if (config) {
-        // Login to the Discord bot.
-        await client.login(config.token);
-    } else {
-        console.error("No config available!");
+export async function serveDiscordBot() {
+    let discordConfig = await payload.findGlobal({ slug: GlobalSlugs.Discord })
+    if (discordConfig.enabled) {
+        console.log("Starting Discord Bot...")
+        let token = discordConfig.auth.token;
+        if (token) {
+            discordClient = new Client({
+                intents: BOT_INTENTS,
+                partials: [Partials.Channel, Partials.Message, Partials.Reaction]
+            });
+
+            onCreateClient()
+
+            // Login to the Discord bot.
+            await discordClient.login(token);
+        } else {
+            console.error("No config available!");
+        }
+    } else if (discordClient) {
+        console.log("Disabling Discord Bot")
+        discordClient.destroy()
+        discordClient = undefined
     }
 }

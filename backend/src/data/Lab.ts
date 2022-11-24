@@ -1,8 +1,10 @@
 import { XRCSchema } from "@xrc/XRCSchema";
-import { Member } from "./MemberManager";
+import { TerpLinkEvent } from "../util/terplink";
+import Lab from "../globals/Lab";
 import { Event, EventManager } from "./EventManager";
+import { Member } from "./MemberManager";
+import payload from "payload";
 import XRC from "./XRC";
-import { TerpLink, TerpLinkEvent } from "util/terplink";
 
 /**
  * Manages the state of the XR Club lab. Members can be added and removed from
@@ -81,7 +83,12 @@ export class LabManager {
 
     public async getTerpLinkEvent(): Promise<TerpLinkEvent> {
         if (!this._labTerpLinkEvent) {
-            let tlEvent = await XRC.terplink.getEvent(XRC.host.labTerpLinkCode)
+            let lab = await payload.findGlobal({
+                slug: 'lab'
+            })
+
+            let accessCode = lab.event.terplink.accessCode;
+            let tlEvent = await XRC.terplink.getEvent(accessCode)
             if (!tlEvent) {
                 throw new Error("Could not fetch lab event!")
             }

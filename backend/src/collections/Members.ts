@@ -1,10 +1,43 @@
+import { FilterOptions } from "payload/dist/fields/config/types";
 import { CollectionConfig } from "payload/types";
+import ImportRosterEndpoint from "../endpoints/Members/ImportTerpLinkRoster";
+import ResolveMemberEndpoint from "../endpoints/Members/ResolveMember";
+import { CollectionSlugs } from "../slugs";
+import Media from "./Media";
+
+const CLUB_ROLES: string[] = [
+    "President",
+    "Vice President",
+    "Treasurer",
+    "Engagement Director",
+    "Lab Manager",
+    "Mentor",
+    "Graphic Designer",
+    "Event Coordinator",
+    "Web Developer",
+    "Marketing Director"
+]
+
+const INTEGRATION_TYPES: string[] = [
+    "LinkedIn",
+    "GitHub",
+    "Website",
+    "Twitter",
+    "Twitch",
+    "YouTube",
+    "Discord",
+    "Steam",
+    "Meta"
+]
 
 const Members: CollectionConfig = {
-    slug: 'members',
+    slug: CollectionSlugs.Members,
     admin: {
-        useAsTitle: 'name'
+        useAsTitle: 'name',
+        group: 'Users',
+        defaultColumns: [ 'name', 'email', 'isClubMember', 'isLeadership' ]
     },
+    endpoints: [ImportRosterEndpoint, ResolveMemberEndpoint],
     fields: [
         {
             name: 'name',
@@ -13,6 +46,56 @@ const Members: CollectionConfig = {
         {
             name: 'email',
             type: 'text',
+            unique: true,
+            index: true
+        },
+        {
+            name: 'isClubMember',
+            type: 'checkbox'
+        },
+        {
+            name: 'isLeadership',
+            type: 'checkbox',
+            defaultValue: false
+        },
+        {
+            name: 'leadership',
+            type: 'group',
+            fields: [
+                {
+                    name: 'picture',
+                    type: 'upload',
+                    relationTo: Media.slug
+                },
+                {
+                    name: 'roles',
+                    type: 'select',
+                    options: CLUB_ROLES,
+                    hasMany: true
+                },
+                {
+                    name: 'links',
+                    type: 'array',
+                    fields: [
+                        {
+                            name: 'type',
+                            type: 'select',
+                            options: INTEGRATION_TYPES
+                        },
+                        {
+                            name: 'url',
+                            type: 'text'
+                        }
+                    ]
+                },
+                {
+                    name: 'bio',
+                    type: 'richText'
+                }
+            ],
+            admin: {
+                condition: (data, siblingData) => data.isLeadership
+            }
         },
         {
             name: 'umd',
@@ -25,15 +108,37 @@ const Members: CollectionConfig = {
                 },
                 {
                     name: 'cardSerial',
-                    type: 'text'
+                    type: 'text',
+                    index: true
                 },
                 {
-                    name: 'terplinkAccountId',
-                    type: 'text'
-                },
-                {
-                    name: 'terplinkIssuanceId',
-                    type: 'text'
+                    name: 'terplink',
+                    type: 'group',
+                    fields: [
+                        {
+                            name: 'accountId',
+                            type: 'text',
+                            unique: true
+                        },
+                        {
+                            name: 'issuanceId',
+                            admin: {
+                                description: "The id stored within an event pass"
+                            },
+                            type: 'text',
+                            unique: true,
+                            index: true
+                        },
+                        {
+                            name: 'communityId',
+                            admin: {
+                                description: "Used to identify members within the club roster"
+                            },
+                            type: 'text',
+                            unique: true,
+                            index: true
+                        }
+                    ]
                 }
             ]
         },
@@ -60,6 +165,12 @@ const Members: CollectionConfig = {
             ]
         }
     ]
+}
+
+export const LeadershipFilter: FilterOptions = {
+    "isLeadership": {
+        equals: true
+    }
 }
 
 export default Members;

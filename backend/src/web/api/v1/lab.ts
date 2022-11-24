@@ -30,7 +30,7 @@ const lab_checkin: APIRoute = {
                 if (!member) {
                     let tlEvent = await XRC.lab.getTerpLinkEvent();
                     let tlCheckInMember = await tlEvent.getMemberFromIssuanceId(issuanceId);
-                    
+                
                     // Ensure that the TerpLink member was actually found.
                     if (!tlCheckInMember) {
                         throw new Error("Could not get TerpLink member from the lab event using their issuance id!");
