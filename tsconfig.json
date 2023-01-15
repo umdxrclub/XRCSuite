@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react",
+  },
+  "include": [
+    "src", "src/payload.config.ts"
+, "react-app-env.d.ts"  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+  ],
+  "ts-node": {
+    "transpileOnly": true
+  }
+}
