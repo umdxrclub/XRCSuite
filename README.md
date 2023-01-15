@@ -16,11 +16,8 @@ We use the [yarn dependency manager](https://classic.yarnpkg.com/en/) for this p
 In our humble opinion, the beautiful thing about this codebase is that all the backend, frontend, and Discord bot are all contained with a single codebase. This makes it much easier to ensure that these components are always up to date and work together seamlessly!
 
 - [TypeScript](https://www.typescriptlang.org/) as the language of choice for nearly the entire codebase, it powers both the backend, frontend, and Discord bot!
-
 - [Payload CMS](https://payloadcms.com/) for managing all of the data stored by this software. It super powerful and automatically builds all the admin UI you need to manage your data, we highly recommend that you check it out yourself!
-
 - [React](https://reactjs.org/) for building all of our frontend and admin user interfaces.
-
 - [discord.js](https://discord.js.org/#/) for serving our Discord bot and enabling all of its interactions.
 
 ## Student Contributors
