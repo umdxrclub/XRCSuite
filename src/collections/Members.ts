@@ -50,6 +50,10 @@ const Members: CollectionConfig = {
             type: 'text'
         },
         {
+            name: 'birthday',
+            type: 'date'
+        },
+        {
             name: 'email',
             type: 'text',
             unique: true,

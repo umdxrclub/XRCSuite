@@ -113,7 +113,7 @@ export default buildConfig({
         Gatekeeper
     ],
     typescript: {
-        outputFile: path.resolve(__dirname, '../shared/payload-types.ts'),
+        outputFile: path.resolve(__dirname, './types/PayloadSchema.ts'),
     },
     // graphQL: {
     //     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),

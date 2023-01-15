@@ -1,7 +1,5 @@
-import { Collection } from "discord.js";
 import { Endpoint } from "payload/dist/config/types";
 import { createMemberProfile, getAllLeadershipMembers } from "../../collections/util/MembersUtil";
-import { CollectionSlugs } from "../../slugs";
 
 const LeadershipEndpoint: Endpoint = {
     path: "/leadership",

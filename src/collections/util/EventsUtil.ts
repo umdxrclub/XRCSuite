@@ -4,8 +4,9 @@ import moment from "moment";
 import payload from "payload";
 import { getGuild, sendGuildMessage } from "../../discord/util";
 import { CollectionSlugs } from "../../slugs";
+import { Event } from "../../types/PayloadSchema";
 
-export function createEventEmbed(event: any): EmbedBuilder {
+export function createEventEmbed(event: Event): EmbedBuilder {
     let embed = new EmbedBuilder()
 
     embed.setTitle(event.name)
@@ -50,7 +51,7 @@ export function createEventEmbed(event: any): EmbedBuilder {
     return embed;
 }
 
-export async function createGuildEvent(event: any) {
+export async function createGuildEvent(event: Event) {
     let guild = await getGuild();
 
     var description = event.description as string;
@@ -74,7 +75,7 @@ export async function createGuildEvent(event: any) {
     return guildEvent;
 }
 
-export async function announceEvent(event: any, channel?: TextChannel) {
+export async function announceEvent(event: Event, channel?: TextChannel) {
     // Create Discord event if necessary.
     let guild = await getGuild();
     var discordEventId = event.discord.eventId;

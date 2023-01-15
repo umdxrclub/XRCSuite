@@ -27,6 +27,10 @@ const Devices: CollectionConfig = {
         {
             name: 'serialNumber',
             type: 'text'
+        },
+        {
+            name: 'umdSerialNumber',
+            type: 'text'
         }
     ]
 }

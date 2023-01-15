@@ -7,7 +7,7 @@
     "start": "ts-node ./src/run.ts --transpile-only",
     "deploy": "ts-node ./src/deploy.ts",
     "dev": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts nodemon ./src/run.ts",
-    "types": "payload generate:types",
+    "types": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload generate:types",
     "build:payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload build",
     "build:server": "tsc",
     "build": "yarn copyfiles && yarn build:payload && yarn build:server",
