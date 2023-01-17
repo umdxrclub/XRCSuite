@@ -2,6 +2,7 @@ import { GlobalConfig } from "payload/types";
 import Events from "../collections/Events";
 import Members, { LeadershipRoles } from "../collections/Members";
 import Schedules from "../collections/Schedules";
+import LabColorPicker from "../components/lab/LabColorPicker";
 import LabCheckIn from "../endpoints/Lab/LabCheckIn";
 import LabStatusEndpoint from "../endpoints/Lab/LabStatus";
 import LabStatusHook from "../hooks/Lab/LabStatus";
@@ -27,7 +28,7 @@ const Lab: GlobalConfig = {
             name: 'members',
             type: 'relationship',
             relationTo: Members.slug,
-            hasMany: true
+            hasMany: true,
         },
         {
             name: 'schedule',
@@ -48,6 +49,15 @@ const Lab: GlobalConfig = {
             name: 'settings',
             type: 'group',
             fields: [
+                {
+                    type: 'ui',
+                    name: 'color',
+                    admin: {
+                        components: {
+                            Field: LabColorPicker
+                        }
+                    }
+                },
                 {
                     type: 'checkbox',
                     name: 'notifyStatus',

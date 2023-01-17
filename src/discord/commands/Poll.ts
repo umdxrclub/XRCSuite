@@ -2,6 +2,7 @@ import { EmbedBuilder, RGBTuple } from "@discordjs/builders";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, CommandInteraction, Interaction, ModalBuilder, SlashCommandBuilder, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import payload from "payload";
 import { CollectionSlugs } from "../../slugs";
+import { Poll } from "../../types/PayloadSchema";
 import { getDiscordClient } from "../bot";
 import { Command } from "./command";
 
@@ -33,7 +34,7 @@ async function getOpenPolls(discordId: string) {
     })
 }
 
-function createPollSelectableMenu(polls: any[], customId: string) {
+function createPollSelectableMenu(polls: Poll[], customId: string) {
     return new ActionRowBuilder<StringSelectMenuBuilder>()
                     .addComponents(
                         new StringSelectMenuBuilder()
@@ -97,6 +98,23 @@ async function onPollInvoke(interaction: ChatInputCommandInteraction<CacheType>)
     }
 }
 
+function createProgressBar(percentage: number) {
+    const fill = "█" // "🟦"
+    const background = " " // "⬛"
+    const numCells = 20
+
+    let numFillCells = Math.round(percentage * numCells);
+
+    var progressBar = ""
+    for (var i = 0; i < numCells; i++) {
+        progressBar += i < numFillCells ? fill : background
+    }
+
+    progressBar = '`' + progressBar + '`'
+
+    return progressBar
+}
+
 async function onInteractionCreate(interaction: Interaction<CacheType>) {
     let user = interaction.user;
 
@@ -146,9 +164,9 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
             let choiceNumber = match[2]
 
             // Attempt to fetch the poll.
-            var poll;
+            var poll: Poll | undefined = undefined;
             try {
-                poll = await payload.findByID({
+                poll = await payload.findByID<Poll>({
                     collection: CollectionSlugs.Polls,
                     id: pollId
                 })
@@ -174,7 +192,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
                 choice.voters.push({ id: interaction.user.id })
 
                 // Update poll
-                await payload.update({
+                await payload.update<Poll>({
                     collection: CollectionSlugs.Polls,
                     id: pollId,
                     data: {
@@ -231,12 +249,12 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
     }
 }
 
-export async function createPollEmbedAndRow(poll: any) {
+export async function createPollEmbedAndRow(poll: Poll) {
     let client = await getDiscordClient();
     
     // Extract info from the poll
     let title = poll.title;
-    let choices = poll.choices as any[];
+    let choices = poll.choices;
     let totalVotes = choices.reduce((acc, c) => acc + c.voters.length, 0)
     let author = await client.users.fetch(poll.author)
 
@@ -244,10 +262,10 @@ export async function createPollEmbedAndRow(poll: any) {
     let embed = new EmbedBuilder()
     embed.setTitle(title)
     embed.setFields(...[...choices] // copy array to prevent sorting the buttons
-        .sort((a, b) => b.voters.length - a.voters.length)
         .map((c, i) => {
-            let percentage = totalVotes == 0 ? 0 : Math.round(100*c.voters.length/totalVotes)
-            let text = `${c.voters.length} (${percentage}%)`;
+            let percentage = c.voters.length/totalVotes;
+            let displayPercentage = totalVotes == 0 ? 0 : Math.round(100*percentage)
+            let text = `**${c.voters.length}** \u200b \u200b \u200b ${createProgressBar(percentage)} (${displayPercentage}%)`;
 
             // If the poll is closed and this choice won, bold it and add trophy.
             if (!poll.open && i == 0) {
@@ -286,7 +304,7 @@ export async function createPollEmbedAndRow(poll: any) {
  * The poll command allows users to create polls that other club members can
  * vote on.
  */
-export const Poll: Command = {
+export const PollCommand: Command = {
     onInvoke: onPollInvoke,
     onInteractionCreate: onInteractionCreate,
     data: new SlashCommandBuilder()

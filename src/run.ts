@@ -7,6 +7,7 @@ import { scheduleJobs } from "./jobs/Scheduler";
 dotenv.config();
 
 (async () => {
+    // Create web server.
     await startWebServer();
 
     console.log("Backend server ready, starting Discord bot...")

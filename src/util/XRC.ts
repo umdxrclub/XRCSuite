@@ -1,9 +1,9 @@
 import { Axios } from 'axios';
 import { UMDVerificationManager } from '../endpoints/Members/UMDVerification';
-import { useAxios } from "../util/axios";
-import { Odoo } from '../util/odoo';
-import { TerpLink } from '../util/terplink';
-import { UMDDirectory } from '../util/umd-directory';
+import { useAxios } from "./axios";
+import { Odoo } from './odoo';
+import { TerpLink } from './terplink';
+import { UMDDirectory } from './umd-directory';
 
 class XRCManager
 {

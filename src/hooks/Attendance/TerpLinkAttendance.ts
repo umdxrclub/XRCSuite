@@ -1,6 +1,6 @@
 import payload from "payload";
 import { CollectionAfterChangeHook } from "payload/types";
-import XRC from "../../data/XRC";
+import XRC from "../../util/XRC";
 import { CollectionSlugs } from "../../slugs";
 
 async function checkInOrOut(

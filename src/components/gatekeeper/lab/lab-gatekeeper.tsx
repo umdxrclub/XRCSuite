@@ -1,6 +1,5 @@
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { XRCSchema } from "../../../types/XRCSchema";
 import { GradientCard } from "../../util/GradientCard";
 import { RobotoLink } from "../../util/RobotoLink";
 import { GatekeeperScanner } from "../scanner/gatekeeper-scanner";
@@ -58,7 +57,7 @@ export const LabGatekeeper: React.FC = ({ }) => {
       </div>
     </div>
     <GatekeeperScanner resolve={ async (method, value) => {
-      if (method == "eventPass") {
+      if (method == "terplink") {
         try {
           var res = await fetch(`https://umdxrc.figsware.net/api/v1/lab/checkin?tlIssuanceId=${value}&validateAgreement=0`, {
             method: "POST"
@@ -69,7 +68,7 @@ export const LabGatekeeper: React.FC = ({ }) => {
           };
         }
         
-        let j = await res.json() as XRCSchema.Response<XRCSchema.LabCheckInResult>
+        let j = await res.json()
         console.log(j)
         if (j.success) {
           return {

@@ -1,16 +1,18 @@
 import axios from "axios";
-import { wrapper } from "axios-cookiejar-support";
+import crypto from "crypto";
 import { CookieJar } from "tough-cookie";
 import { FileCookieStore } from "tough-cookie-file-store";
 import { CAS_LOGIN_SSO, CAS_LOGIN_URL, loginWithCAS, loginWithCASUsingSAML } from "../util/cas";
 import { wasRequestRedirectedTo } from "./scrape-util";
+import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent/http';
 
 const DEBUG = false
 
 const jar = new CookieJar(new FileCookieStore("./cookies.json"));
-const sharedAxios = wrapper(axios.create({
-    jar: jar
-}))
+const sharedAxios = axios.create({
+    httpAgent: new HttpCookieAgent({ cookies: { jar } }),
+    httpsAgent: new HttpsCookieAgent({ cookies: { jar }, secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT })
+})
 
 sharedAxios.defaults.withCredentials = true;
 

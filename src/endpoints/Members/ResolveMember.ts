@@ -1,5 +1,5 @@
 import { Endpoint } from "payload/dist/config/types";
-import { resolveMember } from "../../data/MemberManager";
+import { resolveMember } from "../../collections/util/MembersUtil";
 
 const ResolveMemberEndpoint: Endpoint = {
     path: "/resolve",

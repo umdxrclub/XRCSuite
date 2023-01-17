@@ -1,6 +1,7 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import payload from "payload";
 import { GlobalSlugs } from "../../slugs";
+import { rejectInteractionIfNotLeadership } from "../util";
 import { Command } from "./command";
 
 async function onLabInvoke(interaction: ChatInputCommandInteraction<CacheType>) {
@@ -62,8 +63,9 @@ async function onLabInvoke(interaction: ChatInputCommandInteraction<CacheType>) 
     }
 }
 
-export const Lab: Command = {
+export const LabCommand: Command = {
     onInvoke: onLabInvoke,
+    leadershipOnly: true,
     data: new SlashCommandBuilder()
         .setName("lab")
         .setDescription("Manages the status of the XR Lab.")

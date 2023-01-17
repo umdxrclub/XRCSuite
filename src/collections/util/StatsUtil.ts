@@ -5,7 +5,7 @@ import { CollectionSlugs } from "../../slugs";
 export async function createStatSnapshot() {
     // Retrieve Discord member count
     let guild = await getGuild();
-    let discordMemberCount = guild.memberCount;
+    let discordMemberCount = guild?.memberCount ?? -1;
 
     return await payload.create({
         collection: CollectionSlugs.Stats,

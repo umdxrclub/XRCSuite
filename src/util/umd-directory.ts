@@ -1,14 +1,13 @@
-import { Axios, AxiosResponse } from "axios";
+import { Axios, AxiosRequestConfig, AxiosResponse } from "axios";
 import parse from "node-html-parser";
 import { retryRequest, X_WWW_FORM_HEADERS_CONFIG } from "./scrape-util";
-import querystring from "querystring"
 
 type DirectoryResult = {
     name: string,
     email: string
 }
 
-const UMD_DIRECTORY_URL = "https://identity.umd.edu/search"
+const UMDDirectoryUrl = "https://identity.umd.edu/search"
 
 /**
  * Configuration parameters for an advanced search of the UMD directory.
@@ -38,7 +37,6 @@ export type AdvancedSearchParameters = {
 export class UMDDirectory {
     private axios: Axios
 
-
     constructor(axios: Axios) {
         this.axios = axios;
         this.axios.interceptors.response.use(this.directory_intercept.bind(this));
@@ -49,9 +47,8 @@ export class UMDDirectory {
      * student listings in the search results.
      */
     private async login() {
-        await this.axios.post(UMD_DIRECTORY_URL, querystring.stringify({
-            login: "Log in"
-        }), X_WWW_FORM_HEADERS_CONFIG)
+        let params = new URLSearchParams({ login: "Log in "}).toString()
+        await this.axios.post(UMDDirectoryUrl, params, X_WWW_FORM_HEADERS_CONFIG)
     }
 
     /**
@@ -60,14 +57,14 @@ export class UMDDirectory {
      * will attempt to log in and retry the request.
      */
     private async directory_intercept(res: AxiosResponse<any, any>) {
-        if (res.config.url?.startsWith(UMD_DIRECTORY_URL)) {
+        if (res.config.url?.startsWith(UMDDirectoryUrl)) {
             if ((res.data as string).indexOf('value="Log in"') > 0) {
                 console.log("Logging into UMD directory...")
                 await this.login();
                 return await retryRequest(res);
             }
         }
-        
+
         return res;
     }
 
@@ -89,12 +86,13 @@ export class UMDDirectory {
     }
 
     /**
-     * Performs a search on the directory website using a specified form as 
+     * Performs a search on the directory website using a specified form as
      * search parameters.
      */
     private async searchWithForm(form: any): Promise<DirectoryResult[]> {
+        let params = new URLSearchParams(form);
         // Create the form data used to search up the student
-        const res = await this.axios.post(UMD_DIRECTORY_URL, querystring.stringify(form), X_WWW_FORM_HEADERS_CONFIG)
+        const res = await this.axios.post(UMDDirectoryUrl, params.toString(), X_WWW_FORM_HEADERS_CONFIG)
 
         // Parse the body, and for each found student, parse their name/email.
         return this.parseBody(res.data);

@@ -1,6 +1,6 @@
 import { GlobalConfig } from "payload/types";
 import { createActionButton } from "../components/ActionButton";
-import { XRClubDiscordRoles } from "../data/XRCTypes";
+import { XRClubDiscordRoles } from "../types/XRCTypes";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";

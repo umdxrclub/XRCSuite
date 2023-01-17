@@ -1,18 +1,19 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CacheType, ChatInputCommandInteraction, GuildMember } from "discord.js";
 import payload from "payload";
-import { XRClubDiscordRole, XRClubDiscordRoles } from "../../data/XRCTypes";
+import { XRClubDiscordRole, XRClubDiscordRoles } from "../../types/XRCTypes";
 import { GlobalSlugs } from "../../slugs";
 import { getGuild } from "../util";
 import { Command } from "./command";
+import { Bot } from "../../types/PayloadSchema";
 
 async function resolveMemberAndRole(memberId: string, roleName: string, callback: (role: XRClubDiscordRole, roleId: string, member: GuildMember, hasRole: boolean) => void) {
   // Get the corresponding role id.
   let role = XRClubDiscordRoles.find(r => r.name == roleName);
-  let doc = await payload.findGlobal({
+  let doc = await payload.findGlobal<Bot>({
       slug: GlobalSlugs.Discord
   })
-  let roleId = doc.guild.roles[roleName] as string | undefined;
+  let roleId = doc.guild.roles[roleName];
 
   // Add this role to the member if they don't already have it.
   if (roleId) {
@@ -50,7 +51,7 @@ async function onRolesInvoke(
   }
 }
 
-export const Roles: Command = {
+export const RolesCommand: Command = {
   onInvoke: onRolesInvoke,
   data: new SlashCommandBuilder()
     .setName("roles")

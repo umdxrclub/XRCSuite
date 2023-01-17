@@ -1,5 +1,6 @@
 import { Endpoint } from "payload/dist/config/types";
 import { GlobalSlugs } from "../../slugs";
+import { Lab, Member } from "../../types/PayloadSchema";
 
 /**
  * The schema of the public API for retrieving the status of the XR Lab.
@@ -21,12 +22,12 @@ const LabStatusEndpoint: Endpoint = {
     method: "get",
     handler: async (req, res, next) => {
         // Get the current lab global store.
-        let lab = await req.payload.findGlobal({
+        let lab = await req.payload.findGlobal<Lab>({
             slug: GlobalSlugs.Lab
         })
 
-        let members = lab.members;
-        let staffNames = members.filter(m => m.isLeadership).map(m => m.name);
+        let members = lab.members as Member[] ?? [];
+        let staffNames = members.filter(m => m.leadershipRoles?.length > 0).map(m => m.name);
 
         // Form the status body.
         let status: LabStatus = {
@@ -41,3 +42,5 @@ const LabStatusEndpoint: Endpoint = {
 }
 
 export default LabStatusEndpoint;
+
+// https://umdxrc.figsware.net/api/globals/lab/status

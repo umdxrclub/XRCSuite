@@ -1,6 +1,8 @@
 import { ChatInputCommandInteraction, CacheType, SlashCommandBuilder, ChannelType, TextChannel, ActionRowBuilder, StringSelectMenuBuilder } from "discord.js";
 import payload from "payload";
+import { isDiscordMemberLeadership } from "../../collections/util/MembersUtil";
 import { CollectionSlugs } from "../../slugs";
+import { rejectInteractionIfNotLeadership } from "../util";
 import { Command } from "./command";
 
 const EventAnnounceId = "EventAnnounce";
@@ -42,8 +44,9 @@ async function onEventsInvoke(
     }
 }
 
-export const Events: Command = {
+export const EventsCommand: Command = {
     onInvoke: onEventsInvoke,
+    leadershipOnly: true,
     data: new SlashCommandBuilder()
         .setName("events")
         .setDescription("Manages events for the XR Club.")

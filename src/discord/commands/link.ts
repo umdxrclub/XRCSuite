@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import payload from "payload";
 import { getMemberFromDiscordId } from "../../collections/util/MembersUtil";
-import XRC from "../../data/XRC";
+import XRC from "../../util/XRC";
 import { CollectionSlugs } from "../../slugs";
 import { Command } from "./command";
 
@@ -84,7 +84,7 @@ async function onLinkInvoke(
     }
 }
 
-export const link: Command = {
+export const LinkCommand: Command = {
   onInvoke: onLinkInvoke,
   data: new SlashCommandBuilder()
     .setName("link")

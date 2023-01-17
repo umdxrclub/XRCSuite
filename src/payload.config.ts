@@ -32,7 +32,8 @@ const aliasDirectories = [
     './endpoints/',
     './util/',
     './hooks/',
-    './discord/'
+    './discord/',
+    './ws/'
 ]
 
 const emptyObjPath = path.resolve(__dirname, './mocks/EmptyObject.ts')
@@ -57,8 +58,6 @@ export default buildConfig({
                 let files = walkDirectory(dirPath, ".ts")
                 return [...arr, ...files];
             }, [] as string[]);
-
-            console.log("loading config")
 
             let newConfig = {
                 ...config,

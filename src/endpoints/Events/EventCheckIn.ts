@@ -1,7 +1,7 @@
 import { Endpoint } from "payload/dist/config/types";
-import { resolveMember } from "../../data/MemberManager";
-import XRC from "../../data/XRC";
+import XRC from "../../util/XRC";
 import { CollectionSlugs } from "../../slugs";
+import { resolveMember } from "../../collections/util/MembersUtil";
 
 /**
  * The required parameters for event check in:

@@ -217,8 +217,9 @@ export interface Wishlist {
  */
 export interface Description {
   id: string;
-  name?: string;
-  type?: 'Desktop' | 'Laptop' | 'VR Headset' | 'AR Headset' | 'Phone' | 'Software';
+  name: string;
+  image?: string | Media;
+  type: 'h_vr' | 'h_ar' | 'h_xr' | 'h_pc' | 'h_laptop' | 'h_phone' | 's_game' | 's_software';
   description?: {
     [k: string]: unknown;
   }[];
@@ -254,11 +255,14 @@ export interface Admin {
  */
 export interface Device {
   id: string;
-  name?: string;
-  type?: string | Description;
-  publish?: boolean;
-  serialNumber?: string;
-  umdSerialNumber?: string;
+  description: string | Description;
+  status: 'requested' | 'denied' | 'pending' | 'inLab' | 'checkedOut';
+  public: boolean;
+  info: {
+    serial?: string;
+    umdSerial?: string;
+    mac?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

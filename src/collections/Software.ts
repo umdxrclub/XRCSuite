@@ -1,6 +1,8 @@
 import { CollectionConfig } from "payload/types";
 import { CollectionSlugs } from "../slugs";
+import { SoftwareDescriptionPrefix } from "../types/XRCTypes";
 import Descriptions from "./Descriptions";
+import Devices from "./Devices";
 
 const Software: CollectionConfig = {
     slug: CollectionSlugs.Software,
@@ -13,10 +15,17 @@ const Software: CollectionConfig = {
             name: 'type',
             type: 'relationship',
             relationTo: Descriptions.slug,
-            validate: software => {
-                console.log(software)
-                return true;
+            filterOptions: {
+                type: {
+                    contains: SoftwareDescriptionPrefix
+                }
             }
+        },
+        {
+            name: "availableOn",
+            type: 'relationship',
+            relationTo: Devices.slug,
+            hasMany: true
         },
         {
             name: 'publish',

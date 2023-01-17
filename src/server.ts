@@ -1,8 +1,10 @@
 import express, { NextFunction, Request, Response } from "express";
 import fs from "fs/promises";
 import https from "https";
+import http from "http";
 import payload from "payload";
 import process from "process"
+import { createWebSocketEndpoints } from "./ws/WebSocketServer";
 
 export type ExpressRequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 
@@ -37,14 +39,18 @@ export default async function startWebServer() {
         express: app
     })
 
+    // Create HTTP(S) server
+    var server: http.Server | https.Server;
     let port = process.env.PORT ?? 8080;
-
     if (process.env.HTTPS_KEY_PATH && process.env.HTTPS_CERT_PATH) {
-        https.createServer({
+        server = https.createServer({
             key: await fs.readFile(process.env.HTTPS_KEY_PATH),
             cert: await fs.readFile(process.env.HTTPS_CERT_PATH)
         }, app).listen(port, () => callback(true));
     } else {
-        app.listen(port, () => callback(false));
+        server = app.listen(port, () => callback(false));
     }
+
+    // Create WebSocket servers
+    createWebSocketEndpoints(server);
 }

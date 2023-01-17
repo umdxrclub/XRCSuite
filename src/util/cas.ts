@@ -3,12 +3,13 @@ import parse from "node-html-parser";
 import { hotp } from "otplib";
 import payload from "payload";
 import querystring from "querystring";
-import XRC from "../data/XRC";
+import XRC from "./XRC";
 import { GlobalSlugs } from "../slugs";
 import {
   parseForm, queryStringFromForm,
   retryRequest, X_WWW_FORM_HEADERS_CONFIG
 } from "./scrape-util";
+import { Ca } from "../types/PayloadSchema";
 
 function log(msg: string) {
   console.log(`[CASAuthService] ${msg}`);
@@ -83,9 +84,12 @@ export async function loginWithCAS() {
   // POST: /frame/frameless/v4/auth
 
   const axios = XRC.axios;
-  const CAS = await payload.findGlobal({
+  const CAS = await payload.findGlobal<Ca>({
     slug: GlobalSlugs.CAS
   })
+
+  if (!CAS.duoDeviceName || !CAS.username || !CAS.password || !CAS.hotpSecret)
+    throw new Error("Missing CAS credentials, cannot proceed!")
 
   // First get the initial CAS page. If we're authenticated, this will
   // bring us to the Demo page. Otherwise, this will have the login screen

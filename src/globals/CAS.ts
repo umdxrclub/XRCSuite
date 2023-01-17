@@ -4,6 +4,11 @@ import Members from "../collections/Members";
 const CAS: GlobalConfig = {
     slug: 'cas',
     label: 'CAS',
+    access: {
+        read: (args) => {
+            return args.req.user.casManager
+        }
+    },
     fields: [
         {
             name: 'username',
@@ -11,7 +16,7 @@ const CAS: GlobalConfig = {
         },
         {
             name: 'password',
-            type: 'text',
+            type: 'text'
         },
         {
             name: 'duoDeviceName',

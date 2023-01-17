@@ -44,7 +44,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
     }
 }
 
-export const Birthday: Command = {
+export const BirthdayCommand: Command = {
     onInvoke: onBirthdayInvoke,
     onInteractionCreate: onInteractionCreate,
     data: new SlashCommandBuilder()

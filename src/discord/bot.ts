@@ -1,19 +1,17 @@
 import {
-  CacheType,
-  Client,
-  GatewayIntentBits,
-  Interaction,
-  Partials,
+    Client,
+    GatewayIntentBits, Partials
 } from "discord.js";
 import payload from "payload";
 import { GlobalSlugs } from "../slugs";
 import { BotCommands } from "./commands/command";
+import { rejectInteractionIfNotLeadership } from "./util";
 
 const BOT_INTENTS = [
   GatewayIntentBits.Guilds,
   GatewayIntentBits.GuildMessages,
   GatewayIntentBits.GuildMessageReactions,
-  GatewayIntentBits.MessageContent
+  GatewayIntentBits.MessageContent,
 ];
 
 // Create the bot client.
@@ -30,32 +28,30 @@ function onCreateClient(guildId: string) {
       // Make sure that the interaction comes from the configured guild.
       if (interaction.guildId != guildId) return;
 
-      // Only process commands.
+      BotCommands.forEach((c) => {
+        if (c.onInteractionCreate) {
+          c.onInteractionCreate(interaction);
+        }
+      });
+
+      // Only process commands from this point forward.
       if (!interaction.isChatInputCommand()) return;
 
       // Find the associated command and execute its handler.
       const command = BotCommands.find(
         (cmd) => cmd.data.name === interaction.commandName
       );
-      if (command) await command.onInvoke(interaction);
-    });
 
-    // Add interaction create handlers.
-    discordClient.on("interactionCreate", (interaction) => {
-      // Make sure that the interaction comes from the configured guild.
-      if (interaction.guildId != guildId) return;
-
-      BotCommands.forEach((c) => {
-        if (c.onInteractionCreate) {
-          c.onInteractionCreate(interaction);
+      if (command) {
+        // If the command requires leadership, ensure that they are leadership.
+        if (command.leadershipOnly && await rejectInteractionIfNotLeadership(interaction)) {
+            return;
         }
-      });
-    });
 
-    discordClient.on("messageCreate", message => {
-        if (message.guildId != guildId) return;
-        console.log(message.content)
-    })
+        // Run command
+        await command.onInvoke(interaction);
+      }
+    });
   }
 }
 
@@ -77,7 +73,11 @@ export async function serveDiscordBot() {
       onCreateClient(discordConfig.guild.guildId);
 
       // Login to the Discord bot.
-      await discordClient.login(token);
+      try {
+        await discordClient.login(token);
+      } catch (error) {
+        console.error("Error while logging into Discord: " + error)
+      }
     } else {
       console.error("No config available!");
     }

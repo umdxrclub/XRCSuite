@@ -1,4 +1,5 @@
 import { CollectionConfig } from "payload/types";
+import DirectorySearchEndpoint from "../endpoints/Members/DirectorySearch";
 import ImportRosterEndpoint from "../endpoints/Members/ImportTerpLinkRoster";
 import LeadershipEndpoint from "../endpoints/Members/Leadership";
 import ResolveMemberEndpoint from "../endpoints/Members/ResolveMember";
@@ -39,7 +40,7 @@ const Members: CollectionConfig = {
         group: 'Users',
         defaultColumns: [ 'name', 'nickname', 'email', 'isClubMember' ]
     },
-    endpoints: [ImportRosterEndpoint, ResolveMemberEndpoint, UMDVerificationEndpoint, LeadershipEndpoint],
+    endpoints: [ImportRosterEndpoint, ResolveMemberEndpoint, UMDVerificationEndpoint, LeadershipEndpoint, DirectorySearchEndpoint ],
     fields: [
         {
             name: 'name',

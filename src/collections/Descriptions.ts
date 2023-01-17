@@ -1,14 +1,6 @@
 import { CollectionConfig } from "payload/types";
 import { CollectionSlugs } from "../slugs";
-
-const DEVICE_TYPES: string[] = [
-    "Desktop",
-    "Laptop",
-    "VR Headset",
-    "AR Headset",
-    "Phone",
-    "Software"
-]
+import { DescriptionType } from "../types/XRCTypes";
 
 const Descriptions: CollectionConfig = {
     slug: CollectionSlugs.Descriptions,
@@ -19,16 +11,23 @@ const Descriptions: CollectionConfig = {
     fields: [
         {
             name: 'name',
-            type: 'text'
+            type: 'text',
+            required: true
+        },
+        {
+            name: 'image',
+            type: 'upload',
+            relationTo: CollectionSlugs.Media
         },
         {
             name: 'type',
             type: 'select',
-            options: DEVICE_TYPES
+            options: DescriptionType,
+            required: true
         },
         {
             name: 'description',
-            type: 'richText'
+            type: 'richText',
         }
     ]
 }

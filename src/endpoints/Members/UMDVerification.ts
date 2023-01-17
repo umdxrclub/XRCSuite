@@ -2,7 +2,7 @@ import payload from "payload";
 import { Endpoint } from "payload/dist/config/types";
 import { env } from "process";
 import { v4 as uuidv4 } from "uuid";
-import XRC from "../../data/XRC";
+import XRC from "../../util/XRC";
 import { CollectionSlugs } from "../../slugs";
 
 const CASLoginBaseUrl = "https://shib.idm.umd.edu/shibboleth-idp/profile/cas/login";

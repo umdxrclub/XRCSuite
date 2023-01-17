@@ -1,6 +1,6 @@
 import Events from "../../collections/Events";
 import { Endpoint } from "payload/dist/config/types";
-import XRC from "../../data/XRC";
+import XRC from "../../util/XRC";
 import { XR_CLUB_ID } from "../../util/terplink";
 import { CollectionSlugs } from "../../slugs";
 import parse from "node-html-parser";

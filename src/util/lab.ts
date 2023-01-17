@@ -1,5 +1,5 @@
 import payload from "payload";
-import XRC from "../data/XRC";
+import XRC from "./XRC";
 import { GlobalSlugs } from "../slugs";
 import { TerpLink, TerpLinkEvent } from "./terplink";
 

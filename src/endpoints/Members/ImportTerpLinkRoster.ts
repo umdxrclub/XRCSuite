@@ -1,6 +1,6 @@
 import { Endpoint } from "payload/dist/config/types";
 import Members from "../../collections/Members";
-import XRC from "../../data/XRC";
+import XRC from "../../util/XRC";
 
 /**
  * This endpoint fetches the current roster and adds any unknown email as a

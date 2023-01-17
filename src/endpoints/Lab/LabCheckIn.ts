@@ -1,11 +1,9 @@
 import { Endpoint } from "payload/dist/config/types";
-import { abort } from "process";
-import { resolveMember } from "../../data/MemberManager";
-import XRC from "../../data/XRC";
-import { CollectionSlugs, GlobalSlugs } from "../../slugs";
+import { resolveMember } from "../../collections/util/MembersUtil";
+import { GlobalSlugs } from "../../slugs";
 
 /**
- * The required parameters for the lab check in. 
+ * The required parameters for the lab check in.
  *
  * m - Resolve method type
  * v - Resolve method content

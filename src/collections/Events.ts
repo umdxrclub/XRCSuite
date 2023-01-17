@@ -5,7 +5,7 @@ import EventCheckIn from "../endpoints/Events/EventCheckIn";
 import { CollectionSlugs } from "../slugs";
 import { createActionButton } from "../components/ActionButton";
 import AnnounceEventEndpoint from "../endpoints/Events/AnnounceEvent";
-import { XRClubEventTypes } from "../data/XRCTypes";
+import { XRClubEventTypes } from "../types/XRCTypes";
 import CreateDiscordEventEndpoint from "../endpoints/Events/CreateDiscordEvent";
 
 const Events: CollectionConfig = {
