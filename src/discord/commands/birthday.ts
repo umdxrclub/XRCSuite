@@ -7,7 +7,7 @@ const BirthdayRegex = /\d{1,2}\/\d{1,2}\/\d{4}/
 
 async function onBirthdayInvoke(interaction: ChatInputCommandInteraction<CacheType>) {
     let user = interaction.user;
-    let member = await getMemberFromDiscordId(user.id);
+    let member = await getMemberFromDispocordId(user.id);
 
     if (member) {
         if (member.birthday) {
