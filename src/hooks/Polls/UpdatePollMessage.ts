@@ -2,6 +2,9 @@ import { TextChannel } from "discord.js";
 import { CollectionAfterChangeHook } from "payload/types";
 import { getDiscordClient } from "../../discord/bot";
 import { createPollEmbedAndRow } from "../../discord/commands/Poll";
+import { Throttle } from "../../util/throttle";
+
+const pollUpdateThrottle = new Throttle(5000);
 
 const UpdatedPollMessageHook: CollectionAfterChangeHook = async (args) => {
     let doc = args.doc;
@@ -23,8 +26,10 @@ const UpdatedPollMessageHook: CollectionAfterChangeHook = async (args) => {
         let message = await channel.messages.fetch(messageId)
         if (!message) return;
 
-        // Update the message
-        await message.edit({ content: "", embeds: [embed], components: row ? [row] : [] })
+        // Update the message using the throttle.
+        pollUpdateThrottle.exec(() => {
+            message.edit({ content: "", embeds: [embed], components: row ? [row] : [] })
+        });
     })
 }
 
