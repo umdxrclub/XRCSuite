@@ -7,15 +7,24 @@ import {
     TextChannel,
     Guild,
     ChatInputCommandInteraction,
-    CacheType
+    CacheType,
+    NewsChannel,
+    AttachmentBuilder,
+    Message
 } from "discord.js";
 import payload from "payload";
-import { AnnouncementChannelType } from "../types/XRCTypes";
-import { GlobalSlugs } from "../slugs";
+import { XRCSuiteChannelType } from "../types/XRCTypes";
+import { CollectionSlugs, GlobalSlugs } from "../slugs";
 import { getDiscordClient } from "./bot";
 import { BotCommands } from "./commands/command";
-import { Bot } from "../types/PayloadSchema";
+import { Bot, Media } from "../types/PayloadSchema";
 import { isDiscordMemberLeadership } from "../collections/util/MembersUtil";
+import { resolveDocument } from "../util/payload-backend";
+import { MediaDirectory } from "../collections/Media";
+import path from "path";
+import { Throttle } from "../util/throttle";
+
+export type DiscordMessage = string | MessagePayload | MessageCreateOptions
 
 /**
  * Sends a message to the specified announcement channel of all registered
@@ -25,9 +34,9 @@ import { isDiscordMemberLeadership } from "../collections/util/MembersUtil";
  * @param content The message content
  */
 export async function sendGuildMessage (
-  channel: AnnouncementChannelType,
-  content: string | MessagePayload | MessageCreateOptions
-) {
+  channel: XRCSuiteChannelType,
+  content: DiscordMessage
+): Promise<Message | undefined> {
     // First retrieve discord client
     let client = await getDiscordClient();
 
@@ -42,8 +51,8 @@ export async function sendGuildMessage (
         // Check to see that a channel was successfully retrieved.
         if (channelId) {
             let channel = await client.channels.fetch(channelId);
-            if (channel && channel instanceof TextChannel) {
-                await channel.send(content);
+            if (channel && (channel instanceof TextChannel || channel instanceof NewsChannel)) {
+                return await channel.send(content);
             }
         }
     }
@@ -113,4 +122,35 @@ export async function rejectInteractionIfNotLeadership(interaction: ChatInputCom
 
     await interaction.reply({ content: "You do not have permission to use this command!", ephemeral: true })
     return true;
+}
+
+/**
+ * Creates an attachment that can be included in a message/embed from some
+ * Payload media.
+ *
+ * @param media The media to create an attachment from
+ * @returns An attachment builder and url
+ */
+export async function createAttachmentFromMedia(media: Media | string) {
+    let resolvedMedia = await resolveDocument(media, CollectionSlugs.Media);
+    let attachment = new AttachmentBuilder(path.join(MediaDirectory, resolvedMedia.filename))
+    let url = "attachment://" + resolvedMedia.filename
+
+    return {
+        attachment, url
+    }
+}
+
+export async function bulkSendGuildMessages(channel: XRCSuiteChannelType, messages: DiscordMessage[]): Promise<Message[]> {
+    let sentMessages: Message[] = []
+
+    for (var msg of messages) {
+        let sentMsg = await sendGuildMessage(channel, msg)
+        if (sentMsg) {
+            sentMessages.push(sentMsg)
+        }
+        await Throttle.wait(1000)
+    }
+
+    return sentMessages
 }

@@ -20,5 +20,6 @@ export const GlobalSlugs = {
     Discord: 'bot',
     Lab: 'lab',
     Wishlist: 'wishlist',
-    Gatekeeper: 'gatekeeper'
+    Gatekeeper: 'gatekeeper',
+    Odoo: 'odoo'
 }

@@ -1,6 +1,11 @@
 import { CollectionConfig } from "payload/types";
 import { CollectionSlugs } from "../slugs";
 
+/**
+ * The directory to store the media relative to the project root folder.
+ */
+export const MediaDirectory = "./media";
+
 const Media: CollectionConfig = {
     slug: CollectionSlugs.Media,
     access: {
@@ -25,7 +30,7 @@ const Media: CollectionConfig = {
     ],
     upload: {
         staticURL: '/media',
-        staticDir: '../media',
+        staticDir: "../" + MediaDirectory,
         mimeTypes: ['image/*', 'audio/*']
     },
 }

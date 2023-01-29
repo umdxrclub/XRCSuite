@@ -15,8 +15,8 @@ const WakeOnLANEndpoint: Endpoint = {
             id: id
         });
 
-        if (device.info.mac) {
-            sendWakeOnLAN(device.info.mac)
+        if (device.mac) {
+            sendWakeOnLAN(device.mac)
             res.status(200).send({ message: "Send WOL packet!" })
         } else {
             res.status(400).send({ error: "Device does not have a MAC address!" })

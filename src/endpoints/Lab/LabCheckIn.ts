@@ -43,7 +43,7 @@ const LabCheckIn: Endpoint = {
 
             let checkInType = indexToRemove == -1 ? "in" : "out";
 
-            res.status(200).json({type: checkInType})
+            res.status(200).json({name: member.name, type: checkInType})
 
             // Update lab state
             await req.payload.updateGlobal({
@@ -51,8 +51,11 @@ const LabCheckIn: Endpoint = {
                 data: {
                     ...lab,
                     members: currentLabMembers
-                }
+                },
+                depth: 0
             })
+        } else {
+            res.status(200).json({ error: "No member found! "})
         }
     }
 }

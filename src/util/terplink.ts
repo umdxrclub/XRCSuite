@@ -467,15 +467,20 @@ export class TerpLinkEvent {
      *
      * @param issuanceId The issuanceId to search for.
      */
-    async getMemberFromIssuanceId(issuanceId: string): Promise<TerpLinkEventMember> {
-        const res = await this.get(`member?issuanceId=${issuanceId}&skip=0&take=10`)
-        if ((res.data.items as any[]).length > 0) {
-            const tlMember = res.data.items[0] as TerpLinkSchema.Member;
+    async getMemberFromIssuanceId(issuanceId: string): Promise<TerpLinkEventMember | undefined> {
+        var member: TerpLinkEventMember | undefined = undefined
+        try {
+            const res = await this.get(`member?issuanceId=${issuanceId}&skip=0&take=10`)
+            if ((res.data.items as any[]).length > 0) {
+                const tlMember = res.data.items[0] as TerpLinkSchema.Member;
 
-            return new TerpLinkEventMember(tlMember.attendanceId, tlMember.account, this);
+                member = new TerpLinkEventMember(tlMember.attendanceId, tlMember.account, this);
+            }
+        } catch {
+
         }
 
-        throw new Error("No member found!");
+        return member
     }
 
     /**

@@ -12,7 +12,7 @@ export interface Config {}
  */
 export interface Lab {
   id: string;
-  open?: boolean;
+  open: boolean;
   event?: string | Event;
   members?: string[] | Member[];
   schedule?: string | Schedule;
@@ -20,20 +20,28 @@ export interface Lab {
     contractId?: number;
   };
   settings: {
+    gatekeeper: {
+      acceptSound?: string | Media;
+      rejectSound?: string | Media;
+    };
+    labOpenImage?: string | Media;
+    labClosedImage?: string | Media;
+    startupLabWhenFirstCheckIn?: boolean;
+    shutdownLabWhenAllCheckedOut?: boolean;
     notifyStatus?: boolean;
     notifyLeadershipCheckInOut?: boolean;
     leadershipRolesToNotify?: (
-      | 'President'
-      | 'Vice President'
-      | 'Treasurer'
-      | 'Engagement Director'
-      | 'Lab Manager'
-      | 'Mentor'
-      | 'Graphic Designer'
-      | 'Event Coordinator'
-      | 'Web Developer'
-      | 'Marketing Director'
-      | 'Video Producer'
+      | 'president'
+      | 'vicePresident'
+      | 'treasurer'
+      | 'mentor'
+      | 'engagement'
+      | 'event'
+      | 'lab'
+      | 'designer'
+      | 'developer'
+      | 'marketing'
+      | 'video'
     )[];
   };
 }
@@ -73,23 +81,23 @@ export interface Member {
   email?: string;
   isClubMember?: boolean;
   leadershipRoles?: (
-    | 'President'
-    | 'Vice President'
-    | 'Treasurer'
-    | 'Engagement Director'
-    | 'Lab Manager'
-    | 'Mentor'
-    | 'Graphic Designer'
-    | 'Event Coordinator'
-    | 'Web Developer'
-    | 'Marketing Director'
-    | 'Video Producer'
+    | 'president'
+    | 'vicePresident'
+    | 'treasurer'
+    | 'mentor'
+    | 'engagement'
+    | 'event'
+    | 'lab'
+    | 'designer'
+    | 'developer'
+    | 'marketing'
+    | 'video'
   )[];
   profile: {
     picture?: string | Media;
     links: {
-      type?: 'LinkedIn' | 'GitHub' | 'Website' | 'Twitter' | 'Twitch' | 'YouTube' | 'Discord' | 'Steam' | 'Meta';
-      url?: string;
+      type: 'linkedin' | 'github' | 'web' | 'twitter' | 'twitch' | 'youtube' | 'discord' | 'steam' | 'meta';
+      url: string;
       id?: string;
     }[];
     bio?: string;
@@ -174,11 +182,38 @@ export interface Bot {
   };
   guild: {
     guildId?: string;
+    profileLinkEmojis: {
+      linkedin?: string;
+      github?: string;
+      web?: string;
+      twitter?: string;
+      twitch?: string;
+      youtube?: string;
+      discord?: string;
+      steam?: string;
+      meta?: string;
+    };
+    leadershipColors: {
+      president?: string;
+      vicePresident?: string;
+      treasurer?: string;
+      mentor?: string;
+      engagement?: string;
+      event?: string;
+      lab?: string;
+      designer?: string;
+      developer?: string;
+      marketing?: string;
+      video?: string;
+    };
+    defaultLeadershipColor?: string;
     channels: {
       announcements?: string;
-      notifications?: string;
+      lab?: string;
+      inventory?: string;
       audit?: string;
       events?: string;
+      leadership?: string;
     };
     roles: {
       lab?: string;
@@ -219,7 +254,18 @@ export interface Description {
   id: string;
   name: string;
   image?: string | Media;
-  type: 'h_vr' | 'h_ar' | 'h_xr' | 'h_pc' | 'h_laptop' | 'h_phone' | 's_game' | 's_software';
+  type:
+    | 'h_vr'
+    | 'h_ar'
+    | 'h_xr'
+    | 'h_vr_accessory'
+    | 'h_pc'
+    | 'h_laptop'
+    | 'h_console'
+    | 'h_phone'
+    | 'h_misc'
+    | 's_game'
+    | 's_software';
   description?: {
     [k: string]: unknown;
   }[];
@@ -228,12 +274,14 @@ export interface Description {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gatekeeper".
+ * via the `definition` "odoo".
  */
-export interface Gatekeeper {
+export interface Odoo {
   id: string;
-  acceptSound?: string | Media;
-  rejectSound?: string | Media;
+  url?: string;
+  db?: string;
+  uid?: number;
+  password?: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -241,6 +289,7 @@ export interface Gatekeeper {
  */
 export interface Admin {
   id: string;
+  casManager?: boolean;
   email?: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
@@ -256,13 +305,11 @@ export interface Admin {
 export interface Device {
   id: string;
   description: string | Description;
-  status: 'requested' | 'denied' | 'pending' | 'inLab' | 'checkedOut';
+  status: 'inLab' | 'checkedOut';
   public: boolean;
-  info: {
-    serial?: string;
-    umdSerial?: string;
-    mac?: string;
-  };
+  serial?: string;
+  umdSerial?: string;
+  mac?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -340,6 +387,7 @@ export interface Announcement {
 export interface Software {
   id: string;
   type?: string | Description;
+  availableOn?: string[] | Device[];
   publish?: boolean;
   createdAt: string;
   updatedAt: string;

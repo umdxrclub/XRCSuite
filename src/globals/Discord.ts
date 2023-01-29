@@ -1,10 +1,11 @@
 import { GlobalConfig } from "payload/types";
 import { createActionButton } from "../components/ActionButton";
-import { XRClubDiscordRoles } from "../types/XRCTypes";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
+import { getOptionObjects } from "../payload";
 import { GlobalSlugs } from "../slugs";
+import { ChannelType, LeadershipRoles, ProfileLinks, XRClubDiscordRoles } from "../types/XRCTypes";
 
 const Bot: GlobalConfig = {
     slug: GlobalSlugs.Discord,
@@ -56,26 +57,35 @@ const Bot: GlobalConfig = {
                     type: 'text'
                 },
                 {
+                    name: 'profileLinkEmojis',
+                    type: 'group',
+                    fields: getOptionObjects(ProfileLinks).map(o => ({
+                        name: o.value,
+                        label: o.label,
+                        type: 'text'
+                    })),
+                },
+                {
+                    name: 'leadershipColors',
+                    type: 'group',
+                    fields: getOptionObjects(LeadershipRoles).map(o => ({
+                        name: o.value,
+                        label: o.label,
+                        type: 'text'
+                    })),
+                },
+                {
+                    name: 'defaultLeadershipColor',
+                    type: 'text'
+                },
+                {
                     name: 'channels',
                     type: 'group',
-                    fields: [
-                        {
-                            name: 'announcements',
-                            type: 'text'
-                        },
-                        {
-                            name: 'notifications',
-                            type: 'text',
-                        },
-                        {
-                            name: 'audit',
-                            type: 'text'
-                        },
-                        {
-                            name: 'events',
-                            type: 'text'
-                        }
-                    ]
+                    fields: ChannelType.map(ct => ({
+                        name: ct.value,
+                        label: ct.label,
+                        type: 'text'
+                    }))
                 },
                 {
                     name: 'roles',

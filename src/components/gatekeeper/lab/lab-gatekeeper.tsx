@@ -1,8 +1,9 @@
+import { Typography } from "@mui/material";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { GradientCard } from "../../util/GradientCard";
 import { RobotoLink } from "../../util/RobotoLink";
-import { GatekeeperScanner } from "../scanner/gatekeeper-scanner";
+import { GatekeeperResolver, GatekeeperScanner } from "../scanner/GatekeeperScanner";
 import ContractSVG from "./contract-svgrepo-com.svg";
 import "./lab-gatekeeper.css";
 import NoFoodImage from "./no-food.png";
@@ -10,6 +11,46 @@ import SecurityCameraSVG from "./security-camera-svgrepo-com.svg";
 
 function getCurrentTimeString(): string {
   return moment().format("h:mm A");
+}
+
+const XRLabResolver: GatekeeperResolver = async (method, value) => {
+  console.log(method, value)
+  var checkInURL = new URL('/api/globals/lab/checkin', window.location.origin)
+  checkInURL.searchParams.set('m', method)
+  checkInURL.searchParams.set('v', value)
+  try {
+    var res = await fetch(checkInURL, {
+      method: "POST"
+    })
+  } catch {
+    return {
+      error: "Could not connect to server!"
+    };
+  }
+
+  let j = await res.json()
+  console.log(j)
+  if (j.error) {
+    return {
+      error: j.error
+    };
+  } else {
+    var checkInType: "checkin" | "checkout";
+
+    if (j.type == "in") {
+      checkInType = "checkin"
+    } else {
+      checkInType = "checkout"
+    }
+
+    return {
+      error: undefined,
+      member: {
+        name: j.name,
+        type: checkInType
+      }
+    }
+  }
 }
 
 export const LabGatekeeper: React.FC = ({ }) => {
@@ -33,57 +74,29 @@ export const LabGatekeeper: React.FC = ({ }) => {
     <div className="lab-info">
       <div className="lab-header">
         <div className="lab-welcome">
-          <h2>Welcome to the</h2>
-          <h1>XR LAB</h1>
+          <Typography fontWeight={"bold"} variant="h2">Welcome to the</Typography>
+          <Typography variant="h1">XR LAB</Typography>
         </div>
-        <h1>{time}</h1>
+        <Typography variant="h1">{time}</Typography>
       </div>
       <div className="lab-rules">
-        <h3>Remember that:</h3>
+        <Typography variant="h3">Remember that:</Typography>
         <div className="lab-rules-group">
           <GradientCard>
             <img src={ContractSVG} />
-            <p>You <u>must</u> be a club member AND sign our agreement.</p>
+            <Typography>You <u>must</u> be a club member AND sign our agreement.</Typography>
           </GradientCard>
           <GradientCard>
             <img src={NoFoodImage} />
-            <p>No food or drink is allowed in the lab.</p>
+            <Typography>No food or drink is allowed in the lab.</Typography>
           </GradientCard>
           <GradientCard>
             <img src={SecurityCameraSVG} />
-            <p>This lab is under 24/7 video surveillance.</p>
+            <Typography>This lab is under 24/7 video surveillance.</Typography>
           </GradientCard>
         </div>
       </div>
     </div>
-    <GatekeeperScanner resolve={ async (method, value) => {
-      if (method == "terplink") {
-        try {
-          var res = await fetch(`https://umdxrc.figsware.net/api/v1/lab/checkin?tlIssuanceId=${value}&validateAgreement=0`, {
-            method: "POST"
-          })
-        } catch {
-          return {
-            error: "Could not connect to server!"
-          };
-        }
-        
-        let j = await res.json()
-        console.log(j)
-        if (j.success) {
-          return {
-            error: undefined,
-            member: j.data!
-          }
-        } else {
-          return {
-            error: j.error
-          };
-        }
-      }
-      return {
-        error: "Failed to resolve member!"
-      };
-    } } />
+    <GatekeeperScanner resolver={ XRLabResolver } />
   </div>
 };

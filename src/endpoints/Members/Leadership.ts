@@ -6,7 +6,7 @@ const LeadershipEndpoint: Endpoint = {
     method: "get",
     handler: async (req, res, next) => {
         let leadership = await getAllLeadershipMembers();
-        let profiles = leadership.docs.map(createMemberProfile)
+        let profiles = leadership.map(createMemberProfile)
         res.status(200).send(profiles)
     }
 }

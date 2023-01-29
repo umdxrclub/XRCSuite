@@ -1,15 +1,17 @@
 import { GlobalConfig } from "payload/types";
 import Events from "../collections/Events";
-import Members, { LeadershipRoles } from "../collections/Members";
+import Members from "../collections/Members";
 import Schedules from "../collections/Schedules";
-import LabColorPicker from "../components/lab/LabColorPicker";
 import LabCheckIn from "../endpoints/Lab/LabCheckIn";
+import LabMediaEndpoint from "../endpoints/Lab/LabMedia";
 import LabStatusEndpoint from "../endpoints/Lab/LabStatus";
 import LabStatusHook from "../hooks/Lab/LabStatus";
+import { CollectionSlugs } from "../slugs";
+import { LeadershipRoles } from "../types/XRCTypes";
 
 const Lab: GlobalConfig = {
     slug: 'lab',
-    endpoints: [ LabCheckIn, LabStatusEndpoint ],
+    endpoints: [ LabCheckIn, LabStatusEndpoint, LabMediaEndpoint ],
     hooks: {
         afterChange: [ LabStatusHook ]
     },
@@ -17,7 +19,8 @@ const Lab: GlobalConfig = {
         {
             name: 'open',
             type: 'checkbox',
-            defaultValue: false
+            defaultValue: false,
+            required: true
         },
         {
             name: 'event',
@@ -50,13 +53,52 @@ const Lab: GlobalConfig = {
             type: 'group',
             fields: [
                 {
-                    type: 'ui',
-                    name: 'color',
-                    admin: {
-                        components: {
-                            Field: LabColorPicker
+                    name: 'gatekeeper',
+                    type: 'group',
+                    fields: [
+                        {
+                            name: "acceptSound",
+                            type: "upload",
+                            relationTo: CollectionSlugs.Media,
+                            filterOptions: {
+                                mimeType: { contains: 'audio' }
+                            }
+                        },
+                        {
+                            name: "rejectSound",
+                            type: "upload",
+                            relationTo: CollectionSlugs.Media,
+                            filterOptions: {
+                                mimeType: { contains: 'audio' }
+                            }
                         }
+                    ]
+                },
+                {
+                    name: "labOpenImage",
+                    type: "upload",
+                    relationTo: CollectionSlugs.Media,
+                    filterOptions: {
+                        mimeType: { contains: 'image' }
                     }
+                },
+                {
+                    name: "labClosedImage",
+                    type: "upload",
+                    relationTo: CollectionSlugs.Media,
+                    filterOptions: {
+                        mimeType: { contains: 'image' }
+                    }
+                },
+                {
+                    type: 'checkbox',
+                    name: 'startupLabWhenFirstCheckIn',
+                    label: "Turn on all devices when the first member checks into the lab"
+                },
+                {
+                    type: 'checkbox',
+                    name: 'shutdownLabWhenAllCheckedOut',
+                    label: "Shutdown all devices when all members have been checked out of the lab"
                 },
                 {
                     type: 'checkbox',

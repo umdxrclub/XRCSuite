@@ -1,5 +1,4 @@
 import { CollectionConfig } from "payload/types";
-import { Component } from "react";
 import { createActionButton } from "../components/ActionButton";
 import DeviceInventoryEndpoint from "../endpoints/Devices/DeviceInventory";
 import WakeOnLANEndpoint from "../endpoints/Devices/WakeOnLan";
@@ -15,75 +14,66 @@ const Devices: CollectionConfig = {
     useAsTitle: "description",
     group: "Inventory",
   },
-  endpoints: [ DeviceInventoryEndpoint, WakeOnLANEndpoint ],
+  endpoints: [DeviceInventoryEndpoint, WakeOnLANEndpoint],
   fields: [
     {
-        name: "description",
-        type: "relationship",
-        relationTo: Descriptions.slug,
-        filterOptions: {
-          type: {
-            contains: HardwareDescriptionPrefix,
-          },
+      name: "description",
+      type: "relationship",
+      relationTo: Descriptions.slug,
+      filterOptions: {
+        type: {
+          contains: HardwareDescriptionPrefix,
         },
-        required: true,
       },
+      required: true,
+    },
     {
       name: "status",
       type: "select",
       options: DeviceStatus,
-      required: true
+      required: true,
     },
     {
       name: "public",
       type: "checkbox",
       label: "Display on Public Inventory",
       defaultValue: true,
-      required: true
+      required: true,
     },
     {
-      name: "info",
-      type: "group",
-      admin: {
-        condition: (data) => data.status == "inLab" || data.status == "checkedOut"
-      },
-      fields: [
-        {
-          name: "serial",
-          type: "text",
-        },
-        {
-          name: "umdSerial",
-          type: "text",
-        },
-        {
-          name: "mac",
-          label: "MAC Address",
-          type: "text",
-          validate: (val) => {
-            let valid = typeof(val) === "undefined" || MACAddressRegex.test(val);
+      name: "serial",
+      type: "text",
+    },
+    {
+      name: "umdSerial",
+      type: "text",
+    },
+    {
+      name: "mac",
+      label: "MAC Address",
+      type: "text",
+      validate: (val) => {
+        let valid = typeof val === "undefined" || MACAddressRegex.test(val);
 
-            if (valid) {
-              return true;
-            } else {
-              return "This is not a valid MAC address!";
-            }
-          },
+        if (valid) {
+          return true;
+        } else {
+          return "This is not a valid MAC address!";
+        }
+      },
+    },
+    {
+      name: "wol",
+      type: "ui",
+      admin: {
+        condition: (data) => !!data.macAddress,
+        components: {
+          Field: createActionButton({
+            title: "Send WOL Packet",
+            postUrl: "/api/devices/:id/wol",
+          }),
         },
-        {
-          name: "wol",
-          type: "ui",
-          admin: {
-            condition: (data) => !!data.macAddress,
-            components: {
-              Field: createActionButton({
-                title: "Send WOL Packet",
-                postUrl: "/api/devices/:id/wol",
-              }),
-            },
-          },
-        },
-      ],
+      },
     },
   ],
 };

@@ -1,16 +1,20 @@
+import { EmbedBuilder } from "@discordjs/builders";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import payload from "payload";
-import { PaginatedDocs } from "payload/dist/mongoose/types";
-import { MemberProfile } from "../../types/XRCTypes";
-import { CollectionSlugs } from "../../slugs";
-import { Media, Member } from "../../types/PayloadSchema";
 import { Where } from "payload/types";
-import XRC from "../../util/XRC";
+import { getDiscordClient } from "../../discord/bot";
+import { bulkSendGuildMessages, createAttachmentFromMedia, DiscordMessage } from "../../discord/util";
+import { getOptionLabel, rgbToNumber } from "../../payload";
+import { CollectionSlugs, GlobalSlugs } from "../../slugs";
+import { Bot, Media, Member } from "../../types/PayloadSchema";
+import { LeadershipRoles, MemberProfile, ProfileLinks, ResolveMethod } from "../../types/XRCTypes";
 import { getLabTerpLinkEvent } from "../../util/lab";
 import { RosterMember } from "../../util/terplink";
+import XRC from "../../util/XRC";
 import Members from "../Members";
 
-export async function getAllLeadershipMembers(): Promise<PaginatedDocs<Member>> {
-    let leadershipMembers = await payload.find({
+export async function getAllLeadershipMembers(): Promise<Member[]> {
+    let leadershipMembers = await payload.find<Member>({
         collection: CollectionSlugs.Members,
         where: {
             and: [
@@ -25,10 +29,48 @@ export async function getAllLeadershipMembers(): Promise<PaginatedDocs<Member>> 
                     }
                 }
             ]
+        },
+        limit: 100
+    })
+
+    let leadership = leadershipMembers.docs;
+    let leadershipAndRole = leadership.map(l => {
+        let roles = l.leadershipRoles ?? []
+        let roleIndices = roles
+            .map(r => LeadershipRoles.findIndex(o => o.value == r))
+            .map(i => i == -1 ? 1000 : i) // replace not found with highest index
+
+        let lowestIndex = Math.min(...roleIndices)
+        return {
+            member: l,
+            index: lowestIndex
         }
     })
 
-    return leadershipMembers;
+    // Sort by roles, then by names within the role
+    leadershipAndRole.sort((a,b) => {
+        if (a.index == b.index) {
+            return a.member.name.localeCompare(b.member.name)
+        } else {
+            return a.index - b.index
+        }
+    })
+
+    return  leadershipAndRole.map(lr => lr.member);
+}
+
+export function getHighestLeadershipRole(member: Member): string | undefined {
+    let roles = member.leadershipRoles ?? []
+    if (roles.length > 0) {
+        let roleIndices = roles
+        .map(r => LeadershipRoles.findIndex(o => o.value == r))
+        .map(i => i == -1 ? 1000 : i) // replace not found with highest index
+
+        let lowestIndex = Math.min(...roleIndices)
+        return LeadershipRoles[lowestIndex].value
+    }
+
+    return undefined
 }
 
 /**
@@ -82,8 +124,71 @@ export function createMemberProfile(member: Member): MemberProfile {
     }
 }
 
+export async function createMemberEmbedMessage(member: Member): Promise<DiscordMessage> {
+    let discord = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord });
+    let embed = new EmbedBuilder()
+    var files = []
+    let color: string | undefined
 
-export type ResolveMethod = "id" | "terplink" | "card"
+    var name = member.name
+    if (member.nickname) {
+        name = `"${member.nickname}" - ${name}`
+    }
+    embed.setTitle(name)
+    if (member.profile.picture) {
+        let profileAttachment = await createAttachmentFromMedia(member.profile.picture)
+        embed.setThumbnail(profileAttachment.url)
+        files.push(profileAttachment.attachment)
+    } else if (member.integrations.discord) {
+        let client = await getDiscordClient()
+        let discordMember = await client.users.fetch(member.integrations.discord)
+        if (discordMember) {
+            embed.setThumbnail(discordMember.displayAvatarURL())
+        }
+    }
+
+    if (member.profile.bio) {
+        embed.setDescription(member.profile.bio)
+    }
+
+    if (member.leadershipRoles) {
+        let labels = member.leadershipRoles.map(r => getOptionLabel(LeadershipRoles, r))
+        embed.addFields({
+            name: "Roles",
+            value: labels.join(", ")
+        })
+
+        // Determine embed color
+        let roleType = getHighestLeadershipRole(member);
+        if (discord.guild.leadershipColors[roleType]) {
+            color = discord.guild.leadershipColors[roleType]
+        } else if (discord.guild.defaultLeadershipColor) {
+            color = discord.guild.defaultLeadershipColor
+        }
+    }
+
+    let row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder()
+    member.profile.links.forEach(link => {
+        var builder = new ButtonBuilder()
+            .setLabel(getOptionLabel(ProfileLinks, link.type))
+            .setURL(link.url)
+            .setStyle(ButtonStyle.Link)
+
+        let emoji = discord.guild.profileLinkEmojis[link.type]
+        if (emoji) {
+            builder = builder.setEmoji(emoji)
+        }
+
+        row.addComponents(builder)
+    })
+
+
+    if (color) {
+        embed.setColor(rgbToNumber(color))
+    }
+
+    return { embeds: [embed], files, components: row.components.length > 0 ? [row] : undefined }
+}
 
 export async function resolveMember(method: ResolveMethod, value: string): Promise<Member | undefined> {
     var key: string = ""
@@ -120,6 +225,8 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
             // more we can do to resolve this user, so return undefined.
             return undefined;
         }
+
+        console.log("trying to resolve with issuance ", method, value)
 
         // Fetch the member on TerpLink by their issuance id using the XR Lab
         // event.
@@ -204,4 +311,10 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
 
         return member;
     }
+}
+
+export async function postLeadershipInDiscord() {
+    let leadership = await getAllLeadershipMembers();
+    let messages = await Promise.all(leadership.map(createMemberEmbedMessage))
+    await bulkSendGuildMessages("leadership", messages.reverse())
 }

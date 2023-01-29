@@ -1,5 +1,6 @@
 import { GlobalConfig } from "payload/types";
 import Members from "../collections/Members";
+import PasswordField from "../components/dashboard/PasswordField";
 
 const CAS: GlobalConfig = {
     slug: 'cas',
@@ -16,7 +17,12 @@ const CAS: GlobalConfig = {
         },
         {
             name: 'password',
-            type: 'text'
+            type: 'text',
+            admin: {
+                components: {
+                    Field: PasswordField
+                }
+            }
         },
         {
             name: 'duoDeviceName',
@@ -24,7 +30,12 @@ const CAS: GlobalConfig = {
         },
         {
             name: 'hotpSecret',
-            type: 'text'
+            type: 'text',
+            admin: {
+                components: {
+                    Field: PasswordField
+                }
+            }
         },
         {
             name: 'hotpCounter',

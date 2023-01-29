@@ -1,7 +1,10 @@
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { LabMediaType, ResolveMethod } from "../../../types/XRCTypes";
 import "./gatekeeper-scanner.css";
 import ProceedSVG from "./proceed.svg";
 import ProcessingSVG from "./processing.svg";
+import { ResolveDialog } from "./ResolveDialog";
 import StopSVG from "./stop.svg";
 
 type ScannerStatus = "scanning" | "processing" | "checkin" | "checkout" | "error";
@@ -13,15 +16,14 @@ type ScannerConfig = {
     statusDisplayTime: number
 }
 
-type ScanMethodType = "terplink" | "swipecard";
-export type ResolverResult = {
+export type ResolveResult = {
     error: string | undefined,
     member?: {
         name: string,
         type: "checkin" | "checkout"
     }
 }
-export type GatekeeperResolver = (method: ScanMethodType, value: string) => Promise<ResolverResult>
+export type GatekeeperResolver = (method: ResolveMethod, value: string) => Promise<ResolveResult>
 
 export const DefaultScannerConfig: ScannerConfig = {
     colors: {
@@ -60,21 +62,21 @@ export const DefaultScannerConfig: ScannerConfig = {
 }
 
 type GatekeeperScannerProps = {
-    resolve: GatekeeperResolver
+    resolver: GatekeeperResolver
     config?: ScannerConfig
 }
 
 type KeypressParser = {
-    startKey: string,
-    endKey: string,
+    key: string,
+    endKey?: string,
     onComplete: (value: string) => void,
-    timeout: number
+    timeout?: number
 }
 
 const SWIPECARD_TRACK_LENGTH = 15
 const SWIPECARD_TIMEOUT = 1000;
 
-export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, resolve}) => {
+export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, resolver}) => {
     // Swipe card
     const keystrokes = useRef<string[]>([]);
     const currentKeypressHandler = useRef<KeypressParser | undefined>(undefined);
@@ -82,23 +84,38 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     const isScanning = useRef<boolean>(true);
     const keypressHandlers = useMemo<KeypressParser[]>(() => [
         {
-            startKey: "{",
+            key: "{",
             endKey: "}",
             onComplete: onEventPassScan,
             timeout: 2000
+        },
+        {
+            key: "`",
+            onComplete: () => setResolveDialogOpen(true)
         }
     ], [onEventPassScan]);
 
+    const resolve = async (method: ResolveMethod, value: string) => {
+        isScanning.current = false;
+        setScannerStatus("processing");
+        let result = await resolver(method, value)
+        if (result.member) {
+            setCheckedInMemberName(result.member.name);
+        } else {
+            setErrorString(result.error!);
+        }
+
+        showResultStatus(result.member ? result.member.type : "error");
+    }
+
     // // QR
     // const qr = useRef<Html5Qrcode>();
-
-    // Audio
-    const ding = useRef<HTMLAudioElement>();
 
     // State
     const [ scannerStatus, setScannerStatus ] = useState<ScannerStatus>("scanning");
     const [ checkedInMemberName, setCheckedInMemberName ] = useState("");
     const [ errorString, setErrorString ] = useState("");
+    const [ resolveDialogOpen, setResolveDialogOpen ] = useState<boolean>(false);
 
     // Load default scanner config if one wasn't provided.
     config ??= DefaultScannerConfig;
@@ -108,22 +125,29 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     const STATUS_COLOR = config!.colors[scannerStatus];
     const STATUS_ICON = config!.icons[scannerStatus];
     const STATUS_DESCRIPTION = config!.descriptions[scannerStatus].replace("{NAME}", checkedInMemberName).replace("{ERROR}", errorString);
+    
 
     function newKeypressHandler(e: KeyboardEvent) {
         const key = e.key;
         if (!currentKeypressHandler.current) {
-            let handler = keypressHandlers.find(h => h.startKey == key)
+            let handler = keypressHandlers.find(h => h.key == key)
 
             // If we find a suitable handler, start recording keystrokes.
             if (handler) {
-                console.log("Starting handler...")
-                keystrokes.current = [key]
-                currentKeypressHandler.current = handler
-                keypressTimeout.current = setTimeout(() => {
-                    console.log("Keypress handler timeout")
-                    keypressTimeout.current = undefined
-                    currentKeypressHandler.current = undefined
-                }, handler.timeout)
+                if (handler.endKey) {
+                    console.log("Starting handler...")
+                    keystrokes.current = [key]
+                    currentKeypressHandler.current = handler
+                    keypressTimeout.current = setTimeout(() => {
+                        console.log("Keypress handler timeout")
+                        keypressTimeout.current = undefined
+                        currentKeypressHandler.current = undefined
+                    }, handler.timeout)
+                } else {
+                    // If there's no end key, then just call on complete
+                    // immediately.
+                    handler.onComplete(key)
+                }
             }
         } else {
             let handler = currentKeypressHandler.current;
@@ -156,17 +180,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         const eventPassObj = JSON.parse(text);
         const issuanceId = eventPassObj.issuanceId;
         if (issuanceId) {
-            isScanning.current = false;
-            setScannerStatus("processing");
-            resolve("terplink", issuanceId).then(result => {
-                if (result.member) {
-                    setCheckedInMemberName(result.member.name);
-                } else {
-                    setErrorString(result.error!);
-                }
-
-                showResultStatus(result.member ? result.member.type : "error");
-            })
+            
         }
     }
 
@@ -187,7 +201,10 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
 
     function showResultStatus(status: ScannerStatus) {
         setScannerStatus(status);
-        ding.current?.play();
+
+        let mediaType: LabMediaType = status == "error" ? "reject-sound" : "accept-sound";
+        let sound = new Audio("/api/globals/lab/media/" + mediaType);
+        sound.play().then(() => sound.remove());
 
         setTimeout(() => {
             setScannerStatus("scanning");
@@ -202,9 +219,6 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         // // Create the QR code scanner
         // configureQRScanner();
 
-        // Get "ding" sound
-        ding.current = new Audio("/frontend/static/sound/ding.mp3");
-
         return () => {
             document.removeEventListener("keypress", newKeypressHandler);
             // if (qr.current) {
@@ -214,15 +228,16 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     }, [])
 
     return <div className="scanner-bar" style={{backgroundColor: STATUS_COLOR}}>
+        <ResolveDialog open={resolveDialogOpen} onClose={() => setResolveDialogOpen(false)} submitResolve={resolve}/>
         <div className="scanner-content">
             <div className="scanner-status-bg" >
-                <h4>{STATUS_TITLE}</h4>
+                <Typography variant="h4">{STATUS_TITLE}</Typography>
                 <div className="scanner-status-icon">
                     <img src={STATUS_ICON} />
                 </div>
             </div>
             <div className="scanner-text">
-                <h5>{STATUS_DESCRIPTION}</h5>
+                <Typography variant="h5">{STATUS_DESCRIPTION}</Typography>
             </div>
         </div>
     </div>

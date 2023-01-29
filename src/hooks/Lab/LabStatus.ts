@@ -1,18 +1,39 @@
 import { EmbedBuilder } from "@discordjs/builders";
+import { AttachmentBuilder } from "discord.js";
 import payload from "payload";
 import { GlobalAfterChangeHook } from "payload/types";
-import { sendGuildMessage } from "../../discord/util";
+import { createAttachmentFromMedia, sendGuildMessage } from "../../discord/util";
 import { CollectionSlugs } from "../../slugs";
+import { Lab, Media, Member } from "../../types/PayloadSchema";
 
 const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   // Check if the lab status has changed.
-  let notifyStatus = args.doc.settings.notifyStatus;
-  let openStatusChanged = args.previousDoc.open != args.doc.open;
+  let doc = args.doc as Lab;
+  let prevDoc = args.previousDoc as Lab;
+
+  let notifyStatus = doc.settings.notifyStatus;
+  let openStatusChanged = prevDoc.open != doc.open;
   if (openStatusChanged && notifyStatus) {
-    let labOpen = args.doc.open as boolean; 
+    let labOpen = doc.open;
 
     // Send Discord notification.
     let embed = new EmbedBuilder();
+
+    // Determine whether an image banner can be added
+    var bannerMedia: Media | string | undefined = undefined
+    if (labOpen && doc.settings.labOpenImage) {
+      bannerMedia = doc.settings.labOpenImage
+    } else if (!labOpen && doc.settings.labClosedImage) {
+      bannerMedia = doc.settings.labClosedImage
+    }
+
+    // Resolve and add the image banner
+    var bannerAttachment: AttachmentBuilder | undefined = undefined
+    if (bannerMedia) {
+      let attachment = await createAttachmentFromMedia(bannerMedia);
+      bannerAttachment = attachment.attachment;
+      embed.setImage(attachment.url)
+    }
 
     embed.setTitle("XR Lab Status");
     embed.setFooter({ text: "AVW 4176" });
@@ -22,7 +43,7 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     embed.setColor(labOpen ? [133, 212, 49] : [212, 82, 49]);
     embed.setTimestamp(new Date());
 
-    await sendGuildMessage("notifications", { embeds: [embed] });
+    await sendGuildMessage("lab", { embeds: [embed], files: bannerAttachment ? [bannerAttachment] : [] });
   }
 
   // Determine the members who have checked in/out.
@@ -56,7 +77,7 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     let newMembers = await Promise.all(
       newMemberIds.map(
         async (id) =>
-          await payload.findByID({
+          await payload.findByID<Member>({
             collection: CollectionSlugs.Members,
             id: id,
           })
@@ -69,14 +90,22 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     leadershipMembers.forEach(async (m) => {
       // Send Discord notification.
       let embed = new EmbedBuilder();
+      let name = m.nickname ?? m.name;
 
       embed.setTitle("XR Lab Status");
       embed.setFooter({ text: "AVW 4176" });
-      embed.setDescription(`${m.name} has checked into the XR Lab!`);
+      embed.setDescription(`${name} has checked into the XR Lab!`);
       embed.setColor([133, 212, 49]);
       embed.setTimestamp(new Date());
 
-      await sendGuildMessage("notifications", { embeds: [embed] });
+      var profileFile : AttachmentBuilder | undefined
+      if (m.profile.picture) {
+        let profileAttachment = await createAttachmentFromMedia(m.profile.picture);
+        profileFile = profileAttachment.attachment
+        embed.setThumbnail(profileAttachment.url)
+      }
+
+      await sendGuildMessage("lab", { embeds: [embed], files: profileFile ? [profileFile] : [] });
     });
   }
 };

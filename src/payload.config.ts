@@ -19,10 +19,10 @@ import Projects from './collections/Projects'
 import Media from './collections/Media'
 import Schedules from './collections/Schedules'
 import Polls from './collections/Polls'
-import Gatekeeper from './globals/Gatekeeper'
 import GatekeeperRoute from './routes/Gatekeeper';
 import XRCBeforeDashboard from './components/dashboard/XRCBeforeDashboard';
 import Stats from './collections/Stats';
+import Odoo from './globals/Odoo';
 
 const fallbackModules = [
     'util',
@@ -109,7 +109,7 @@ export default buildConfig({
         Bot,
         CAS,
         Wishlist,
-        Gatekeeper
+        Odoo
     ],
     typescript: {
         outputFile: path.resolve(__dirname, './types/PayloadSchema.ts'),

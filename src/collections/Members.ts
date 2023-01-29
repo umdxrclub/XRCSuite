@@ -5,33 +5,8 @@ import LeadershipEndpoint from "../endpoints/Members/Leadership";
 import ResolveMemberEndpoint from "../endpoints/Members/ResolveMember";
 import UMDVerificationEndpoint from "../endpoints/Members/UMDVerification";
 import { CollectionSlugs } from "../slugs";
+import { LeadershipRoles, ProfileLinks } from "../types/XRCTypes";
 import Media from "./Media";
-
-export const LeadershipRoles: string[] = [
-    "President",
-    "Vice President",
-    "Treasurer",
-    "Engagement Director",
-    "Lab Manager",
-    "Mentor",
-    "Graphic Designer",
-    "Event Coordinator",
-    "Web Developer",
-    "Marketing Director",
-    "Video Producer"
-]
-
-const INTEGRATION_TYPES: string[] = [
-    "LinkedIn",
-    "GitHub",
-    "Website",
-    "Twitter",
-    "Twitch",
-    "YouTube",
-    "Discord",
-    "Steam",
-    "Meta"
-]
 
 const Members: CollectionConfig = {
     slug: CollectionSlugs.Members,
@@ -87,11 +62,13 @@ const Members: CollectionConfig = {
                         {
                             name: 'type',
                             type: 'select',
-                            options: INTEGRATION_TYPES
+                            options: ProfileLinks,
+                            required: true
                         },
                         {
                             name: 'url',
-                            type: 'text'
+                            type: 'text',
+                            required: true
                         }
                     ]
                 },
@@ -159,7 +136,6 @@ const Members: CollectionConfig = {
                     name: 'discord',
                     type: 'text',
                     unique: true,
-                    index: true
                 },
                 {
                     name: 'oculus',

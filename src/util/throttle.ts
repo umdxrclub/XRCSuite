@@ -25,7 +25,7 @@ export class Throttle {
             this._pendingExecFunction = fn;
         } else {
             fn();
-            this._executeTimeout = setTimeout(this._execAndClearTimeout, this._intervalMs)
+            this._executeTimeout = setTimeout(this._execAndClearTimeout.bind(this), this._intervalMs)
         }
     }
 
@@ -36,5 +36,11 @@ export class Throttle {
         }
 
         this._executeTimeout = null;
+    }
+
+    public static wait(ms: number): Promise<void> {
+        return new Promise(resolve => {
+            setTimeout(resolve, ms)
+        })
     }
 }

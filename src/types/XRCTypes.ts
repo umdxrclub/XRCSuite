@@ -1,11 +1,15 @@
 import { Option } from "payload/dist/fields/config/types"
+import { Bot } from "./PayloadSchema"
 
-export type AnnouncementChannelType = "announcements" | "audit" | "notifications" | "events"
+export type XRCSuiteChannelType = keyof Bot["guild"]["channels"]
 
 export type XRClubDiscordRole = {
     name: string,
     title: string
 }
+
+export type ResolveMethod = "id" | "terplink" | "card"
+export type LabMediaType = "accept-sound" | "reject-sound"
 
 export const XRClubDiscordRoles: XRClubDiscordRole[] = [
     {
@@ -32,22 +36,97 @@ export const XRClubEventTypes: string[] = [
     "Other"
 ]
 
+export const LeadershipRoles = [
+    {
+        label: "President",
+        value: "president"
+    },
+    {
+        label: "Vice President",
+        value: "vicePresident"
+    },
+    {
+        label: "Treasurer",
+        value: "treasurer"
+    },
+    {
+        label: "Mentor",
+        value: "mentor"
+    },
+    {
+        label: "Engagement Director",
+        value: "engagement"
+    },
+    {
+        label: "Event Coordinator",
+        value: "event"
+    },
+    {
+        label: "Lab Manager",
+        value: "lab"
+    },
+    {
+        label: "Graphic Designer",
+        value: "designer"
+    },
+    {
+        label: "Web Developer",
+        value: "developer"
+    },
+    {
+        label: "Marketing Director",
+        value: "marketing"
+    },
+    {
+        label: "Video Producer",
+        value: "video"
+    }
+]
+
+export const ProfileLinks: Option[] = [
+    {
+        label: "LinkedIn",
+        value: "linkedin"
+    },
+    {
+        label: "GitHub",
+        value: "github"
+    },
+    {
+        label: "Website",
+        value: "web"
+    },
+    {
+        label: "Twitter",
+        value: "twitter"
+    },
+    {
+        label: "Twitch",
+        value: "twitch"
+    },
+    {
+        label: "YouTube",
+        value: "youtube"
+    },
+    {
+        label: "Discord",
+        value: "discord"
+    },
+    {
+        label: "Steam",
+        value: "steam"
+    },
+    {
+        label: "Meta",
+        value: "meta"
+    }
+]
+
+
 /**
  * The different statuses that a device can be in.
  */
 export const DeviceStatus: Option[] = [
-    {
-        label: "Requested",
-        value: "requested"
-    },
-    {
-        label: "Denied Funding",
-        value: "denied"
-    },
-    {
-        label: "Pending",
-        value: "pending"
-    },
     {
         label: "In Lab",
         value: "inLab"
@@ -80,6 +159,10 @@ export const DescriptionType: Option[] = [
         value: HardwareDescriptionPrefix + "xr"
     },
     {
+        label: "VR Accessory",
+        value: HardwareDescriptionPrefix + "vr_accessory"
+    },
+    {
         label: "Desktop",
         value: HardwareDescriptionPrefix + "pc"
     },
@@ -88,8 +171,16 @@ export const DescriptionType: Option[] = [
         value: HardwareDescriptionPrefix + "laptop"
     },
     {
+        label: "Game Console",
+        value: HardwareDescriptionPrefix + "console"
+    },
+    {
         label: "Phone",
         value: HardwareDescriptionPrefix + "phone"
+    },
+    {
+        label: "Misc. Hardware",
+        value: HardwareDescriptionPrefix + "misc"
     },
     {
         label: "Game",
@@ -98,6 +189,33 @@ export const DescriptionType: Option[] = [
     {
         label: "Software",
         value: SoftwareDescriptionPrefix + "software"
+    }
+]
+
+export const ChannelType = [
+    {
+        label: "Announcements",
+        value: "announcements"
+    },
+    {
+        label: "Lab Notifications",
+        value: "lab"
+    },
+    {
+        label: "Lab Inventory",
+        value: "inventory"
+    },
+    {
+        label: "Audit",
+        value: "audit"
+    },
+    {
+        label: "Events",
+        value: "events"
+    },
+    {
+        label: "Leadership",
+        value: "leadership"
     }
 ]
 
