@@ -6,7 +6,6 @@ import LeadershipEndpoint from "../endpoints/Members/Leadership";
 import ResolveMemberEndpoint from "../endpoints/Members/ResolveMember";
 import UMDVerificationEndpoint from "../endpoints/Members/UMDVerification";
 import { CollectionSlugs } from "../slugs";
-import { LeadershipRoles, ProfileLinks } from "../types/XRCTypes";
 import Media from "./Media";
 
 const Members: CollectionConfig = {
@@ -33,7 +32,6 @@ const Members: CollectionConfig = {
         {
             name: 'email',
             type: 'text',
-            unique: true,
             index: true
         },
         {
@@ -41,11 +39,10 @@ const Members: CollectionConfig = {
             type: 'checkbox'
         },
         {
-            name: 'leadershipRoles',
-            type: 'select',
-            options: LeadershipRoles,
-            hasMany: true,
-            defaultValue: []
+            name: 'roles',
+            type: 'relationship',
+            relationTo: CollectionSlugs.Roles,
+            hasMany: true
         },
         {
             name: 'profile',
@@ -87,13 +84,11 @@ const Members: CollectionConfig = {
                 {
                     name: 'directoryId',
                     type: 'text',
-                    unique: true
                 },
                 {
                     name: 'cardSerial',
                     type: 'text',
                     index: true,
-                    unique: true,
                     admin: {
                         description: "The serial number on the back of a UMD swipe card"
                     }
@@ -105,7 +100,6 @@ const Members: CollectionConfig = {
                         {
                             name: 'accountId',
                             type: 'text',
-                            unique: true
                         },
                         {
                             name: 'issuanceId',
@@ -113,7 +107,6 @@ const Members: CollectionConfig = {
                                 description: "The id stored within an event pass"
                             },
                             type: 'text',
-                            unique: true,
                             index: true
                         },
                         {
@@ -122,7 +115,6 @@ const Members: CollectionConfig = {
                                 description: "Used to identify members within the club roster"
                             },
                             type: 'text',
-                            unique: true,
                             index: true
                         }
                     ]
@@ -136,7 +128,6 @@ const Members: CollectionConfig = {
                 {
                     name: 'discord',
                     type: 'text',
-                    unique: true,
                 },
                 {
                     name: 'oculus',

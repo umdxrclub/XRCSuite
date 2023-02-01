@@ -11,7 +11,7 @@ export type XRClubDiscordRole = {
 export type ResolveMethod = "id" | "terplink" | "card"
 export type LabMediaType = "accept-sound" | "reject-sound"
 
-export const XRClubDiscordRoles: XRClubDiscordRole[] = [
+export const XRClubDiscordNotificationRoles: XRClubDiscordRole[] = [
     {
         name: "lab",
         title: "Lab Notifications"
@@ -35,93 +35,6 @@ export const XRClubEventTypes: string[] = [
     "Field Trip",
     "Other"
 ]
-
-export const LeadershipRoles = [
-    {
-        label: "President",
-        value: "president"
-    },
-    {
-        label: "Vice President",
-        value: "vicePresident"
-    },
-    {
-        label: "Treasurer",
-        value: "treasurer"
-    },
-    {
-        label: "Mentor",
-        value: "mentor"
-    },
-    {
-        label: "Engagement Director",
-        value: "engagement"
-    },
-    {
-        label: "Event Coordinator",
-        value: "event"
-    },
-    {
-        label: "Lab Manager",
-        value: "lab"
-    },
-    {
-        label: "Graphic Designer",
-        value: "designer"
-    },
-    {
-        label: "Web Developer",
-        value: "developer"
-    },
-    {
-        label: "Marketing Director",
-        value: "marketing"
-    },
-    {
-        label: "Video Producer",
-        value: "video"
-    }
-]
-
-export const ProfileLinks: Option[] = [
-    {
-        label: "LinkedIn",
-        value: "linkedin"
-    },
-    {
-        label: "GitHub",
-        value: "github"
-    },
-    {
-        label: "Website",
-        value: "web"
-    },
-    {
-        label: "Twitter",
-        value: "twitter"
-    },
-    {
-        label: "Twitch",
-        value: "twitch"
-    },
-    {
-        label: "YouTube",
-        value: "youtube"
-    },
-    {
-        label: "Discord",
-        value: "discord"
-    },
-    {
-        label: "Steam",
-        value: "steam"
-    },
-    {
-        label: "Meta",
-        value: "meta"
-    }
-]
-
 
 /**
  * The different statuses that a device can be in.
@@ -198,8 +111,12 @@ export const ChannelType = [
         value: "announcements"
     },
     {
-        label: "Lab Notifications",
+        label: "Lab Status",
         value: "lab"
+    },
+    {
+        label: "Notifications",
+        value: "notifications"
     },
     {
         label: "Lab Inventory",

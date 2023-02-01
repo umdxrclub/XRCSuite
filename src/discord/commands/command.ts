@@ -1,6 +1,5 @@
 import { SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CacheType, ChatInputCommandInteraction, Interaction } from "discord.js";
-import { Member } from "../../types/PayloadSchema";
 import { BirthdayCommand } from "./birthday";
 import { EventsCommand } from "./events";
 import { ExecCommand } from "./exec";
@@ -15,7 +14,7 @@ type CommandData = SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashC
  * A structure for creating slash commands.
  */
 export interface Command {
-    leadershipOnly?: boolean | Member["leadershipRoles"]
+    leadershipOnly?: boolean
     data: CommandData,
     onInvoke: (interaction: ChatInputCommandInteraction<CacheType>) => Promise<void>,
     onInteractionCreate?: (interaction: Interaction<CacheType>) => Promise<void>

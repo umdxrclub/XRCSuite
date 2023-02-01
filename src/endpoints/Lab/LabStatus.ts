@@ -27,7 +27,7 @@ const LabStatusEndpoint: Endpoint = {
         })
 
         let members = lab.members as Member[] ?? [];
-        let staffNames = members.filter(m => m.leadershipRoles?.length > 0).map(m => m.name);
+        let staffNames = [] // members.filter(m => m.leadershipRoles?.length > 0).map(m => m.name);
 
         // Form the status body.
         let status: LabStatus = {

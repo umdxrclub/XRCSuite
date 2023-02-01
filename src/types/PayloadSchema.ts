@@ -30,19 +30,7 @@ export interface Lab {
     shutdownLabWhenAllCheckedOut?: boolean;
     notifyStatus?: boolean;
     notifyLeadershipCheckInOut?: boolean;
-    leadershipRolesToNotify?: (
-      | 'president'
-      | 'vicePresident'
-      | 'treasurer'
-      | 'mentor'
-      | 'engagement'
-      | 'event'
-      | 'lab'
-      | 'designer'
-      | 'developer'
-      | 'marketing'
-      | 'video'
-    )[];
+    rolesToAnnounce?: string[] | Role[];
   };
 }
 /**
@@ -80,23 +68,11 @@ export interface Member {
   birthday?: string;
   email?: string;
   isClubMember?: boolean;
-  leadershipRoles?: (
-    | 'president'
-    | 'vicePresident'
-    | 'treasurer'
-    | 'mentor'
-    | 'engagement'
-    | 'event'
-    | 'lab'
-    | 'designer'
-    | 'developer'
-    | 'marketing'
-    | 'video'
-  )[];
+  roles?: string[] | Role[];
   profile: {
     picture?: string | Media;
     links: {
-      type: 'linkedin' | 'github' | 'web' | 'twitter' | 'twitch' | 'youtube' | 'discord' | 'steam' | 'meta';
+      type: string | Integration;
       url: string;
       id?: string;
     }[];
@@ -122,6 +98,17 @@ export interface Member {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles".
+ */
+export interface Role {
+  id: string;
+  name?: string;
+  color?: string;
+  priority?: number;
+  discordRoleId?: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -135,6 +122,15 @@ export interface Media {
   height?: number;
   createdAt: string;
   updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "integrations".
+ */
+export interface Integration {
+  id: string;
+  name?: string;
+  discordEmoji?: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -185,31 +181,6 @@ export interface Bot {
   };
   guild: {
     guildId?: string;
-    profileLinkEmojis: {
-      linkedin?: string;
-      github?: string;
-      web?: string;
-      twitter?: string;
-      twitch?: string;
-      youtube?: string;
-      discord?: string;
-      steam?: string;
-      meta?: string;
-    };
-    leadershipColors: {
-      president?: string;
-      vicePresident?: string;
-      treasurer?: string;
-      mentor?: string;
-      engagement?: string;
-      event?: string;
-      lab?: string;
-      designer?: string;
-      developer?: string;
-      marketing?: string;
-      video?: string;
-    };
-    defaultLeadershipColor?: string;
     channels: {
       announcements?: string;
       lab?: string;
@@ -218,11 +189,25 @@ export interface Bot {
       events?: string;
       leadership?: string;
     };
-    roles: {
-      lab?: string;
-      workshop?: string;
-      project?: string;
+    notificationRoles: {
+      lab?: string | Role;
+      workshop?: string | Role;
+      project?: string | Role;
     };
+  };
+  bulkMessages: {
+    lab: {
+      messageId: string;
+      id?: string;
+    }[];
+    leadership: {
+      messageId: string;
+      id?: string;
+    }[];
+    inventory: {
+      messageId: string;
+      id?: string;
+    }[];
   };
 }
 /**
@@ -459,19 +444,6 @@ export interface Stat {
     instagram?: number;
     twitter?: number;
   };
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "roles".
- */
-export interface Role {
-  id: string;
-  name?: string;
-  color?: string;
-  priority?: number;
-  discordRoleId?: string;
   createdAt: string;
   updatedAt: string;
 }

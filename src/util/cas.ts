@@ -9,7 +9,7 @@ import {
   parseForm, queryStringFromForm,
   retryRequest, X_WWW_FORM_HEADERS_CONFIG
 } from "./scrape-util";
-import { Ca } from "../types/PayloadSchema";
+import { CAS } from "../types/PayloadSchema";
 
 function log(msg: string) {
   console.log(`[CASAuthService] ${msg}`);
@@ -84,7 +84,7 @@ export async function loginWithCAS() {
   // POST: /frame/frameless/v4/auth
 
   const axios = XRC.axios;
-  const CAS = await payload.findGlobal<Ca>({
+  const CAS = await payload.findGlobal<CAS>({
     slug: GlobalSlugs.CAS
   })
 

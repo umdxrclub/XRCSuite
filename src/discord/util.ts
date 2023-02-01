@@ -10,7 +10,8 @@ import {
     CacheType,
     NewsChannel,
     AttachmentBuilder,
-    Message
+    Message,
+    GuildBasedChannel
 } from "discord.js";
 import payload from "payload";
 import { XRCSuiteChannelType } from "../types/XRCTypes";
@@ -30,31 +31,17 @@ export type DiscordMessage = string | MessagePayload | MessageCreateOptions
  * Sends a message to the specified announcement channel of all registered
  * guilds.
  *
- * @param channel The type of channel to send the message to
+ * @param channelType The type of channel to send the message to
  * @param content The message content
  */
 export async function sendGuildMessage (
-  channel: XRCSuiteChannelType,
+  channelType: XRCSuiteChannelType,
   content: DiscordMessage
 ): Promise<Message | undefined> {
-    // First retrieve discord client
-    let client = await getDiscordClient();
+    let channel = await getGuildChannel(channelType);
 
-    // Ensure that the Discord client exists.
-    if (client) {
-        let { guild } = await payload.findGlobal({
-            slug: GlobalSlugs.Discord
-        });
-
-        let channelId: string | undefined = guild.channels[channel];
-
-        // Check to see that a channel was successfully retrieved.
-        if (channelId) {
-            let channel = await client.channels.fetch(channelId);
-            if (channel && (channel instanceof TextChannel || channel instanceof NewsChannel)) {
-                return await channel.send(content);
-            }
-        }
+    if (channel && (channel instanceof TextChannel || channel instanceof NewsChannel)) {
+        return await channel.send(content);
     }
 }
 
@@ -63,7 +50,7 @@ export async function sendGuildMessage (
  *
  * @returns The current Discord guild.
  */
-export async function getGuild(): Promise<Guild | undefined> {
+export async function getGuild(): Promise<Guild | null> {
     let client = getDiscordClient();
 
     let { guild } = await payload.findGlobal<Bot>({
@@ -73,8 +60,44 @@ export async function getGuild(): Promise<Guild | undefined> {
     if (guild.guildId) {
         return client.guilds.resolve(guild.guildId)
     } else {
-        return undefined;
+        return null;
     }
+}
+
+export async function getGuildChannel(channelType: XRCSuiteChannelType): Promise<GuildBasedChannel | null>{
+    let { guild } = await payload.findGlobal({
+        slug: GlobalSlugs.Discord
+    });
+
+    let channelId: string | undefined = guild.channels[channelType];
+
+    // Check to see that a channel was successfully retrieved.
+    if (channelId) {
+        let channel = await getGuildChannelById(channelId);
+        return channel;
+    }
+
+    return null;
+}
+
+export async function getGuildChannelById(channelId: string): Promise<GuildBasedChannel | null> {
+    let guild = await getGuild();
+    if (guild) {
+        let channel = await guild.channels.fetch(channelId)
+        return channel;
+    }
+
+    return null;
+}
+
+export async function getBulkMessageIds(bulkMessageType: keyof Bot["bulkMessages"]): Promise<string[]> {
+    let { bulkMessages } = await payload.findGlobal<Bot>({
+        slug: GlobalSlugs.Discord
+    })
+
+    let messages = bulkMessages[bulkMessageType] ?? []
+
+    return messages.map(o => o.messageId)
 }
 
 /**

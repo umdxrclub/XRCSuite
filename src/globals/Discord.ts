@@ -1,11 +1,10 @@
-import { GlobalConfig } from "payload/types";
+import { Field, GlobalConfig } from "payload/types";
 import { createActionButton } from "../components/ActionButton";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
-import { getOptionObjects } from "../payload";
 import { CollectionSlugs, GlobalSlugs } from "../slugs";
-import { ChannelType, LeadershipRoles, ProfileLinks, XRClubDiscordRoles } from "../types/XRCTypes";
+import { ChannelType, XRClubDiscordNotificationRoles } from "../types/XRCTypes";
 
 const Bot: GlobalConfig = {
     slug: GlobalSlugs.Discord,
@@ -71,28 +70,6 @@ const Bot: GlobalConfig = {
                     type: 'text'
                 },
                 {
-                    name: 'profileLinkEmojis',
-                    type: 'group',
-                    fields: getOptionObjects(ProfileLinks).map(o => ({
-                        name: o.value,
-                        label: o.label,
-                        type: 'text'
-                    })),
-                },
-                {
-                    name: 'leadershipColors',
-                    type: 'group',
-                    fields: getOptionObjects(LeadershipRoles).map(o => ({
-                        name: o.value,
-                        label: o.label,
-                        type: 'text'
-                    })),
-                },
-                {
-                    name: 'defaultLeadershipColor',
-                    type: 'text'
-                },
-                {
                     name: 'channels',
                     type: 'group',
                     fields: ChannelType.map(ct => ({
@@ -102,17 +79,38 @@ const Bot: GlobalConfig = {
                     }))
                 },
                 {
-                    name: 'roles',
+                    name: 'notificationRoles',
                     type: 'group',
-                    fields: XRClubDiscordRoles.map(r => ({
+                    fields: XRClubDiscordNotificationRoles.map(r => ({
                         name: r.name,
-                        type: 'text',
-                        label: r.title
+                        type: 'relationship',
+                        label: r.title,
+                        relationTo: CollectionSlugs.Roles
                     }))
                 }
             ]
+        },
+        {
+            name: 'bulkMessages',
+            type: 'group',
+            fields: ["lab", "leadership", "inventory"].map(createBulkMessagesField)
         }
     ]
 };
+
+function createBulkMessagesField(name: string): Field {
+    return {
+        name: name,
+        type: 'array',
+        fields: [
+            {
+                name: 'messageId',
+                type: 'text',
+                required: true
+            }
+        ],
+        defaultValue: []
+    }
+}
 
 export default Bot;

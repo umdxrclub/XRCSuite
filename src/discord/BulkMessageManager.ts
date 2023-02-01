@@ -1,24 +1,99 @@
-import { getDiscordClient } from "./bot";
-import { DiscordMessage, getGuild } from "./util";
+import { TextChannel } from "discord.js";
+import { Throttle } from "../util/throttle";
+import { DiscordMessage, getGuildChannelById } from "./util";
+
+export type NewBulkMessageIdsListener = (messageIds: string[]) => void
 
 class BulkMessageManager {
-    private _messageIds: string[]
+    public messageUpdateDelayMs: number = 1000
+    public alwaysCreateNewMessages: boolean = false
+    private _messageIds: string[] = []
     private _channelId: string
+    private _channel: TextChannel | undefined
+    private _newMessageIdsListeners: NewBulkMessageIdsListener[] = []
 
-    constructor(channelId: string) {
+    constructor(channelId: string, messageIds?: string[]) {
         this._channelId = channelId;
+        if (messageIds) {
+            this._messageIds = messageIds;
+        }
     }
 
-    public async createMessages(messages: DiscordMessage[]) {
-
+    public async setMessages(messages: DiscordMessage[]) {
+        if (messages.length != this._messageIds.length || this.alwaysCreateNewMessages) {
+            await this.deleteAllMessages();
+            await this.createMessages(messages)
+        } else {
+            await this.editMessages(messages)
+        }
     }
 
-    public async delete() {
-
+    public async deleteAllMessages() {
+        let channel = await this.getMessageChannel();
+        await channel.bulkDelete(this._messageIds);
+        this.setMessageIds([])
     }
 
-    public async deleteAll() {
-        let guild = await getGuild();
+    public addNewMessageIdListener(listener: NewBulkMessageIdsListener) {
+        this._newMessageIdsListeners.push(listener)
+    }
+
+    public removeNewMessageIdListener(listener: NewBulkMessageIdsListener) {
+        let index = this._newMessageIdsListeners.findIndex(l => l === listener);
+        if (index > -1) {
+            this._newMessageIdsListeners.splice(index, 1);
+        }
+    }
+
+    private async createMessages(messages: DiscordMessage[]) {
+        let channel = await this.getMessageChannel();
+        if (channel) {
+            let ids = []
+            for (var messageContent of messages) {
+                let createdMsg = await this._channel.send(messageContent)
+                ids.push(createdMsg.id)
+
+                await Throttle.wait(this.messageUpdateDelayMs)
+            }
+            this.setMessageIds(ids)
+        }
+    }
+
+    private async editMessages(messages: DiscordMessage[]) {
+        let channel = await this.getMessageChannel();
+        if (channel && messages.length == this._messageIds.length) {
+            for (var i = 0; i < messages.length; i++) {
+                let messageId = this._messageIds[i];
+                let messageContent = messages[i];
+
+                let messageToEdit = await channel.messages.fetch(messageId);
+                if (messageToEdit) {
+                    await messageToEdit.edit(messageContent)
+                } else {
+                    console.error("Could not find message to edit!")
+                }
+
+                await Throttle.wait(this.messageUpdateDelayMs)
+            }
+        }
+    }
+
+    private async getMessageChannel() {
+        if (this._channel === undefined) {
+            let channel = await getGuildChannelById(this._channelId);
+            if (channel && channel instanceof TextChannel) {
+                this._channel = channel;
+            } else {
+                console.warn("Could not find channel for bulk messages!")
+            }
+        }
+
+        return this._channel
+    }
+
+    private setMessageIds(messageIds: string[]) {
+        this._messageIds = messageIds;
+        this._newMessageIdsListeners.forEach(l => l(this._messageIds))
     }
 }
 

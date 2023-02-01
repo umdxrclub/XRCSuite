@@ -1,5 +1,6 @@
 import { Endpoint } from "payload/dist/config/types";
 import Members from "../../collections/Members";
+import { Member } from "../../types/PayloadSchema";
 import XRC from "../../util/XRC";
 
 /**
@@ -31,7 +32,7 @@ const ImportRosterEndpoint: Endpoint = {
                 console.log("Retrieved email " + email + " for " + rosterMember.name);
 
                 // Create the new member
-                await req.payload.create({
+                await req.payload.create<Member>({
                     collection: Members.slug,
                     data: {
                         name: rosterMember.name,

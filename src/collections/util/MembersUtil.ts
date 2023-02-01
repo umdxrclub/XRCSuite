@@ -7,7 +7,7 @@ import { bulkSendGuildMessages, createAttachmentFromMedia, DiscordMessage } from
 import { getOptionLabel, rgbToNumber } from "../../payload";
 import { CollectionSlugs, GlobalSlugs } from "../../slugs";
 import { Bot, Media, Member } from "../../types/PayloadSchema";
-import { LeadershipRoles, MemberProfile, ProfileLinks, ResolveMethod } from "../../types/XRCTypes";
+import { MemberProfile, ResolveMethod } from "../../types/XRCTypes";
 import { getLabTerpLinkEvent } from "../../util/lab";
 import { RosterMember } from "../../util/terplink";
 import XRC from "../../util/XRC";
@@ -19,12 +19,12 @@ export async function getAllLeadershipMembers(): Promise<Member[]> {
         where: {
             and: [
                 {
-                    leadershipRoles: {
+                    roles: {
                         not_equals: undefined
                     }
                 },
                 {
-                    leadershipRoles: {
+                    roles: {
                         not_equals: []
                     }
                 }
@@ -33,45 +33,49 @@ export async function getAllLeadershipMembers(): Promise<Member[]> {
         limit: 100
     })
 
-    let leadership = leadershipMembers.docs;
-    let leadershipAndRole = leadership.map(l => {
-        let roles = l.leadershipRoles ?? []
-        let roleIndices = roles
-            .map(r => LeadershipRoles.findIndex(o => o.value == r))
-            .map(i => i == -1 ? 1000 : i) // replace not found with highest index
+    console.log(leadershipMembers)
 
-        let lowestIndex = Math.min(...roleIndices)
-        return {
-            member: l,
-            index: lowestIndex
-        }
-    })
+    return leadershipMembers.docs;
 
-    // Sort by roles, then by names within the role
-    leadershipAndRole.sort((a,b) => {
-        if (a.index == b.index) {
-            return a.member.name.localeCompare(b.member.name)
-        } else {
-            return a.index - b.index
-        }
-    })
+    // let leadership = leadershipMembers.docs;
+    // let leadershipAndRole = leadership.map(async l => {
+    //     let roles = l.roles ?? []
+    //     let roleIndices = roles
+    //         .map(r => LeadershipRoles.findIndex(o => o.value == r))
+    //         .map(i => i == -1 ? 1000 : i) // replace not found with highest index
 
-    return  leadershipAndRole.map(lr => lr.member);
+    //     let lowestIndex = Math.min(...roleIndices)
+    //     return {
+    //         member: l,
+    //         index: lowestIndex
+    //     }
+    // })
+
+    // // Sort by roles, then by names within the role
+    // leadershipAndRole.sort((a, b) => {
+    //     if (a.index == b.index) {
+    //         return a.member.name.localeCompare(b.member.name)
+    //     } else {
+    //         return a.index - b.index
+    //     }
+    // })
+
+    // return leadershipAndRole.map(lr => lr.member);
 }
 
-export function getHighestLeadershipRole(member: Member): string | undefined {
-    let roles = member.leadershipRoles ?? []
-    if (roles.length > 0) {
-        let roleIndices = roles
-        .map(r => LeadershipRoles.findIndex(o => o.value == r))
-        .map(i => i == -1 ? 1000 : i) // replace not found with highest index
+// export function getHighestLeadershipRole(member: Member): string | undefined {
+//     let roles = member.leadershipRoles ?? []
+//     if (roles.length > 0) {
+//         let roleIndices = roles
+//             .map(r => LeadershipRoles.findIndex(o => o.value == r))
+//             .map(i => i == -1 ? 1000 : i) // replace not found with highest index
 
-        let lowestIndex = Math.min(...roleIndices)
-        return LeadershipRoles[lowestIndex].value
-    }
+//         let lowestIndex = Math.min(...roleIndices)
+//         return LeadershipRoles[lowestIndex].value
+//     }
 
-    return undefined
-}
+//     return undefined
+// }
 
 /**
  * Gets a Member from their Discord id.
@@ -96,7 +100,7 @@ export async function isDiscordMemberLeadership(id: string): Promise<boolean> {
     let member = await getMemberFromDiscordId(id);
 
     if (member) {
-        let roles = member.leadershipRoles ?? []
+        let roles = member.roles ?? []
         return roles.length > 0
     }
 
@@ -105,8 +109,7 @@ export async function isDiscordMemberLeadership(id: string): Promise<boolean> {
 
 export function createMemberProfile(member: Member): MemberProfile {
     var profilePic: string | undefined = undefined
-    switch (typeof(member.profile.picture))
-    {
+    switch (typeof (member.profile.picture)) {
         case "string":
             profilePic = member.profile.picture;
 
@@ -117,10 +120,10 @@ export function createMemberProfile(member: Member): MemberProfile {
     return {
         name: member.name,
         nickname: member.nickname,
-        leadershipRoles: member.leadershipRoles,
+        leadershipRoles: [],// member.roles,
         profilePictureUrl: profilePic,
         bio: member.profile.bio,
-        links: member.profile.links.map(l => ({ type: l.type, url: l.url }))
+        links: []//member.profile.links.map(l => ({ type: l.type, url: l.url }))
     }
 }
 
@@ -151,36 +154,36 @@ export async function createMemberEmbedMessage(member: Member): Promise<DiscordM
         embed.setDescription(member.profile.bio)
     }
 
-    if (member.leadershipRoles) {
-        let labels = member.leadershipRoles.map(r => getOptionLabel(LeadershipRoles, r))
-        embed.addFields({
-            name: "Roles",
-            value: labels.join(", ")
-        })
+    // if (member.leadershipRoles) {
+    //     let labels = member.leadershipRoles.map(r => getOptionLabel(LeadershipRoles, r))
+    //     embed.addFields({
+    //         name: "Roles",
+    //         value: labels.join(", ")
+    //     })
 
-        // Determine embed color
-        let roleType = getHighestLeadershipRole(member);
-        if (discord.guild.leadershipColors[roleType]) {
-            color = discord.guild.leadershipColors[roleType]
-        } else if (discord.guild.defaultLeadershipColor) {
-            color = discord.guild.defaultLeadershipColor
-        }
-    }
+    //     // Determine embed color
+    //     let roleType = getHighestLeadershipRole(member);
+    //     if (discord.guild.leadershipColors[roleType]) {
+    //         color = discord.guild.leadershipColors[roleType]
+    //     } else if (discord.guild.defaultLeadershipColor) {
+    //         color = discord.guild.defaultLeadershipColor
+    //     }
+    // }
 
     let row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder()
-    member.profile.links.forEach(link => {
-        var builder = new ButtonBuilder()
-            .setLabel(getOptionLabel(ProfileLinks, link.type))
-            .setURL(link.url)
-            .setStyle(ButtonStyle.Link)
+    // member.profile.links.forEach(link => {
+    //     var builder = new ButtonBuilder()
+    //         .setLabel(getOptionLabel(ProfileLinks, link.type))
+    //         .setURL(link.url)
+    //         .setStyle(ButtonStyle.Link)
 
-        let emoji = discord.guild.profileLinkEmojis[link.type]
-        if (emoji) {
-            builder = builder.setEmoji(emoji)
-        }
+    //     let emoji = discord.guild.profileLinkEmojis[link.type]
+    //     if (emoji) {
+    //         builder = builder.setEmoji(emoji)
+    //     }
 
-        row.addComponents(builder)
-    })
+    //     row.addComponents(builder)
+    // })
 
 
     if (color) {

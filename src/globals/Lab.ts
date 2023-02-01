@@ -7,7 +7,6 @@ import LabMediaEndpoint from "../endpoints/Lab/LabMedia";
 import LabStatusEndpoint from "../endpoints/Lab/LabStatus";
 import LabStatusHook from "../hooks/Lab/LabStatus";
 import { CollectionSlugs } from "../slugs";
-import { LeadershipRoles } from "../types/XRCTypes";
 
 const Lab: GlobalConfig = {
     slug: 'lab',
@@ -114,10 +113,10 @@ const Lab: GlobalConfig = {
                     }
                 },
                 {
-                    type: 'select',
-                    name: 'leadershipRolesToNotify',
-                    label: "Leadership Roles to Announce",
-                    options: LeadershipRoles,
+                    type: 'relationship',
+                    name: 'rolesToAnnounce',
+                    label: "Roles to Announce",
+                    relationTo: CollectionSlugs.Roles,
                     hasMany: true,
                     admin: {
                         description: "A leadership check in/out notification will only be sent if the member has one of these roles."
