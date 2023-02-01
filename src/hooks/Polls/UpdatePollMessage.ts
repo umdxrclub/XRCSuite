@@ -1,7 +1,7 @@
 import { TextChannel } from "discord.js";
 import { CollectionAfterChangeHook } from "payload/types";
+import { createPollEmbedAndRow } from "../../collections/util/PollUtil";
 import { getDiscordClient } from "../../discord/bot";
-import { createPollEmbedAndRow } from "../../discord/commands/Poll";
 import { Throttle } from "../../util/throttle";
 
 const pollUpdateThrottle = new Throttle(5000);

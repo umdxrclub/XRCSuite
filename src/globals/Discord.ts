@@ -4,7 +4,7 @@ import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
 import { getOptionObjects } from "../payload";
-import { GlobalSlugs } from "../slugs";
+import { CollectionSlugs, GlobalSlugs } from "../slugs";
 import { ChannelType, LeadershipRoles, ProfileLinks, XRClubDiscordRoles } from "../types/XRCTypes";
 
 const Bot: GlobalConfig = {
@@ -45,6 +45,20 @@ const Bot: GlobalConfig = {
                 {
                     name: 'token',
                     type: 'text'
+                }
+            ]
+        },
+        {
+            name: 'media',
+            type: 'group',
+            fields: [
+                {
+                    name: "banner",
+                    type: "upload",
+                    relationTo: CollectionSlugs.Media,
+                    filterOptions: {
+                        mimeType: { contains: 'image' }
+                    }
                 }
             ]
         },

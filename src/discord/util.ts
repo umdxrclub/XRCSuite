@@ -154,3 +154,10 @@ export async function bulkSendGuildMessages(channel: XRCSuiteChannelType, messag
 
     return sentMessages
 }
+
+export function createAttachmentFromImageData(image: string) {
+    let buff = Buffer.from(image.split(",")[1], "base64")
+    let attachment = new AttachmentBuilder(buff)
+
+    return attachment;
+}

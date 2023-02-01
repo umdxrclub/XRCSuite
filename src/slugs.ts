@@ -13,6 +13,8 @@ export const CollectionSlugs = {
     Software: 'software',
     Polls: 'polls',
     Stats: 'stats',
+    Roles: 'roles',
+    Integrations: 'integrations'
 }
 
 export const GlobalSlugs = {

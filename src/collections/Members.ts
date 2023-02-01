@@ -1,5 +1,6 @@
 import { CollectionConfig } from "payload/types";
 import DirectorySearchEndpoint from "../endpoints/Members/DirectorySearch";
+import DiscordAvatarEndpoint from "../endpoints/Members/DiscordAvatar";
 import ImportRosterEndpoint from "../endpoints/Members/ImportTerpLinkRoster";
 import LeadershipEndpoint from "../endpoints/Members/Leadership";
 import ResolveMemberEndpoint from "../endpoints/Members/ResolveMember";
@@ -15,7 +16,7 @@ const Members: CollectionConfig = {
         group: 'Users',
         defaultColumns: [ 'name', 'nickname', 'email', 'isClubMember' ]
     },
-    endpoints: [ImportRosterEndpoint, ResolveMemberEndpoint, UMDVerificationEndpoint, LeadershipEndpoint, DirectorySearchEndpoint ],
+    endpoints: [ImportRosterEndpoint, ResolveMemberEndpoint, UMDVerificationEndpoint, LeadershipEndpoint, DirectorySearchEndpoint, DiscordAvatarEndpoint ],
     fields: [
         {
             name: 'name',
@@ -61,8 +62,8 @@ const Members: CollectionConfig = {
                     fields: [
                         {
                             name: 'type',
-                            type: 'select',
-                            options: ProfileLinks,
+                            type: 'relationship',
+                            relationTo: CollectionSlugs.Integrations,
                             required: true
                         },
                         {

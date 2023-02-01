@@ -180,6 +180,9 @@ export interface Bot {
     clientSecret?: string;
     token?: string;
   };
+  media: {
+    banner?: string | Media;
+  };
   guild: {
     guildId?: string;
     profileLinkEmojis: {
@@ -226,7 +229,7 @@ export interface Bot {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cas".
  */
-export interface Ca {
+export interface CAS {
   id: string;
   username?: string;
   password?: string;
@@ -456,6 +459,19 @@ export interface Stat {
     instagram?: number;
     twitter?: number;
   };
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "roles".
+ */
+export interface Role {
+  id: string;
+  name?: string;
+  color?: string;
+  priority?: number;
+  discordRoleId?: string;
   createdAt: string;
   updatedAt: string;
 }

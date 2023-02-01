@@ -1,9 +1,10 @@
 import re
 import xmlrpc.client, json, sys
 
-url = "https://umdxrclub.odoo.com"
-db = "umdxrclub"
-password = "5c2b759becc92894a7625a29ce5f96456bd6ad78"
+# TODO: Load these values through Payload
+url = ""
+db = ""
+password = ""
 common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
 uid = 2
 

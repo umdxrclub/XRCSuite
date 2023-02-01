@@ -1,4 +1,3 @@
-
 import path from 'path';
 import { buildConfig } from 'payload/config';
 import Devices from './collections/Devices'
@@ -23,9 +22,11 @@ import GatekeeperRoute from './routes/Gatekeeper';
 import XRCBeforeDashboard from './components/dashboard/XRCBeforeDashboard';
 import Stats from './collections/Stats';
 import Odoo from './globals/Odoo';
+import Roles from './collections/Roles';
+import Integrations from './collections/Integrations';
 
 const fallbackModules = [
-    'util',
+    'util'
 ]
 
 const aliasDirectories = [
@@ -102,7 +103,9 @@ export default buildConfig({
         Media,
         Schedules,
         Polls,
-        Stats
+        Stats,
+        Roles,
+        Integrations
     ],
     globals: [
         Lab,

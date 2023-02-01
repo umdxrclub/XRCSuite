@@ -42,7 +42,10 @@ const CAS: GlobalConfig = {
             type: 'number',
             defaultValue: 0
         }
-    ]
+    ],
+    typescript: {
+        interface: "CAS"
+    }
 };
 
 export default CAS;
