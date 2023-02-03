@@ -102,10 +102,13 @@ export interface Member {
  */
 export interface Role {
   id: string;
-  name?: string;
+  name: string;
   color?: string;
-  priority?: number;
+  priority: number;
   discordRoleId?: string;
+  discordEmoji?: string;
+  isLeadership: boolean;
+  isSelfAssignable: boolean;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -184,30 +187,47 @@ export interface Bot {
     channels: {
       announcements?: string;
       lab?: string;
+      notifications?: string;
       inventory?: string;
       audit?: string;
       events?: string;
       leadership?: string;
+    };
+    statusChannels: {
+      lab: {
+        channelId?: string;
+        messages: {
+          messageId: string;
+          id?: string;
+        }[];
+      };
+      inventory: {
+        channelId?: string;
+        messages: {
+          messageId: string;
+          id?: string;
+        }[];
+      };
+      leadership: {
+        channelId?: string;
+        messages: {
+          messageId: string;
+          id?: string;
+        }[];
+      };
+      roles: {
+        channelId?: string;
+        messages: {
+          messageId: string;
+          id?: string;
+        }[];
+      };
     };
     notificationRoles: {
       lab?: string | Role;
       workshop?: string | Role;
       project?: string | Role;
     };
-  };
-  bulkMessages: {
-    lab: {
-      messageId: string;
-      id?: string;
-    }[];
-    leadership: {
-      messageId: string;
-      id?: string;
-    }[];
-    inventory: {
-      messageId: string;
-      id?: string;
-    }[];
   };
 }
 /**

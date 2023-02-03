@@ -4,7 +4,7 @@ import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
 import { CollectionSlugs, GlobalSlugs } from "../slugs";
-import { ChannelType, XRClubDiscordNotificationRoles } from "../types/XRCTypes";
+import { ChannelType, StatusChannelType, XRClubDiscordNotificationRoles } from "../types/XRCTypes";
 
 const Bot: GlobalConfig = {
     slug: GlobalSlugs.Discord,
@@ -79,6 +79,11 @@ const Bot: GlobalConfig = {
                     }))
                 },
                 {
+                    name: 'statusChannels',
+                    type: 'group',
+                    fields: StatusChannelType.map(o => createStatusChannelField(o.value,o.label))
+                },
+                {
                     name: 'notificationRoles',
                     type: 'group',
                     fields: XRClubDiscordNotificationRoles.map(r => ({
@@ -89,27 +94,32 @@ const Bot: GlobalConfig = {
                     }))
                 }
             ]
-        },
-        {
-            name: 'bulkMessages',
-            type: 'group',
-            fields: ["lab", "leadership", "inventory"].map(createBulkMessagesField)
         }
     ]
 };
 
-function createBulkMessagesField(name: string): Field {
+function createStatusChannelField(name: string, label: string): Field {
     return {
         name: name,
-        type: 'array',
+        label: label,
+        type: 'group',
         fields: [
             {
-                name: 'messageId',
-                type: 'text',
-                required: true
+                name: 'channelId',
+                type: 'text'
+            },
+            {
+                name: 'messages',
+                type: 'array',
+                fields: [
+                    {
+                        name: 'messageId',
+                        type: 'text',
+                        required: true
+                    }
+                ]
             }
-        ],
-        defaultValue: []
+        ]
     }
 }
 

@@ -5,6 +5,8 @@ import {
 import payload from "payload";
 import { GlobalSlugs } from "../slugs";
 import { BotCommands } from "./commands/command";
+import BotInteractions from "./interactions/interactions";
+import { createAndUpdateStatusChannelManagers } from "./multi/multi";
 import { rejectInteractionIfNotLeadership } from "./util";
 
 const BOT_INTENTS = [
@@ -21,6 +23,7 @@ function onCreateClient(guildId: string) {
   if (discordClient) {
     discordClient.once("ready", async (client) => {
       console.log("Logged in as " + client.user.username);
+      await createAndUpdateStatusChannelManagers();
     });
 
     // Add slash command handlers
@@ -28,7 +31,9 @@ function onCreateClient(guildId: string) {
       // Make sure that the interaction comes from the configured guild.
       if (interaction.guildId != guildId) return;
 
-      BotCommands.forEach((c) => {
+      BotInteractions.forEach(i => i(interaction))
+
+      BotCommands.forEach(c => {
         if (c.onInteractionCreate) {
           c.onInteractionCreate(interaction);
         }

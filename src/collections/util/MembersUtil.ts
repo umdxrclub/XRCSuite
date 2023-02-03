@@ -1,81 +1,61 @@
 import { EmbedBuilder } from "@discordjs/builders";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection } from "discord.js";
 import payload from "payload";
 import { Where } from "payload/types";
 import { getDiscordClient } from "../../discord/bot";
 import { bulkSendGuildMessages, createAttachmentFromMedia, DiscordMessage } from "../../discord/util";
 import { getOptionLabel, rgbToNumber } from "../../payload";
 import { CollectionSlugs, GlobalSlugs } from "../../slugs";
-import { Bot, Media, Member } from "../../types/PayloadSchema";
+import { Bot, Media, Member, Role } from "../../types/PayloadSchema";
 import { MemberProfile, ResolveMethod } from "../../types/XRCTypes";
 import { getLabTerpLinkEvent } from "../../util/lab";
+import { resolveDocument } from "../../util/payload-backend";
 import { RosterMember } from "../../util/terplink";
 import XRC from "../../util/XRC";
 import Members from "../Members";
+import { getHighestRole, getLeadershipRoles, isMemberLeadership } from "./RolesUtil";
 
 export async function getAllLeadershipMembers(): Promise<Member[]> {
-    let leadershipMembers = await payload.find<Member>({
+    let leadershipRoles = await getLeadershipRoles();
+    let leadershipRoleIds = leadershipRoles.map(r => r.id);
+
+    let leadershipMembersDocs = await payload.find<Member>({
         collection: CollectionSlugs.Members,
         where: {
-            and: [
-                {
-                    roles: {
-                        not_equals: undefined
-                    }
-                },
-                {
-                    roles: {
-                        not_equals: []
-                    }
-                }
-            ]
+            roles: {
+                in: leadershipRoleIds
+            }
         },
         limit: 100
     })
-
-    console.log(leadershipMembers)
-
-    return leadershipMembers.docs;
-
-    // let leadership = leadershipMembers.docs;
-    // let leadershipAndRole = leadership.map(async l => {
-    //     let roles = l.roles ?? []
-    //     let roleIndices = roles
-    //         .map(r => LeadershipRoles.findIndex(o => o.value == r))
-    //         .map(i => i == -1 ? 1000 : i) // replace not found with highest index
-
-    //     let lowestIndex = Math.min(...roleIndices)
-    //     return {
-    //         member: l,
-    //         index: lowestIndex
-    //     }
-    // })
-
-    // // Sort by roles, then by names within the role
-    // leadershipAndRole.sort((a, b) => {
-    //     if (a.index == b.index) {
-    //         return a.member.name.localeCompare(b.member.name)
-    //     } else {
-    //         return a.index - b.index
-    //     }
-    // })
-
-    // return leadershipAndRole.map(lr => lr.member);
+    
+    let leadershipMembers = await sortMembersByRolePriority(leadershipMembersDocs.docs);
+    return leadershipMembers;
 }
 
-// export function getHighestLeadershipRole(member: Member): string | undefined {
-//     let roles = member.leadershipRoles ?? []
-//     if (roles.length > 0) {
-//         let roleIndices = roles
-//             .map(r => LeadershipRoles.findIndex(o => o.value == r))
-//             .map(i => i == -1 ? 1000 : i) // replace not found with highest index
+export async function sortMembersByRolePriority(members: Member[]): Promise<Member[]> {
+    let memberAndRolePromises = members.map(async m => {
+        let roles = m.roles ?? [];
+        let resolvedRolesPromises: Promise<Role>[] = roles.map(r => resolveDocument(r, CollectionSlugs.Roles));
+        let resolvedRoles = await Promise.all(resolvedRolesPromises)
 
-//         let lowestIndex = Math.min(...roleIndices)
-//         return LeadershipRoles[lowestIndex].value
-//     }
+        return {
+            member: m,
+            roles: resolvedRoles
+        }
+    })
 
-//     return undefined
-// }
+    let memberAndRoles = await Promise.all(memberAndRolePromises);
+
+    memberAndRoles.sort((a, b) => {
+        let aHighest = getHighestRole(a.roles)
+        let bHighest = getHighestRole(b.roles)
+        return aHighest?.priority - bHighest?.priority
+    })
+
+    return memberAndRoles.map(mr => mr.member)
+}
+
 
 /**
  * Gets a Member from their Discord id.
@@ -97,13 +77,11 @@ export async function getMemberFromDiscordId(id: string): Promise<Member | undef
 }
 
 export async function isDiscordMemberLeadership(id: string): Promise<boolean> {
-    let member = await getMemberFromDiscordId(id);
-
+    let member = await getMemberFromDiscordId(id); 
     if (member) {
-        let roles = member.roles ?? []
-        return roles.length > 0
+        return isMemberLeadership(member);
     }
-
+    
     return false;
 }
 
@@ -128,7 +106,6 @@ export function createMemberProfile(member: Member): MemberProfile {
 }
 
 export async function createMemberEmbedMessage(member: Member): Promise<DiscordMessage> {
-    let discord = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord });
     let embed = new EmbedBuilder()
     var files = []
     let color: string | undefined
@@ -154,21 +131,21 @@ export async function createMemberEmbedMessage(member: Member): Promise<DiscordM
         embed.setDescription(member.profile.bio)
     }
 
-    // if (member.leadershipRoles) {
-    //     let labels = member.leadershipRoles.map(r => getOptionLabel(LeadershipRoles, r))
-    //     embed.addFields({
-    //         name: "Roles",
-    //         value: labels.join(", ")
-    //     })
+    if (member.roles && member.roles.length > 0) {
+        let roles: Role[] = await Promise.all(member.roles.map(r => resolveDocument(r, CollectionSlugs.Roles)));
+        roles.sort((a, b) => a.priority - b.priority)
+        let highestRole = roles[0];
 
-    //     // Determine embed color
-    //     let roleType = getHighestLeadershipRole(member);
-    //     if (discord.guild.leadershipColors[roleType]) {
-    //         color = discord.guild.leadershipColors[roleType]
-    //     } else if (discord.guild.defaultLeadershipColor) {
-    //         color = discord.guild.defaultLeadershipColor
-    //     }
-    // }
+        embed.addFields({
+            name: "Roles",
+            value: roles.map(r => r.name).join(", ")
+        })
+
+        // Determine embed color
+        if (highestRole.color) {
+            embed.setColor(rgbToNumber(highestRole.color))
+        }
+    }
 
     let row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder()
     // member.profile.links.forEach(link => {

@@ -1,16 +1,16 @@
 import { TextChannel } from "discord.js";
-import { Throttle } from "../util/throttle";
-import { DiscordMessage, getGuildChannelById } from "./util";
+import { Throttle } from "../../util/throttle";
+import { DiscordMessage, getGuildChannelById } from "../util";
 
-export type NewBulkMessageIdsListener = (messageIds: string[]) => void
+export type NewMultiMessageIdsListener = (messageIds: string[]) => void
 
-class BulkMessageManager {
+class MultiMessageManager {
     public messageUpdateDelayMs: number = 1000
     public alwaysCreateNewMessages: boolean = false
     private _messageIds: string[] = []
     private _channelId: string
     private _channel: TextChannel | undefined
-    private _newMessageIdsListeners: NewBulkMessageIdsListener[] = []
+    private _newMessageIdsListeners: NewMultiMessageIdsListener[] = []
 
     constructor(channelId: string, messageIds?: string[]) {
         this._channelId = channelId;
@@ -34,11 +34,11 @@ class BulkMessageManager {
         this.setMessageIds([])
     }
 
-    public addNewMessageIdListener(listener: NewBulkMessageIdsListener) {
+    public addNewMessageIdListener(listener: NewMultiMessageIdsListener) {
         this._newMessageIdsListeners.push(listener)
     }
 
-    public removeNewMessageIdListener(listener: NewBulkMessageIdsListener) {
+    public removeNewMessageIdListener(listener: NewMultiMessageIdsListener) {
         let index = this._newMessageIdsListeners.findIndex(l => l === listener);
         if (index > -1) {
             this._newMessageIdsListeners.splice(index, 1);
@@ -97,4 +97,4 @@ class BulkMessageManager {
     }
 }
 
-export default BulkMessageManager;
+export default MultiMessageManager;

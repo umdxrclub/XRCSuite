@@ -2,47 +2,70 @@ import { EmbedBuilder } from "@discordjs/builders";
 import { AttachmentBuilder } from "discord.js";
 import payload from "payload";
 import { GlobalAfterChangeHook } from "payload/types";
-import BulkMessageManager from "../../discord/BulkMessageManager";
-import { createAttachmentFromMedia, getBulkMessageIds, getGuildChannel, sendGuildMessage } from "../../discord/util";
-import { createLabStatusEmbedMessage } from "../../globals/util/LabUtil";
+import { getStatusChannelManager } from "../../discord/multi/multi";
+import MultiMessageManager from "../../discord/multi/MultiMessageManager";
+import { createAttachmentFromMedia, getGuildChannel, sendGuildMessage } from "../../discord/util";
+import { createLabStatusEmbedMessage, updateLabStatusMessage } from "../../globals/util/LabUtil";
 import { getDocumentId } from "../../payload";
 import { CollectionSlugs, GlobalSlugs } from "../../slugs";
 import { Bot, Lab, Media, Member } from "../../types/PayloadSchema";
+import { resolveDocument } from "../../util/payload-backend";
 
-var labStatusBulkEditor: BulkMessageManager | undefined = undefined
+// var labStatusBulkEditor: MultiMessageManager | undefined = undefined
 
-async function getBulkManager() {
-  if (!labStatusBulkEditor) {
-    let channel = await getGuildChannel("lab");
-    let msgIds = await getBulkMessageIds("lab");
-    if (channel && msgIds) {
-      labStatusBulkEditor = new BulkMessageManager(channel.id, msgIds)
-      labStatusBulkEditor.addNewMessageIdListener(async newMessageIds => {
-        let bot = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord, depth: 0 });
-        await payload.updateGlobal<Bot>({ slug: GlobalSlugs.Discord, depth: 0, data: {
-          ...bot,
-          bulkMessages: {
-            ...bot.bulkMessages,
-            lab: newMessageIds.map(id => ({ messageId: id }))
-          }
-        }})
-      })
+async function getLabNotificationDiscordRoleId(): Promise<string | null> {
+  let discordDoc = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord })
+    if (discordDoc.guild.notificationRoles.lab) {
+      let labNotificationRole = await resolveDocument(discordDoc.guild.notificationRoles.lab, CollectionSlugs.Roles);
+      return labNotificationRole.discordRoleId ?? null;
     }
-  }
 
-  return labStatusBulkEditor;
+    return null;
+}
+
+// async function getMultiMessageManager() {
+//   if (!labStatusBulkEditor) {
+//     let channel = await getGuildChannel("lab");
+//     let msgIds = await getBulkMessageIds("lab");
+//     if (channel && msgIds) {
+//       labStatusBulkEditor = new MultiMessageManager(channel.id, msgIds)
+//       labStatusBulkEditor.addNewMessageIdListener(async newMessageIds => {
+//         let bot = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord, depth: 0 });
+//         await payload.updateGlobal<Bot>({ slug: GlobalSlugs.Discord, depth: 0, data: {
+//           ...bot,
+//           bulkMessages: {
+//             ...bot.bulkMessages,
+//             lab: newMessageIds.map(id => ({ messageId: id }))
+//           }
+//         }})
+//       })
+//     }
+//   }
+
+//   return labStatusBulkEditor;
+// }
+
+function createLabNotificationEmbed(): EmbedBuilder {
+  let embed = new EmbedBuilder();
+
+  embed.setTitle("XR Lab");
+  embed.setFooter({ text: "AVW 4176" });
+  embed.setTimestamp(new Date());
+
+  return embed;
 }
 
 const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   // Check if the lab status has changed.
   let doc = args.doc as Lab;
   let prevDoc = args.previousDoc as Lab;
+  let notificationRoleId = await getLabNotificationDiscordRoleId();
+  var shouldNotify = false
 
-  let bulk = await getBulkManager();
-  if (bulk) {
-    let labStatusMsg = await createLabStatusEmbedMessage();
-    bulk.setMessages([labStatusMsg])
-  }
+  updateLabStatusMessage();
+
+  let embeds = []
+  let files = []
 
   // Determine the members who have checked in/out.
   let prevMembers = prevDoc.members?.map(getDocumentId) ?? [];
@@ -51,7 +74,7 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   let removedMemberIds = prevMembers.filter(
     (id) => !currentMembers.includes(id)
   );
-  let announceRoles = doc.settings.rolesToAnnounce ?? [];
+  let announceRoles = doc.settings.rolesToAnnounce?.map(getDocumentId) ?? [];
 
   // Create an array of all changed members with their id and a checked in/out flag.
   var changedMemberIds: { id: string, type: "in" | "out" }[] = newMemberIds.map(id => ({ id, type: "in" }))
@@ -70,6 +93,17 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     });
   });
 
+  // Determine whether lab status changed.
+  if (doc.open != prevDoc.open) {
+    let open = doc.open;
+    shouldNotify ||= open;
+
+    let statusChangeEmbed = createLabNotificationEmbed();
+    statusChangeEmbed.setDescription(open ? "The XR Lab is now open!" : "The XR Lab is now closed.")
+    statusChangeEmbed.setColor(open ? [133, 212, 49] : [212,71,49])
+    embeds.push(statusChangeEmbed)
+  }
+
   // Process the newly checked-in members.
   if (newMemberIds.length > 0) {
     let newMembers = await Promise.all(
@@ -82,30 +116,37 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
       )
     );
 
-    let leadershipMembers = newMembers.filter((m) =>
-      (m.roles ?? []).some((r) => announceRoles.includes(r))
+    let membersToAnnounce = newMembers.filter((m) =>
+      (m.roles ?? []).some((r) => announceRoles.includes(getDocumentId(r)))
     );
-    leadershipMembers.forEach(async (m) => {
-      // Send Discord notification.
-      let embed = new EmbedBuilder();
-      let name = m.nickname ?? m.name;
 
-      embed.setTitle("XR Lab Status");
-      embed.setFooter({ text: "AVW 4176" });
+    
+    membersToAnnounce.forEach(async (m) => {
+      // Send Discord notification.
+      let embed = createLabNotificationEmbed();
+      let name = m.nickname ?? m.name;
       embed.setDescription(`${name} has checked into the XR Lab!`);
       embed.setColor([133, 212, 49]);
-      embed.setTimestamp(new Date());
 
       var profileFile : AttachmentBuilder | undefined
       if (m.profile.picture) {
         let profileAttachment = await createAttachmentFromMedia(m.profile.picture);
         profileFile = profileAttachment.attachment
         embed.setThumbnail(profileAttachment.url)
+        files.push(profileFile)
       }
 
-      await sendGuildMessage("lab", { embeds: [embed], files: profileFile ? [profileFile] : [] });
+      embeds.push(embed)
     });
   }
+
+  // If there is a role to ping, add it.
+  var notificationMessageContent: string | undefined = undefined
+  if (shouldNotify && notificationRoleId) {
+    notificationMessageContent = `<@&${notificationRoleId}>`
+  }
+
+  await sendGuildMessage("notifications", { content: notificationMessageContent, embeds: embeds, files: files });
 };
 
 export default LabStatusHook;

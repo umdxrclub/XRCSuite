@@ -90,16 +90,6 @@ export async function getGuildChannelById(channelId: string): Promise<GuildBased
     return null;
 }
 
-export async function getBulkMessageIds(bulkMessageType: keyof Bot["bulkMessages"]): Promise<string[]> {
-    let { bulkMessages } = await payload.findGlobal<Bot>({
-        slug: GlobalSlugs.Discord
-    })
-
-    let messages = bulkMessages[bulkMessageType] ?? []
-
-    return messages.map(o => o.messageId)
-}
-
 /**
  * Registers all slash commands specified within the BotCommands list for the
  * currently configured guild in Payload.
@@ -183,4 +173,13 @@ export function createAttachmentFromImageData(image: string) {
     let attachment = new AttachmentBuilder(buff)
 
     return attachment;
+}
+
+export async function getMultiMessageIds(type: keyof Bot["guild"]["statusChannels"]) {
+    let discord = await payload.findGlobal<Bot>({
+        slug: GlobalSlugs.Discord
+    })
+
+    let statusChannel = discord.guild.statusChannels[type]
+    return statusChannel.messages.map(o => o.messageId)
 }

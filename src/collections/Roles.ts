@@ -1,4 +1,5 @@
 import { CollectionConfig } from "payload/types";
+import RolesChangeHook from "../hooks/Roles/RolesSelect";
 import { CollectionSlugs } from "../slugs";
 
 const Roles: CollectionConfig = {
@@ -6,10 +7,14 @@ const Roles: CollectionConfig = {
     admin: {
         useAsTitle: 'name',
     },
+    hooks: {
+        afterChange: [ RolesChangeHook ]
+    },
     fields: [
         {
             name: 'name',
-            type: 'text'
+            type: 'text',
+            required: true
         },
         {
             name: 'color',
@@ -17,11 +22,29 @@ const Roles: CollectionConfig = {
         },
         {
             name: 'priority',
-            type: 'number'
+            type: 'number',
+            defaultValue: 1000,
+            required: true
         },
         {
             name: 'discordRoleId',
             type: 'text'
+        },
+        {
+            name: 'discordEmoji',
+            type: 'text'
+        },
+        {
+            name: 'isLeadership',
+            type: 'checkbox',
+            defaultValue: false,
+            required: true
+        },
+        {
+            name: 'isSelfAssignable',
+            type: 'checkbox',
+            defaultValue: false,
+            required: true
         }
     ],
     timestamps: false

@@ -1,11 +1,21 @@
 import { EmbedBuilder } from "@discordjs/builders";
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import payload from "payload";
+import { getStatusChannelManager } from "../../discord/multi/multi";
 import { createAttachmentFromMedia, DiscordMessage } from "../../discord/util";
 import { GlobalSlugs } from "../../slugs";
 import { Lab, Media } from "../../types/PayloadSchema";
 
 let LabGoogleMapsURL = "https://goo.gl/maps/y9SHsm25SB874n6H8"
+
+export async function updateLabStatusMessage() {
+    // Update status message
+    let manager = getStatusChannelManager("lab");
+    if (manager) {
+        let labStatusMsg = await createLabStatusEmbedMessage();
+        manager.setMessages([labStatusMsg])
+    }
+}
 
 export async function createLabStatusEmbedMessage(): Promise<DiscordMessage> {
     let lab = await payload.findGlobal<Lab>({ slug: GlobalSlugs.Lab });
