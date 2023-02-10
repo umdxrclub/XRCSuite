@@ -2,7 +2,7 @@ import { ActionRowBuilder } from "@discordjs/builders";
 import { ActionRow, ButtonStyle, ButtonBuilder } from "discord.js";
 import payload from "payload";
 import { getStatusChannelManager } from "../../discord/multi/multi";
-import { createAttachmentFromImageData, DiscordMessage } from "../../discord/util";
+import { createAttachmentFromImageData, createButtonRowComponents, DiscordMessage } from "../../discord/util";
 import { CollectionSlugs } from "../../slugs";
 import { Member, Role } from "../../types/PayloadSchema";
 import { createImageBanner } from "../../util/image";
@@ -44,14 +44,6 @@ export async function isMemberLeadership(member: Member) {
     return roles.some(r => r.isLeadership)
 }
 
-export async function updateRolesSelectMessage() {
-    let roles = getStatusChannelManager("roles")
-    if (roles) {
-        let msg = await createRoleSelectMessage()
-        await roles.setMessages([msg])
-    }
-}
-
 export async function createRoleSelectMessage(): Promise<DiscordMessage> {
     let roleDocs = await payload.find<Role>({
         collection: CollectionSlugs.Roles, limit: 100, where: {
@@ -71,37 +63,11 @@ export async function createRoleSelectMessage(): Promise<DiscordMessage> {
         }
     })
     let roles = roleDocs.docs;
-    let numRoles = roleDocs.totalDocs;
-    let numRows = Math.ceil(numRoles / 5);
-    let rows: ActionRowBuilder<ButtonBuilder>[] = []
-    for (var r = 0; r < numRows; r++) {
-        let start = r * 5;
-        let end = Math.min(numRoles, start + 5);
-        let row = new ActionRowBuilder<ButtonBuilder>();
-        for (var i = start; i < end; i++) {
-            let role = roles[i];
-
-            let builder = new ButtonBuilder()
-                .setCustomId(`Roles-${role.id}`)
-                .setStyle(ButtonStyle.Primary)
-                .setLabel(role.name)
-
-            if (role.discordEmoji)
-                builder = builder.setEmoji(role.discordEmoji)
-
-            row.addComponents(builder)
-        }
-
-        rows.push(row)
-    }
-
-    let banner = await createImageBanner("Select a role!");
-    let files = []
-    if (banner) {
-        let bannerAttachment = await createAttachmentFromImageData(banner);
-        files.push(bannerAttachment.attachment)
-    }
-    
-
-    return { components: rows, files }
+    let rows = createButtonRowComponents(roles.map(doc => ({
+        style: ButtonStyle.Primary,
+        emoji: doc.discordEmoji,
+        label: doc.name,
+        customId: `Roles-${doc.id}`
+    })))
+    return { components: rows }
 }

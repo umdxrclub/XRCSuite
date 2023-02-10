@@ -65,7 +65,7 @@ export function getDiscordClient(): Client | undefined {
 }
 
 export async function serveDiscordBot() {
-  let discordConfig = await payload.findGlobal({ slug: GlobalSlugs.Discord });
+  let discordConfig = await payload.findGlobal({ slug: "bot" });
   if (discordConfig.enabled) {
     console.log("Starting Discord Bot...");
     let token = discordConfig.auth.token;

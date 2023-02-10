@@ -7,4 +7,4 @@ const BotInteractions: InteractionHandler[] = [
     RolesMessageInteractionHandler
 ]
 
-export default BotInteractions
+export default BotInteractions;

@@ -12,7 +12,7 @@ import Wishlist from './globals/Wishlist'
 import CAS from './globals/CAS'
 import XRCLogo from './components/XRCLogo'
 import Descriptions from './collections/Descriptions'
-import Announcements from './collections/Announcements'
+import Messages from './collections/Messages'
 import Software from './collections/Software'
 import Projects from './collections/Projects'
 import Media from './collections/Media'
@@ -97,7 +97,7 @@ export default buildConfig({
         Attendances,
         Events,
         Descriptions,
-        Announcements,
+        Messages,
         Software,
         Projects,
         Media,

@@ -1,8 +1,12 @@
 import { Field, GlobalConfig } from "payload/types";
+import createDiscordMessageField from "../blocks/messages";
 import { createActionButton } from "../components/ActionButton";
+import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpiont";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
+import DefaultRoleChangedHook from "../hooks/Bot/DefaultRoleHook";
+import GetStartedMessageChanged from "../hooks/Bot/GetStartedMessageHook";
 import { CollectionSlugs, GlobalSlugs } from "../slugs";
 import { ChannelType, StatusChannelType, XRClubDiscordNotificationRoles } from "../types/XRCTypes";
 
@@ -11,7 +15,7 @@ const Bot: GlobalConfig = {
     admin: {
         group: 'Discord'
     },
-    endpoints: [ RegisterSlashCommandsEndpoint, GuildStatsEndpoint ],
+    endpoints: [ RegisterSlashCommandsEndpoint, GuildStatsEndpoint, DiscordUserEndpoint ],
     fields: [
         {
             name: 'enabled',
@@ -62,6 +66,14 @@ const Bot: GlobalConfig = {
             ]
         },
         {
+            name: "getStartedMessage",
+            type: "relationship",
+            relationTo: CollectionSlugs.Messages,
+            hooks: {
+                afterChange: [ GetStartedMessageChanged ]
+            }
+        },
+        {
             name: 'guild',
             type: 'group',
             fields: [
@@ -82,6 +94,19 @@ const Bot: GlobalConfig = {
                     name: 'statusChannels',
                     type: 'group',
                     fields: StatusChannelType.map(o => createStatusChannelField(o.value,o.label))
+                },
+                {
+                    name: 'defaultRole',
+                    type: 'relationship',
+                    relationTo: CollectionSlugs.Roles,
+                    hooks: {
+                        afterChange: [ DefaultRoleChangedHook ]
+                    },
+                    filterOptions: {
+                        discordRoleId: {
+                            not_equals: undefined
+                        }
+                    }
                 },
                 {
                     name: 'notificationRoles',

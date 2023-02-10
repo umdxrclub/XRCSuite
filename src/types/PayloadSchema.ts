@@ -5,62 +5,45 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
-export interface Config {}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "lab".
- */
-export interface Lab {
-  id: string;
-  open: boolean;
-  event?: string | Event;
-  members?: string[] | Member[];
-  schedule?: string | Schedule;
-  odoo: {
-    contractId?: number;
+export interface Config {
+  collections: {
+    admins: Admin;
+    members: Member;
+    devices: Device;
+    heartbeats: Heartbeat;
+    attendances: Attendance;
+    events: Event;
+    descriptions: Description;
+    messages: Message;
+    software: Software;
+    projects: Project;
+    media: Media;
+    schedules: Schedule;
+    polls: Poll;
+    stats: Stat;
+    roles: Role;
+    integrations: Integration;
   };
-  settings: {
-    gatekeeper: {
-      acceptSound?: string | Media;
-      rejectSound?: string | Media;
-    };
-    labOpenImage?: string | Media;
-    labClosedImage?: string | Media;
-    startupLabWhenFirstCheckIn?: boolean;
-    shutdownLabWhenAllCheckedOut?: boolean;
-    notifyStatus?: boolean;
-    notifyLeadershipCheckInOut?: boolean;
-    rolesToAnnounce?: string[] | Role[];
+  globals: {
+    lab: Lab;
+    bot: Bot;
+    cas: CAS;
+    wishlist: Wishlist;
+    odoo: Odoo;
   };
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events".
- */
-export interface Event {
+export interface Admin {
   id: string;
-  name?: string;
-  type?: 'Workshop' | 'Interest Meeting' | 'Speaker Event' | 'Game Night' | 'Tournament' | 'Field Trip' | 'Other';
-  location?: string;
-  startDate?: string;
-  endDate?: string;
-  imageUrl?: string;
-  description?: string;
-  terplink: {
-    eventId?: string;
-    accessCode?: string;
-  };
-  discord: {
-    eventId?: string;
-    messageId?: string;
-  };
+  casManager?: boolean;
+  email?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpiration?: string;
+  loginAttempts?: number;
+  lockUntil?: string;
   createdAt: string;
   updatedAt: string;
+  password?: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members".
- */
 export interface Member {
   id: string;
   name?: string;
@@ -96,10 +79,6 @@ export interface Member {
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "roles".
- */
 export interface Role {
   id: string;
   name: string;
@@ -110,10 +89,6 @@ export interface Role {
   isLeadership: boolean;
   isSelfAssignable: boolean;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
 export interface Media {
   id: string;
   isPublic?: boolean;
@@ -126,19 +101,243 @@ export interface Media {
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "integrations".
- */
 export interface Integration {
   id: string;
   name?: string;
   discordEmoji?: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "schedules".
- */
+export interface Device {
+  id: string;
+  description: string | Description;
+  status: 'inLab' | 'checkedOut';
+  public: boolean;
+  serial?: string;
+  umdSerial?: string;
+  mac?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Description {
+  id: string;
+  name: string;
+  image?: string | Media;
+  type:
+    | 'h_vr'
+    | 'h_ar'
+    | 'h_xr'
+    | 'h_vr_accessory'
+    | 'h_pc'
+    | 'h_laptop'
+    | 'h_console'
+    | 'h_phone'
+    | 'h_misc'
+    | 's_game'
+    | 's_software';
+  description?: {
+    [k: string]: unknown;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Heartbeat {
+  id: string;
+  device?: string | Device;
+  date?: string;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  location?: [number, number];
+  battery: {
+    level?: number;
+    charging?: boolean;
+  };
+  network: {
+    ipAddress?: string;
+    wifi: {
+      current: {
+        ssid?: string;
+        bssid?: string;
+        level?: number;
+      };
+      nearbyNetworks: {
+        ssid?: string;
+        bssid?: string;
+        level?: number;
+        id?: string;
+      }[];
+    };
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Attendance {
+  id: string;
+  member?: string | Member;
+  date?: string;
+  event?: string | Event;
+  type?: 'in' | 'out';
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Event {
+  id: string;
+  name?: string;
+  type?: 'Workshop' | 'Interest Meeting' | 'Speaker Event' | 'Game Night' | 'Tournament' | 'Field Trip' | 'Other';
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  imageUrl?: string;
+  description?: string;
+  terplink: {
+    eventId?: string;
+    accessCode?: string;
+  };
+  discord: {
+    eventId?: string;
+    messageId?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Message {
+  id: string;
+  name: string;
+  content: (
+    | {
+        body: {
+          [k: string]: unknown;
+        }[];
+        id?: string;
+        blockName?: string;
+        blockType: 'message';
+      }
+    | {
+        title: string;
+        type: 'medium' | 'large';
+        id?: string;
+        blockName?: string;
+        blockType: 'banner';
+      }
+    | {
+        id?: string;
+        blockName?: string;
+        blockType: 'roleSelect';
+      }
+    | {
+        member?: string | Member;
+        id?: string;
+        blockName?: string;
+        blockType: 'profile';
+      }
+    | {
+        device: string | Device;
+        id?: string;
+        blockName?: string;
+        blockType: 'device';
+      }
+    | {
+        poll: string | Poll;
+        allowVoting: boolean;
+        id?: string;
+        blockName?: string;
+        blockType: 'poll';
+      }
+    | {
+        event: string | Event;
+        id?: string;
+        blockName?: string;
+        blockType: 'event';
+      }
+    | {
+        buttons: {
+          title: string;
+          url: string;
+          emoji?: string;
+          id?: string;
+        }[];
+        id?: string;
+        blockName?: string;
+        blockType: 'buttonRow';
+      }
+    | {
+        image: string | Media;
+        id?: string;
+        blockName?: string;
+        blockType: 'image';
+      }
+    | {
+        title?: string;
+        description?: string;
+        color?: string;
+        timestamp?: string;
+        id?: string;
+        blockName?: string;
+        blockType: 'embed';
+      }
+  )[];
+  channels: {
+    channelId: string;
+    alwaysResendMessages: boolean;
+    messages: {
+      messageId: string;
+      id?: string;
+    }[];
+    id?: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Poll {
+  id: string;
+  title?: string;
+  open?: boolean;
+  allowRevote?: boolean;
+  author?: string;
+  messages: {
+    channel?: string;
+    msg?: string;
+    id?: string;
+  }[];
+  choices: {
+    name?: string;
+    voters: {
+      id?: string;
+    }[];
+    id?: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Software {
+  id: string;
+  type?: string | Description;
+  availableOn?: string[] | Device[];
+  publish?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Project {
+  id: string;
+  name?: string;
+  status?: 'Proposed' | 'Active' | 'Inactive' | 'Finished';
+  projectLeads?: string[] | Member[];
+  members?: string[] | Member[];
+  logo?: string | Media;
+  banner?: string | Media;
+  gallery: {
+    image?: string | Media;
+    description?: string;
+    id?: string;
+  }[];
+  startDate?: string;
+  endDate?: string;
+  description?: {
+    [k: string]: unknown;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
 export interface Schedule {
   id: string;
   name?: string;
@@ -167,10 +366,44 @@ export interface Schedule {
   createdAt: string;
   updatedAt: string;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "bot".
- */
+export interface Stat {
+  id: string;
+  date?: string;
+  count: {
+    discord?: number;
+    terplink?: number;
+    youtube?: number;
+    instagram?: number;
+    twitter?: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+export interface Lab {
+  id: string;
+  open: boolean;
+  event?: string | Event;
+  members?: string[] | Member[];
+  schedule?: string | Schedule;
+  odoo: {
+    contractId?: number;
+  };
+  media: {
+    gatekeeper: {
+      acceptSound?: string | Media;
+      rejectSound?: string | Media;
+    };
+    labOpenImage?: string | Media;
+    labClosedImage?: string | Media;
+  };
+  settings: {
+    startupLabWhenFirstCheckIn?: boolean;
+    shutdownLabWhenAllCheckedOut?: boolean;
+    notifyStatus?: boolean;
+    notifyLeadershipCheckInOut?: boolean;
+    rolesToAnnounce?: string[] | Role[];
+  };
+}
 export interface Bot {
   id: string;
   enabled?: boolean;
@@ -182,6 +415,7 @@ export interface Bot {
   media: {
     banner?: string | Media;
   };
+  getStartedMessage?: string | Message;
   guild: {
     guildId?: string;
     channels: {
@@ -215,7 +449,7 @@ export interface Bot {
           id?: string;
         }[];
       };
-      roles: {
+      getStarted: {
         channelId?: string;
         messages: {
           messageId: string;
@@ -223,6 +457,7 @@ export interface Bot {
         }[];
       };
     };
+    defaultRole?: string | Role;
     notificationRoles: {
       lab?: string | Role;
       workshop?: string | Role;
@@ -230,10 +465,6 @@ export interface Bot {
     };
   };
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "cas".
- */
 export interface CAS {
   id: string;
   username?: string;
@@ -242,10 +473,6 @@ export interface CAS {
   hotpSecret?: string;
   hotpCounter?: number;
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "wishlist".
- */
 export interface Wishlist {
   id: string;
   wishlist: {
@@ -254,216 +481,10 @@ export interface Wishlist {
     id?: string;
   }[];
 }
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "descriptions".
- */
-export interface Description {
-  id: string;
-  name: string;
-  image?: string | Media;
-  type:
-    | 'h_vr'
-    | 'h_ar'
-    | 'h_xr'
-    | 'h_vr_accessory'
-    | 'h_pc'
-    | 'h_laptop'
-    | 'h_console'
-    | 'h_phone'
-    | 'h_misc'
-    | 's_game'
-    | 's_software';
-  description?: {
-    [k: string]: unknown;
-  }[];
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "odoo".
- */
 export interface Odoo {
   id: string;
   url?: string;
   db?: string;
   uid?: number;
   password?: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "admins".
- */
-export interface Admin {
-  id: string;
-  casManager?: boolean;
-  email?: string;
-  resetPasswordToken?: string;
-  resetPasswordExpiration?: string;
-  loginAttempts?: number;
-  lockUntil?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "devices".
- */
-export interface Device {
-  id: string;
-  description: string | Description;
-  status: 'inLab' | 'checkedOut';
-  public: boolean;
-  serial?: string;
-  umdSerial?: string;
-  mac?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "heartbeats".
- */
-export interface Heartbeat {
-  id: string;
-  device?: string | Device;
-  date?: string;
-  /**
-   * @minItems 2
-   * @maxItems 2
-   */
-  location?: [number, number];
-  battery: {
-    level?: number;
-    charging?: boolean;
-  };
-  network: {
-    ipAddress?: string;
-    wifi: {
-      current: {
-        ssid?: string;
-        bssid?: string;
-        level?: number;
-      };
-      nearbyNetworks: {
-        ssid?: string;
-        bssid?: string;
-        level?: number;
-        id?: string;
-      }[];
-    };
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "attendances".
- */
-export interface Attendance {
-  id: string;
-  member?: string | Member;
-  date?: string;
-  event?: string | Event;
-  type?: 'in' | 'out';
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "announcements".
- */
-export interface Announcement {
-  id: string;
-  title?: string;
-  content?: {
-    [k: string]: unknown;
-  }[];
-  sentMessages: {
-    messageId?: string;
-    id?: string;
-  }[];
-  _status?: 'draft' | 'published';
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "software".
- */
-export interface Software {
-  id: string;
-  type?: string | Description;
-  availableOn?: string[] | Device[];
-  publish?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
- */
-export interface Project {
-  id: string;
-  name?: string;
-  status?: 'Proposed' | 'Active' | 'Inactive' | 'Finished';
-  projectLeads?: string[] | Member[];
-  members?: string[] | Member[];
-  logo?: string | Media;
-  banner?: string | Media;
-  gallery: {
-    image?: string | Media;
-    description?: string;
-    id?: string;
-  }[];
-  startDate?: string;
-  endDate?: string;
-  description?: {
-    [k: string]: unknown;
-  }[];
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "polls".
- */
-export interface Poll {
-  id: string;
-  title?: string;
-  open?: boolean;
-  allowRevote?: boolean;
-  author?: string;
-  messages: {
-    channel?: string;
-    msg?: string;
-    id?: string;
-  }[];
-  choices: {
-    name?: string;
-    voters: {
-      id?: string;
-    }[];
-    id?: string;
-  }[];
-  createdAt: string;
-  updatedAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "stats".
- */
-export interface Stat {
-  id: string;
-  date?: string;
-  count: {
-    discord?: number;
-    terplink?: number;
-    youtube?: number;
-    instagram?: number;
-    twitter?: number;
-  };
-  createdAt: string;
-  updatedAt: string;
 }

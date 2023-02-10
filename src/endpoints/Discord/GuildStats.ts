@@ -4,10 +4,19 @@ import { getGuild } from "../../discord/util";
 const GuildStatsEndpoint: Endpoint = {
     method: "get",
     path: "/stats",
-    handler: async (req, res, next) => {
+    handler: async (req, res) => {
         let guild = await getGuild();
-
-        res.status(200).send({ count: guild.memberCount })
+        let channels = await guild.channels.fetch();
+        res.status(200).send({ 
+            count: guild.memberCount, 
+            iconUrl: guild.iconURL(), 
+            name: guild.name,
+            channels: channels.map(c => ({
+                name: c.name,
+                id: c.id,
+                type: c.type
+            }))
+        })
     }
 }
 

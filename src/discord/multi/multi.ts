@@ -1,11 +1,10 @@
 import { stat } from "fs";
 import payload from "payload";
-import { updateRolesSelectMessage } from "../../collections/util/RolesUtil";
 import { updateLabStatusMessage } from "../../globals/util/LabUtil";
 import { GlobalSlugs } from "../../slugs";
 import { Bot } from "../../types/PayloadSchema";
 import { XRCSuiteStatusChannelType } from "../../types/XRCTypes";
-import { getGuildChannelById } from "../util";
+import { getGuildChannelById, updateGetStartedMessage } from "../util";
 import MultiMessageManager from "./MultiMessageManager";
 
 async function createMultiMessageManager(type: XRCSuiteStatusChannelType) {
@@ -54,14 +53,14 @@ export async function createAndUpdateStatusChannelManagers() {
         lab: await createMultiMessageManager("lab"),
         leadership: await createMultiMessageManager("leadership"),
         inventory: await createMultiMessageManager("inventory"),
-        roles: await createMultiMessageManager("roles")    
+        getStarted: await createMultiMessageManager("getStarted")    
     }
     
     // Lab
     await updateLabStatusMessage();
 
-    // Roles
-    await updateRolesSelectMessage();
+    // Get Started
+    await updateGetStartedMessage();
 }
 
 export function getStatusChannelManager(type: XRCSuiteStatusChannelType) {

@@ -33,7 +33,7 @@ export default async function startWebServer() {
     }
 
     // Start payload
-    await payload.initAsync({
+    await payload.init({
         secret: process.env.MONGO_SECRET,
         mongoURL: process.env.MONGO_URL,
         express: app

@@ -1,5 +1,4 @@
 import { CollectionConfig } from "payload/types";
-import RolesChangeHook from "../hooks/Roles/RolesSelect";
 import { CollectionSlugs } from "../slugs";
 
 const Roles: CollectionConfig = {
@@ -7,9 +6,9 @@ const Roles: CollectionConfig = {
     admin: {
         useAsTitle: 'name',
     },
-    hooks: {
-        afterChange: [ RolesChangeHook ]
-    },
+    // hooks: {
+    //     afterChange: [ RolesChangeHook ]
+    // },
     fields: [
         {
             name: 'name',

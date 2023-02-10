@@ -13,6 +13,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "jsx": "react",
+    "paths": {
+      "payload/generated-types": ["./src/types/PayloadSchema.ts"]
+    }
   },
   "include": [
     "src", "src/payload.config.ts"

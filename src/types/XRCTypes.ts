@@ -1,8 +1,9 @@
 import { Option } from "payload/dist/fields/config/types"
-import { Bot } from "./PayloadSchema"
+import { Bot, Message } from "./PayloadSchema"
 
 export type XRCSuiteChannelType = keyof Bot["guild"]["channels"]
 export type XRCSuiteStatusChannelType = keyof Bot["guild"]["statusChannels"]
+export type DiscordMessageBlockArray = Message["content"]
 
 export type XRClubDiscordRole = {
     name: string,
@@ -151,8 +152,8 @@ export const StatusChannelType = [
         value: "leadership"
     },
     {
-        label: "Roles",
-        value: "roles"
+        label: "Get Started",
+        value: "getStarted"
     }
 ]
 

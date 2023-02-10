@@ -4,6 +4,11 @@ import { DiscordMessage, getGuildChannelById } from "../util";
 
 export type NewMultiMessageIdsListener = (messageIds: string[]) => void
 
+/**
+ * A multi message manager is used to make "status" channels on Discord. It can
+ * automatically create, edit, and delete a series of messages in a channel so
+ * that you can provide live information about something.
+ */
 class MultiMessageManager {
     public messageUpdateDelayMs: number = 1000
     public alwaysCreateNewMessages: boolean = false

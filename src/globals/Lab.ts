@@ -48,7 +48,7 @@ const Lab: GlobalConfig = {
             ]
         },
         {
-            name: 'settings',
+            name: 'media',
             type: 'group',
             fields: [
                 {
@@ -89,6 +89,12 @@ const Lab: GlobalConfig = {
                         mimeType: { contains: 'image' }
                     }
                 },
+            ]
+        },
+        {
+            name: 'settings',
+            type: 'group',
+            fields: [
                 {
                     type: 'checkbox',
                     name: 'startupLabWhenFirstCheckIn',

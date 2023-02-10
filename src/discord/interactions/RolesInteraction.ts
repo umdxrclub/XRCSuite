@@ -28,7 +28,7 @@ const RolesMessageInteractionHandler: InteractionHandler = async interaction => 
                 let member = await guild.members.fetch(interaction.user.id);
                 let hasRole = member.roles.cache.has(role.discordRoleId);
                 var message: string
-                if (member.roles.cache.has(role.discordRoleId)) {
+                if (hasRole) {
                     await member.roles.remove(discordRole.id)
                     message = "You have removed the role: " + role.name
                 } else {

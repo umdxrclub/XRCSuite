@@ -18,11 +18,7 @@ const Routines: { name: string, invoke: () => void }[] = [
     {
         name: "roles",
         invoke: async () => {
-            let channel = await getGuildChannel("roles");
-            if (channel instanceof TextChannel) {
-                let msg = await createRoleSelectMessage();
-                await channel.send(msg)
-            }
+            
         }
     }
 ]

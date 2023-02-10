@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { NewsChannel, TextChannel } from "discord.js";
 import { CollectionAfterChangeHook } from "payload/types";
 import { createPollEmbedAndRow } from "../../collections/util/PollUtil";
 import { getDiscordClient } from "../../discord/bot";
@@ -20,7 +20,7 @@ const UpdatedPollMessageHook: CollectionAfterChangeHook = async (args) => {
 
         // Get the channel of the message.
         let channel = await client.channels.cache.get(channelId).fetch();
-        if (!channel || !(channel instanceof TextChannel)) return;
+        if (!channel || !(channel instanceof TextChannel || channel instanceof NewsChannel)) return;
 
         // Get the message
         let message = await channel.messages.fetch(messageId)

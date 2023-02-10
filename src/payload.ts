@@ -67,3 +67,4 @@ export function rgbToNumber(rgb: string) {
 
     return parseInt(rgb, 16)
 }
+
