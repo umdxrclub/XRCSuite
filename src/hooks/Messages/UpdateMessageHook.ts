@@ -20,7 +20,6 @@ function deepEquality(a: any, b: any): boolean {
     } else if (typeA != typeB) {
         return false;
     }
-        
 
     switch (typeof(a)) {
         case "object":
@@ -43,7 +42,9 @@ function deepEquality(a: any, b: any): boolean {
 }
 
 const UpdateMessageHook: CollectionAfterChangeHook = async args => {
-    let [ message, prevMessage ] = [ args.doc, args.previousDoc ] as Message[]; 
+    let [ message, prevMessage ] = [ args.doc, args.previousDoc ] as Message[];
+    if (!message.useMessageContent) return;
+
     if (args.operation == "update") {
         let channelsAreSame = areSetsEqual(prevMessage.channels, message.channels, x => x.channelId)
         if (channelsAreSame) {

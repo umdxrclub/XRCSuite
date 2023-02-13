@@ -1,4 +1,6 @@
 import { CollectionConfig } from "payload/types";
+import { createDiscordEmojiField } from "../fields/discord/EmojiField";
+import { createDiscordRoleField } from "../fields/discord/RoleField";
 import { CollectionSlugs } from "../slugs";
 
 const Roles: CollectionConfig = {
@@ -25,14 +27,12 @@ const Roles: CollectionConfig = {
             defaultValue: 1000,
             required: true
         },
-        {
+        createDiscordRoleField({
             name: 'discordRoleId',
-            type: 'text'
-        },
-        {
-            name: 'discordEmoji',
-            type: 'text'
-        },
+        }),
+        createDiscordEmojiField({
+            name: 'discordEmoji'
+        }),
         {
             name: 'isLeadership',
             type: 'checkbox',

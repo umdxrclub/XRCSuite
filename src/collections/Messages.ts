@@ -4,6 +4,8 @@ import IgnoreExternalChangesHook from "../hooks/Messages/IgnoreExternalChangesHo
 import DeleteMessageHook from "../hooks/Messages/DeleteMessageHook";
 import UpdateMessageHook from "../hooks/Messages/UpdateMessageHook";
 import { CollectionSlugs } from "../slugs";
+import { createDiscordChannelField } from "../fields/discord/ChannelField";
+import { useAsRowTitle } from "../payload";
 
 const Messages: CollectionConfig = {
     slug: CollectionSlugs.Messages,
@@ -21,18 +23,26 @@ const Messages: CollectionConfig = {
             type: 'text',
             required: true
         },
+        {
+            name: 'useMessageContent',
+            type: 'checkbox',
+            defaultValue: true,
+            required: true
+        },
         createDiscordMessageField({
             name: 'content',
+            admin: {
+                condition: data => data.useMessageContent
+            }
         }),
         {
             name: 'channels',
             type: 'array',
             fields: [
-                {
+                createDiscordChannelField({
                     name: 'channelId',
-                    type: 'text',
                     required: true
-                },
+                }),
                 {
                     name: 'alwaysResendMessages',
                     type: 'checkbox',

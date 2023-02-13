@@ -4,6 +4,7 @@ import { createActionButton } from "../components/ActionButton";
 import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpiont";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
+import { createDiscordChannelField } from "../fields/discord/ChannelField";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
 import DefaultRoleChangedHook from "../hooks/Bot/DefaultRoleHook";
 import GetStartedMessageChanged from "../hooks/Bot/GetStartedMessageHook";
@@ -66,14 +67,6 @@ const Bot: GlobalConfig = {
             ]
         },
         {
-            name: "getStartedMessage",
-            type: "relationship",
-            relationTo: CollectionSlugs.Messages,
-            hooks: {
-                afterChange: [ GetStartedMessageChanged ]
-            }
-        },
-        {
             name: 'guild',
             type: 'group',
             fields: [
@@ -84,16 +77,10 @@ const Bot: GlobalConfig = {
                 {
                     name: 'channels',
                     type: 'group',
-                    fields: ChannelType.map(ct => ({
+                    fields: ChannelType.map(ct => createDiscordChannelField({
                         name: ct.value,
                         label: ct.label,
-                        type: 'text'
                     }))
-                },
-                {
-                    name: 'statusChannels',
-                    type: 'group',
-                    fields: StatusChannelType.map(o => createStatusChannelField(o.value,o.label))
                 },
                 {
                     name: 'defaultRole',
@@ -122,30 +109,5 @@ const Bot: GlobalConfig = {
         }
     ]
 };
-
-function createStatusChannelField(name: string, label: string): Field {
-    return {
-        name: name,
-        label: label,
-        type: 'group',
-        fields: [
-            {
-                name: 'channelId',
-                type: 'text'
-            },
-            {
-                name: 'messages',
-                type: 'array',
-                fields: [
-                    {
-                        name: 'messageId',
-                        type: 'text',
-                        required: true
-                    }
-                ]
-            }
-        ]
-    }
-}
 
 export default Bot;

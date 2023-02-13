@@ -1,4 +1,6 @@
 import { CollectionConfig } from "payload/types";
+import { createDiscordChannelField } from "../fields/discord/ChannelField";
+import { createDiscordMemberField } from "../fields/discord/MemberField";
 import UpdatedPollMessageHook from "../hooks/Polls/UpdatePollMessage";
 import { CollectionSlugs } from "../slugs";
 
@@ -26,19 +28,17 @@ const Polls: CollectionConfig = {
             type: 'checkbox',
             defaultValue: true
         },
-        {
-            name: 'author',
-            index: true,
-            type: 'text'
-        },
+        createDiscordMemberField({
+            name: "author",
+            index: true
+        }),
         {
             name: 'messages',
             type: 'array',
             fields: [
-                {
-                    name: 'channel',
-                    type: 'text',
-                },
+                createDiscordChannelField({
+                    name: 'channel'
+                }),
                 {
                     name: 'msg',
                     type: 'text'
@@ -57,10 +57,9 @@ const Polls: CollectionConfig = {
                     name: 'voters',
                     type: 'array',
                     fields: [
-                        {
-                            name: 'id',
-                            type: 'text'
-                        }
+                        createDiscordMemberField({
+                            name: "id"
+                        })
                     ]
                 }
             ]

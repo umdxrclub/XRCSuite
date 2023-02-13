@@ -1,24 +1,23 @@
 import { EmbedBuilder } from "@discordjs/builders";
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import payload from "payload";
-import { getStatusChannelManager } from "../../discord/multi/multi";
+import { sendDiscordMessages } from "../../collections/util/MessageUtil";
 import { createAttachmentFromMedia, DiscordMessage } from "../../discord/util";
-import { GlobalSlugs } from "../../slugs";
 import { Lab, Media } from "../../types/PayloadSchema";
 
 let LabGoogleMapsURL = "https://goo.gl/maps/y9SHsm25SB874n6H8"
 
 export async function updateLabStatusMessage() {
+    let lab = await payload.findGlobal({slug: "lab"})
     // Update status message
-    let manager = getStatusChannelManager("lab");
-    if (manager) {
+    if (lab.discord.labMessage) {
         let labStatusMsg = await createLabStatusEmbedMessage();
-        manager.setMessages([labStatusMsg])
+        await sendDiscordMessages(lab.discord.labMessage, [ labStatusMsg ])
     }
 }
 
 export async function createLabStatusEmbedMessage(): Promise<DiscordMessage> {
-    let lab = await payload.findGlobal<Lab>({ slug: GlobalSlugs.Lab });
+    let lab = await payload.findGlobal({ slug: "lab" });
     let embed = new EmbedBuilder();
 
     if (lab.open) {
@@ -30,10 +29,10 @@ export async function createLabStatusEmbedMessage(): Promise<DiscordMessage> {
 
     // Determine whether an image banner can be added
     var bannerMedia: Media | string | undefined = undefined
-    if (lab.open && lab.settings.labOpenImage) {
-        bannerMedia = lab.settings.labOpenImage
-    } else if (!lab.open && lab.settings.labClosedImage) {
-        bannerMedia = lab.settings.labClosedImage
+    if (lab.open && lab.media.labOpenImage) {
+        bannerMedia = lab.media.labOpenImage
+    } else if (!lab.open && lab.media.labClosedImage) {
+        bannerMedia = lab.media.labClosedImage
     } else {
         embed.setTitle("XR Lab Status");
         embed.setDescription(lab.open ? "The XR Lab is open!" : "The XR Lab is closed.");

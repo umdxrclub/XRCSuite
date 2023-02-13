@@ -11,40 +11,15 @@ import { CollectionSlugs, GlobalSlugs } from "../../slugs";
 import { Bot, Lab, Media, Member } from "../../types/PayloadSchema";
 import { resolveDocument } from "../../util/payload-backend";
 
-// var labStatusBulkEditor: MultiMessageManager | undefined = undefined
-
 async function getLabNotificationDiscordRoleId(): Promise<string | null> {
-  let discordDoc = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord })
+  let discordDoc = await payload.findGlobal({ slug: "bot" })
     if (discordDoc.guild.notificationRoles.lab) {
-      let labNotificationRole = await resolveDocument(discordDoc.guild.notificationRoles.lab, CollectionSlugs.Roles);
+      let labNotificationRole = await resolveDocument(discordDoc.guild.notificationRoles.lab, "roles");
       return labNotificationRole.discordRoleId ?? null;
     }
 
     return null;
 }
-
-// async function getMultiMessageManager() {
-//   if (!labStatusBulkEditor) {
-//     let channel = await getGuildChannel("lab");
-//     let msgIds = await getBulkMessageIds("lab");
-//     if (channel && msgIds) {
-//       labStatusBulkEditor = new MultiMessageManager(channel.id, msgIds)
-//       labStatusBulkEditor.addNewMessageIdListener(async newMessageIds => {
-//         let bot = await payload.findGlobal<Bot>({ slug: GlobalSlugs.Discord, depth: 0 });
-//         await payload.updateGlobal<Bot>({ slug: GlobalSlugs.Discord, depth: 0, data: {
-//           ...bot,
-//           bulkMessages: {
-//             ...bot.bulkMessages,
-//             lab: newMessageIds.map(id => ({ messageId: id }))
-//           }
-//         }})
-//       })
-//     }
-//   }
-
-//   return labStatusBulkEditor;
-// }
-
 function createLabNotificationEmbed(): EmbedBuilder {
   let embed = new EmbedBuilder();
 
@@ -83,10 +58,10 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   // Create attendance events.
   changedMemberIds.forEach(async ({id, type}) => {
     await payload.create({
-      collection: CollectionSlugs.Attendances,
+      collection: "attendances",
       data: {
         member: id,
-        date: new Date(),
+        date: (new Date()).toString(),
         event: args.doc.event,
         type: type
       },
@@ -109,8 +84,8 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     let newMembers = await Promise.all(
       newMemberIds.map(
         async (id) =>
-          await payload.findByID<Member>({
-            collection: CollectionSlugs.Members,
+          await payload.findByID({
+            collection: "members",
             id: id,
           })
       )

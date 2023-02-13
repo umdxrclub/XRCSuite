@@ -270,16 +270,3 @@ export function createButtonRowComponents(buttons: DiscordButton[]): ActionRowBu
     
     return rows;
 }
-
-export async function updateGetStartedMessage() {
-    return;
-    let manager = await getStatusChannelManager("getStarted");
-    if (manager) {
-        let discord = await payload.findGlobal<Bot>({slug: GlobalSlugs.Discord});
-        if (discord.getStartedMessage) {
-            let message = await resolveDocument<PayloadMessage>(discord.getStartedMessage, CollectionSlugs.Messages);
-            let messagesToSend = await createDiscordMessages(message);
-            await manager.setMessages(messagesToSend)
-        }
-    }   
-}

@@ -1,4 +1,5 @@
 import payload from "payload";
+import { RowLabelFunction } from "payload/dist/admin/components/forms/RowLabel/types";
 import { Option, OptionObject } from "payload/dist/fields/config/types"
 import { hasUncaughtExceptionCaptureCallback } from "process";
 
@@ -66,5 +67,10 @@ export function rgbToNumber(rgb: string) {
     }
 
     return parseInt(rgb, 16)
+}
+
+export function useAsRowTitle(name: string): RowLabelFunction {
+    const func: RowLabelFunction = args => args.data[name];
+    return func;
 }
 

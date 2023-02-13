@@ -13,7 +13,7 @@ const EndPollId = "DeletePoll";
 
 async function getOpenPolls(discordId: string) {
     return await payload.find({
-        collection: CollectionSlugs.Polls,
+        collection: "polls",
         where: {
             and: [
                 {
@@ -115,7 +115,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
 
         // Create the poll
         await payload.create({
-            collection: CollectionSlugs.Polls,
+            collection: "polls",
             data: {
                 title: title,
                 author: user.id,
@@ -146,8 +146,8 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
             // Attempt to fetch the poll.
             var poll: Poll | undefined = undefined;
             try {
-                poll = await payload.findByID<Poll>({
-                    collection: CollectionSlugs.Polls,
+                poll = await payload.findByID({
+                    collection: "polls",
                     id: pollId
                 })
             } catch {
@@ -172,8 +172,8 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
                 choice.voters.push({ id: interaction.user.id })
 
                 // Update poll
-                await payload.update<Poll>({
-                    collection: CollectionSlugs.Polls,
+                await payload.update({
+                    collection: "polls",
                     id: pollId,
                     data: {
                         choices: choices
@@ -192,7 +192,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
                 let replyId = reply.id;
 
                 let poll = await payload.findByID({
-                    collection: CollectionSlugs.Polls,
+                    collection: "polls",
                     id: pollId
                 })
 
@@ -205,7 +205,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
 
                 // Update poll with new message.
                 await payload.update({
-                    collection: CollectionSlugs.Polls,
+                    collection: "polls",
                     id: pollId,
                     data: {
                         messages: messages
@@ -216,7 +216,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
             case EndPollId:
                 // Close the poll.
                 await payload.update({
-                    collection: CollectionSlugs.Polls,
+                    collection: "polls",
                     id: pollId,
                     data: {
                         open: false

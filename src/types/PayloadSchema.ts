@@ -203,6 +203,7 @@ export interface Event {
 export interface Message {
   id: string;
   name: string;
+  useMessageContent: boolean;
   content: (
     | {
         body: {
@@ -258,7 +259,7 @@ export interface Message {
         }[];
         id?: string;
         blockName?: string;
-        blockType: 'buttonRow';
+        blockType: 'linkButtons';
       }
     | {
         image: string | Media;
@@ -271,6 +272,13 @@ export interface Message {
         description?: string;
         color?: string;
         timestamp?: string;
+        url?: string;
+        fields: {
+          name: string;
+          value: string;
+          inline: boolean;
+          id?: string;
+        }[];
         id?: string;
         blockName?: string;
         blockType: 'embed';
@@ -285,6 +293,7 @@ export interface Message {
     }[];
     id?: string;
   }[];
+  publish?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -395,6 +404,11 @@ export interface Lab {
     };
     labOpenImage?: string | Media;
     labClosedImage?: string | Media;
+    tvBanner?: string | Media;
+  };
+  discord: {
+    labMessage?: string | Message;
+    inventoryMessage?: string | Message;
   };
   settings: {
     startupLabWhenFirstCheckIn?: boolean;
@@ -415,7 +429,6 @@ export interface Bot {
   media: {
     banner?: string | Media;
   };
-  getStartedMessage?: string | Message;
   guild: {
     guildId?: string;
     channels: {
@@ -426,36 +439,6 @@ export interface Bot {
       audit?: string;
       events?: string;
       leadership?: string;
-    };
-    statusChannels: {
-      lab: {
-        channelId?: string;
-        messages: {
-          messageId: string;
-          id?: string;
-        }[];
-      };
-      inventory: {
-        channelId?: string;
-        messages: {
-          messageId: string;
-          id?: string;
-        }[];
-      };
-      leadership: {
-        channelId?: string;
-        messages: {
-          messageId: string;
-          id?: string;
-        }[];
-      };
-      getStarted: {
-        channelId?: string;
-        messages: {
-          messageId: string;
-          id?: string;
-        }[];
-      };
     };
     defaultRole?: string | Role;
     notificationRoles: {

@@ -1,3 +1,4 @@
+import { Collection } from "discord.js";
 import { GlobalConfig } from "payload/types";
 import Events from "../collections/Events";
 import Members from "../collections/Members";
@@ -89,6 +90,30 @@ const Lab: GlobalConfig = {
                         mimeType: { contains: 'image' }
                     }
                 },
+                {
+                    name: "tvBanner",
+                    type: "upload",
+                    relationTo: CollectionSlugs.Media,
+                    filterOptions: {
+                        mimeType: { contains: 'image' }
+                    }
+                },
+            ]
+        },
+        {
+            name: 'discord',
+            type: 'group',
+            fields: [
+                {
+                    name: 'labMessage',
+                    type: 'relationship',
+                    relationTo: CollectionSlugs.Messages
+                },
+                {
+                    name: 'inventoryMessage',
+                    type: 'relationship',
+                    relationTo: CollectionSlugs.Messages
+                }
             ]
         },
         {

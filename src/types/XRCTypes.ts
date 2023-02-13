@@ -2,7 +2,6 @@ import { Option } from "payload/dist/fields/config/types"
 import { Bot, Message } from "./PayloadSchema"
 
 export type XRCSuiteChannelType = keyof Bot["guild"]["channels"]
-export type XRCSuiteStatusChannelType = keyof Bot["guild"]["statusChannels"]
 export type DiscordMessageBlockArray = Message["content"]
 
 export type XRClubDiscordRole = {
@@ -11,7 +10,36 @@ export type XRClubDiscordRole = {
 }
 
 export type ResolveMethod = "id" | "terplink" | "card"
-export type LabMediaType = "accept-sound" | "reject-sound"
+export type LabMediaType = "accept-sound" | "reject-sound" | "tv"
+
+export type DiscordMemberInfo = {
+    name: string,
+    avatarUrl: string,
+    inGuild: boolean
+}
+
+export type DiscordGuildStats = {
+    count: number,
+    iconUrl: string,
+    name: string,
+    channels: {
+        name: string,
+        id: string,
+        type: number
+    }[],
+    emojis: {
+        id: string,
+        animated: boolean,
+        name: string,
+        url: string
+    }[],
+    roles: {
+        id: string,
+        name: string,
+        priority: number,
+        color: string
+    }[]
+}
 
 export const XRClubDiscordNotificationRoles: XRClubDiscordRole[] = [
     {

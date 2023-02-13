@@ -1,6 +1,6 @@
 import { FieldBase } from "payload/dist/fields/config/types"
 import { Field } from "payload/types"
-import DiscordMemberField from "../components/dashboard/DiscordMemberField"
+import DiscordMemberField from "../../components/fields/DiscordMemberField"
 
 type DiscordMemberField = Omit<FieldBase, "type"> & {
 
