@@ -13,8 +13,8 @@ const RolesMessageInteractionHandler: InteractionHandler = async interaction => 
 
         var role: Role
         try {
-            role = await payload.findByID<Role>({
-                collection: CollectionSlugs.Roles,
+            role = await payload.findByID({
+                collection: "roles",
                 id: roleId
             })
         } catch {

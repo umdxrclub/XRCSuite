@@ -3,13 +3,9 @@ import { TextInput, useField } from "payload/components/forms";
 import { Button } from "payload/components/elements";
 import React, {useRef, useLayoutEffect} from "react";
 
-const PasswordField: React.FC<Props> = ({ path, label, required, name }) => {
+const DiscordMemberField: React.FC<Props> = ({ path, label, required, name }) => {
   const { value, setValue } = useField<string>({ path: path });
   const ref = useRef<HTMLInputElement>();
-
-  useLayoutEffect(() => {
-    ref.current.type = "password"
-  }, [])
 
   return (
     <TextInput
@@ -24,4 +20,4 @@ const PasswordField: React.FC<Props> = ({ path, label, required, name }) => {
   );
 };
 
-export default PasswordField;
+export default DiscordMemberField;

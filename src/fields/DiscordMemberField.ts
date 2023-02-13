@@ -1,11 +1,19 @@
+import { FieldBase } from "payload/dist/fields/config/types"
 import { Field } from "payload/types"
+import DiscordMemberField from "../components/dashboard/DiscordMemberField"
 
-type DiscordMemberField = Omit<Field, "type"> & {
+type DiscordMemberField = Omit<FieldBase, "type"> & {
 
 }
-const createDiscordMemberField: (field: DiscordMemberField) => Field = field => {
+
+export const createDiscordMemberField: (field: DiscordMemberField) => Field = field => {
     return {
         ...field,
-        type: "text"
+        type: "text",
+        admin: {
+            components: {
+                Field: DiscordMemberField
+            }
+        }
     }
 }
