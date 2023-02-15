@@ -11,7 +11,7 @@ const AnnounceEventEndpoint: Endpoint = {
         var event;
         try {
             event = await req.payload.findByID({
-                collection: CollectionSlugs.Events,
+                collection: "events",
                 id: eventId
             })
         } catch {

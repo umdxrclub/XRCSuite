@@ -29,20 +29,19 @@ export function createEventEmbed(event: Event): EmbedBuilder {
 
     let startMoment = moment(event.startDate);
     let endMoment = moment(event.endDate);
-    var date = ""
 
     if (startMoment.isSame(endMoment, 'date')) {
+
         let startDate = startMoment.format("dddd, MMMM Do YYYY")
         let startTime = startMoment.format("h:mm A")
         let endTime = endMoment.format("h:mm A")
-        date = `${startDate} from ${startTime} - ${endTime}`
+        let date = `${startDate} from ${startTime} - ${endTime}`
+
+        embed.addFields({
+            name: "When",
+            value: date
+        })
     }
-
-    embed.addFields({
-        name: "When",
-        value: date
-    })
-
 
     if (event.terplink.eventId) {
         embed.setURL(`https://terplink.umd.edu/event/${event.terplink.eventId}`)
@@ -84,7 +83,7 @@ export async function announceEvent(event: Event, channel?: TextChannel) {
         discordEventId = gulidEvent.id;
 
         await payload.update({
-            collection: CollectionSlugs.Events,
+            collection: "events",
             id: event.id,
             data: {
                 discord: {

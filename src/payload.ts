@@ -1,6 +1,5 @@
-import payload from "payload";
-import { Option, OptionObject } from "payload/dist/fields/config/types"
-import { hasUncaughtExceptionCaptureCallback } from "process";
+import { Field, Option, OptionObject } from "payload/dist/fields/config/types";
+import { FieldBaseNoType } from "./types/XRCTypes";
 
 /**
  * Retrieves the id of a specified document. Payload sometimes represents documents
@@ -68,3 +67,39 @@ export function rgbToNumber(rgb: string) {
     return parseInt(rgb, 16)
 }
 
+export function createTimeRangeField(field: Omit<FieldBaseNoType, "name">): Field {
+    return {
+        ...field,
+        type: "row",
+        fields: [
+            {
+                name: "from",
+                type: "text"
+            },
+            {
+                name: "to",
+                type: "text"
+            }
+        ]
+    }
+}
+
+export function createTimeBlockField(field: FieldBaseNoType): Field {
+    return {
+        ...field,
+        type: "group",
+        fields: [
+            {
+                name: "allDay",
+                type: "checkbox",
+                required: true,
+                defaultValue: false
+            },
+            createTimeRangeField({
+                admin: {
+                    condition: data => data.allDay
+                }
+            })
+        ]
+    }
+}  
