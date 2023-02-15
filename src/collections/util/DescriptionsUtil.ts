@@ -26,7 +26,7 @@ export async function postPublicInventoryInDiscord() {
     let devices = await getPublicDevices()
     let descriptionIds = new Set<string>(devices.map(d => getDocumentId(d.description)))
     let descriptionPromises: Promise<Description>[] = []
-    descriptionIds.forEach(id => descriptionPromises.push(payload.findByID({ id: id, collection: CollectionSlugs.Descriptions })))
+    descriptionIds.forEach(id => descriptionPromises.push(payload.findByID({ id: id, collection: "descriptions" })))
     let allDescriptions = await Promise.all(descriptionPromises);
 
     let descriptionMap: Map<string, Description[]> = new Map();

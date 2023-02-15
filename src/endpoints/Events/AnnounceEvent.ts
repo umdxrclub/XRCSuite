@@ -1,6 +1,5 @@
 import { Endpoint } from "payload/dist/config/types";
 import { announceEvent } from "../../collections/util/EventsUtil";
-import { CollectionSlugs } from "../../slugs";
 
 const AnnounceEventEndpoint: Endpoint = {
     path: "/:id/announce",

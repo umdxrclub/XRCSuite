@@ -1,8 +1,5 @@
-import { ChatInputCommandInteraction, CacheType, SlashCommandBuilder, ChannelType, TextChannel, ActionRowBuilder, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, CacheType, ChannelType, ChatInputCommandInteraction, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
 import payload from "payload";
-import { isDiscordMemberLeadership } from "../../collections/util/MembersUtil";
-import { CollectionSlugs } from "../../slugs";
-import { rejectInteractionIfNotLeadership } from "../util";
 import { Command } from "./command";
 
 const EventAnnounceId = "EventAnnounce";
@@ -19,7 +16,7 @@ async function onEventsInvoke(
             // }
 
             let events = await payload.find({
-                collection: CollectionSlugs.Events,
+                collection: "events",
                 where: {
                     startDate: {
                         greater_than_equal: new Date()

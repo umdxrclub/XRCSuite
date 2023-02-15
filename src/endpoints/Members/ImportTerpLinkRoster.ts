@@ -18,7 +18,7 @@ const ImportRosterEndpoint: Endpoint = {
 
             // See if an existing member already exists.
             let existingMemberSearch = await req.payload.find({
-                collection: Members.slug,
+                collection: "members",
                 where: {
                     'umd.terplink.communityId': {
                         equals: rosterMember.communityId
@@ -32,8 +32,8 @@ const ImportRosterEndpoint: Endpoint = {
                 console.log("Retrieved email " + email + " for " + rosterMember.name);
 
                 // Create the new member
-                await req.payload.create<Member>({
-                    collection: Members.slug,
+                await req.payload.create({
+                    collection: "members",
                     data: {
                         name: rosterMember.name,
                         email: email,
@@ -43,7 +43,7 @@ const ImportRosterEndpoint: Endpoint = {
                                 communityId: rosterMember.communityId
                             }
                         }
-                    }
+                    } as any
                 })
             }
         });

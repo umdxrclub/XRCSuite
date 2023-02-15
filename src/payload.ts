@@ -100,7 +100,7 @@ export function createTimeBlockField(field: FieldBaseNoType): Field {
             },
             createTimeRangeField({
                 admin: {
-                    condition: data => data.allDay
+                    condition: (_, data) => !(data[field.name]?.allDay)
                 }
             })
         ]

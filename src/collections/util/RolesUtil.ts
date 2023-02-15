@@ -1,16 +1,13 @@
-import { ActionRowBuilder } from "@discordjs/builders";
-import { ActionRow, ButtonStyle, ButtonBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
 import payload from "payload";
-import { getStatusChannelManager } from "../../discord/multi/multi";
-import { createAttachmentFromImageData, createButtonRowComponents, DiscordMessage } from "../../discord/util";
+import { createButtonRowComponents, DiscordMessage } from "../../discord/util";
 import { CollectionSlugs } from "../../slugs";
 import { Member, Role } from "../../types/PayloadSchema";
-import { createImageBanner } from "../../util/image";
 import { resolveDocument } from "../../util/payload-backend";
 
 export async function getLeadershipRoles(): Promise<Role[]> {
-    let roleDocs = await payload.find<Role>({
-        collection: CollectionSlugs.Roles, where: {
+    let roleDocs = await payload.find({
+        collection: "roles", where: {
             isLeadership: {
                 equals: true
             },
@@ -38,15 +35,15 @@ export function getHighestRole(roles: Role[]): Role | null {
 
 export async function isMemberLeadership(member: Member) {
     let unresolvedRoles = member.roles ?? [];
-    let promises: Promise<Role>[] = unresolvedRoles.map(r => resolveDocument(r, CollectionSlugs.Roles))
+    let promises: Promise<Role>[] = unresolvedRoles.map(r => resolveDocument(r, "roles"))
     let roles = await Promise.all(promises);
 
     return roles.some(r => r.isLeadership)
 }
 
 export async function createRoleSelectMessage(): Promise<DiscordMessage> {
-    let roleDocs = await payload.find<Role>({
-        collection: CollectionSlugs.Roles, limit: 100, where: {
+    let roleDocs = await payload.find({
+        collection: "roles", limit: 100, where: {
             and: [
                 {
                     isSelfAssignable: {

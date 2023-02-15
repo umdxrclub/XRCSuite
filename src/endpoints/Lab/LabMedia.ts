@@ -1,6 +1,5 @@
 import { Endpoint } from "payload/config";
-import { CollectionSlugs, GlobalSlugs } from "../../slugs";
-import { Lab, Media } from "../../types/PayloadSchema";
+import { Media } from "../../types/PayloadSchema";
 import { LabMediaType } from "../../types/XRCTypes";
 import { resolveDocument } from "../../util/payload-backend";
 

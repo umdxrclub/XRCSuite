@@ -10,16 +10,12 @@ import path from "path";
 import payload from "payload";
 import { MediaDirectory } from "../collections/Media";
 import { isDiscordMemberLeadership } from "../collections/util/MembersUtil";
-import { createDiscordMessages } from "../collections/util/MessageUtil";
-import { createRoleSelectMessage } from "../collections/util/RolesUtil";
-import { CollectionSlugs, GlobalSlugs } from "../slugs";
-import { Bot, Media, Message as PayloadMessage } from "../types/PayloadSchema";
+import { Media } from "../types/PayloadSchema";
 import { XRCSuiteChannelType } from "../types/XRCTypes";
 import { resolveDocument } from "../util/payload-backend";
 import { Throttle } from "../util/throttle";
 import { getDiscordClient } from "./bot";
 import { BotCommands } from "./commands/command";
-import { getStatusChannelManager } from "./multi/multi";
 
 export type DiscordMessage = string | MessagePayload | MessageCreateOptions
 
@@ -49,8 +45,8 @@ export async function sendGuildMessage (
 export async function getGuild(): Promise<Guild | null> {
     let client = getDiscordClient();
 
-    let { guild } = await payload.findGlobal<Bot>({
-        slug: GlobalSlugs.Discord
+    let { guild } = await payload.findGlobal({
+        slug: "bot"
     })
 
     if (guild.guildId) {
@@ -62,7 +58,7 @@ export async function getGuild(): Promise<Guild | null> {
 
 export async function getGuildChannel(channelType: XRCSuiteChannelType): Promise<GuildBasedChannel | null>{
     let { guild } = await payload.findGlobal({
-        slug: GlobalSlugs.Discord
+        slug: "bot"
     });
 
     let channelId: string | undefined = guild.channels[channelType];
@@ -104,8 +100,8 @@ export async function getGuildRole(roleId: string) {
  */
 export async function registerCommands() {
     let client = await getDiscordClient();
-    let discordConfig = await payload.findGlobal<Bot>({
-        slug: GlobalSlugs.Discord
+    let discordConfig = await payload.findGlobal({
+        slug: "bot"
     })
 
     if (client && discordConfig) {
@@ -153,7 +149,7 @@ export async function rejectInteractionIfNotLeadership(interaction: ChatInputCom
  * @returns An attachment builder and url
  */
 export async function createAttachmentFromMedia(media: Media | string) {
-    let resolvedMedia = await resolveDocument(media, CollectionSlugs.Media);
+    let resolvedMedia = await resolveDocument(media, "media");
     let attachment = new AttachmentBuilder(path.join(MediaDirectory, resolvedMedia.filename))
     let url = "attachment://" + resolvedMedia.filename
 
@@ -176,7 +172,9 @@ export async function bulkSendGuildMessages(channel: XRCSuiteChannelType, messag
     return sentMessages
 }
 
+
 export function createAttachmentFromImageData(image: string) {
+    // TODO: Fixme! Doesn't work when missing image banner.
     let buff = Buffer.from(image.split(",")[1], "base64")
     let attachment = new AttachmentBuilder(buff)
 
@@ -221,15 +219,6 @@ export async function removeRoleFromEveryone(roleId: string) {
             }
         }
     }
-}
-
-export async function getMultiMessageIds(type: keyof Bot["guild"]["statusChannels"]) {
-    let discord = await payload.findGlobal<Bot>({
-        slug: GlobalSlugs.Discord
-    })
-
-    let statusChannel = discord.guild.statusChannels[type]
-    return statusChannel.messages.map(o => o.messageId)
 }
 
 type DiscordButton = {

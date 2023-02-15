@@ -27,7 +27,7 @@ const LabCheckIn: Endpoint = {
         let member = await resolveMember(resolveMethod, resolveContent);
         if (member) {
             let lab = await req.payload.findGlobal({
-                slug: GlobalSlugs.Lab,
+                slug: "lab",
                 depth: 0 // don't need to pull everyone's information
             });
 
@@ -47,7 +47,7 @@ const LabCheckIn: Endpoint = {
 
             // Update lab state
             await req.payload.updateGlobal({
-                slug: GlobalSlugs.Lab,
+                slug: "lab",
                 data: {
                     ...lab,
                     members: currentLabMembers

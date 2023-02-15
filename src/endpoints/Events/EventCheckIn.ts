@@ -1,7 +1,6 @@
 import { Endpoint } from "payload/dist/config/types";
-import XRC from "../../util/XRC";
-import { CollectionSlugs } from "../../slugs";
 import { resolveMember } from "../../collections/util/MembersUtil";
+import XRC from "../../util/XRC";
 
 /**
  * The required parameters for event check in:
@@ -38,7 +37,7 @@ const EventCheckIn: Endpoint = {
 
             // Get the event within the database.
             let eventSearch = await req.payload.find({
-                collection: CollectionSlugs.Events,
+                collection: "events",
                 where:  {
                     'terplink.accessCode': {
                         equals: accessCode
@@ -54,10 +53,10 @@ const EventCheckIn: Endpoint = {
 
                 // Create an attendance
                 req.payload.create({
-                    collection: CollectionSlugs.Attendances,
+                    collection: "attendances",
                     data: {
                         member: member.id,
-                        date: new Date(),
+                        date: (new Date()).toString(),
                         event: event.id,
                         type: "in"
                     }

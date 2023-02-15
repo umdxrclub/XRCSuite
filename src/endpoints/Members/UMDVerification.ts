@@ -87,7 +87,7 @@ export class UMDVerificationManager {
                 // Discord profile.
 
                 let members = await payload.find({
-                    collection: CollectionSlugs.Members,
+                    collection: "members",
                     where: {
                         email: {
                             contains: `${uid}@`
@@ -100,7 +100,7 @@ export class UMDVerificationManager {
                 if (foundMember) {
                     let member = members.docs[0]
                     await payload.update({
-                        collection: CollectionSlugs.Members,
+                        collection: "members",
                         id: member.id,
                         data: {
                             integrations: {

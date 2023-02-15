@@ -51,7 +51,7 @@ interface DuoAuthResult {
 const HOTP_COUNTER_FILE = ".hotp_counter";
 export async function generateAuthCode(hotpSecret: string): Promise<string> {
   let cas = await payload.findGlobal({
-    slug: GlobalSlugs.CAS
+    slug: "cas"
   })
 
   let counter = cas.hotpCounter as number;
@@ -66,12 +66,12 @@ export async function generateAuthCode(hotpSecret: string): Promise<string> {
 export async function incrementHOTPCounter() {
   // Get existing CAS global
   let cas = await payload.findGlobal({
-    slug: GlobalSlugs.CAS
+    slug: "cas"
   })
 
   // Update CAS Global with incremented counter
   await payload.updateGlobal({
-    slug: GlobalSlugs.CAS,
+    slug: "cas",
     data: {
       ...cas,
       hotpCounter: cas.hotpCounter + 1
@@ -84,8 +84,8 @@ export async function loginWithCAS() {
   // POST: /frame/frameless/v4/auth
 
   const axios = XRC.axios;
-  const CAS = await payload.findGlobal<CAS>({
-    slug: GlobalSlugs.CAS
+  const CAS = await payload.findGlobal({
+    slug: "cas"
   })
 
   if (!CAS.duoDeviceName || !CAS.username || !CAS.password || !CAS.hotpSecret)

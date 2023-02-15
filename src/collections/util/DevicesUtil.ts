@@ -1,7 +1,5 @@
-import { EmbedBuilder } from "@discordjs/builders";
 import payload from "payload";
 import { getDocumentId } from "../../payload";
-import { CollectionSlugs } from "../../slugs";
 import { Description, Device } from "../../types/PayloadSchema";
 import { resolveDocument } from "../../util/payload-backend";
 
@@ -12,8 +10,8 @@ export type DeviceListing = {
 
 export async function getPublicDevices(): Promise<Device[]> {
     // Find all devices that are publicly listed.
-    let devices = await payload.find<Device>({
-        collection: CollectionSlugs.Devices,
+    let devices = await payload.find({
+        collection: "devices",
         where: {
             public: {
                 equals: true
@@ -36,7 +34,7 @@ export async function getPublicDeviceInventory() {
         let descriptionId = getDocumentId(device.description);
 
         if (!descriptionMap.has(descriptionId)) {
-            let description = await resolveDocument<Description>(device.description, CollectionSlugs.Descriptions);
+            let description = await resolveDocument(device.description, "descriptions");
 
             // Add the new description
             descriptionMap.set(descriptionId, {

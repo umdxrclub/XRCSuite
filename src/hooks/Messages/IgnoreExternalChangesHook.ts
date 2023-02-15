@@ -2,6 +2,8 @@ import { Message } from "payload/generated-types";
 import { FieldHook } from "payload/types";
 
 const IgnoreExternalChangesHook: FieldHook = async args => {
+    if (args.operation === "create") return;
+    
     let shouldChange = args.req.payloadAPI == "local" && args.req.method == undefined
     let newValue = shouldChange ? args.value : args.previousValue;
     if (!shouldChange && !newValue) {

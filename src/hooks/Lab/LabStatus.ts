@@ -2,13 +2,10 @@ import { EmbedBuilder } from "@discordjs/builders";
 import { AttachmentBuilder } from "discord.js";
 import payload from "payload";
 import { GlobalAfterChangeHook } from "payload/types";
-import { getStatusChannelManager } from "../../discord/multi/multi";
-import MultiMessageManager from "../../discord/multi/MultiMessageManager";
-import { createAttachmentFromMedia, getGuildChannel, sendGuildMessage } from "../../discord/util";
-import { createLabStatusEmbedMessage, updateLabStatusMessage } from "../../globals/util/LabUtil";
+import { createAttachmentFromMedia, sendGuildMessage } from "../../discord/util";
+import { updateLabStatusMessage } from "../../globals/util/LabUtil";
 import { getDocumentId } from "../../payload";
-import { CollectionSlugs, GlobalSlugs } from "../../slugs";
-import { Bot, Lab, Media, Member } from "../../types/PayloadSchema";
+import { Lab } from "../../types/PayloadSchema";
 import { resolveDocument } from "../../util/payload-backend";
 
 async function getLabNotificationDiscordRoleId(): Promise<string | null> {

@@ -1,6 +1,5 @@
 import { Endpoint } from "payload/dist/config/types";
 import { createGuildEvent } from "../../collections/util/EventsUtil";
-import { CollectionSlugs } from "../../slugs";
 
 const CreateDiscordEventEndpoint: Endpoint = {
     path: "/:id/discord-event",
@@ -11,7 +10,7 @@ const CreateDiscordEventEndpoint: Endpoint = {
         var event;
         try {
             event = await req.payload.findByID({
-                collection: CollectionSlugs.Events,
+                collection: "events",
                 id: eventId
             })
         } catch {

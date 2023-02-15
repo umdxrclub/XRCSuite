@@ -1,9 +1,7 @@
-import Events from "../../collections/Events";
-import { Endpoint } from "payload/dist/config/types";
-import XRC from "../../util/XRC";
-import { XR_CLUB_ID } from "../../util/terplink";
-import { CollectionSlugs } from "../../slugs";
 import parse from "node-html-parser";
+import { Endpoint } from "payload/dist/config/types";
+import { XR_CLUB_ID } from "../../util/terplink";
+import XRC from "../../util/XRC";
 
 /**
  * Imports all TerpLink events into the database.
@@ -18,7 +16,7 @@ const ImportEventsEndpoint: Endpoint = {
 
             // See if this event has already been created.
             let result = await req.payload.find({
-                collection: Events.slug,
+                collection: "events",
                 where: {
                     'terplink.eventId': {
                         equals: event.id
@@ -49,7 +47,7 @@ const ImportEventsEndpoint: Endpoint = {
 
                 // Create the new event.
                 await req.payload.create({
-                    collection: Events.slug,
+                    collection: "events",
                     data: {
                         ...eventData,
                         location: page.location,
@@ -57,11 +55,11 @@ const ImportEventsEndpoint: Endpoint = {
                             ...eventData.terplink,
                             accessCode: page.accessCode
                         }
-                    }
+                    } as any
                 })
             } else {
                 await req.payload.update({
-                    collection: CollectionSlugs.Events,
+                    collection: "events",
                     id: result.docs[0].id,
                     data: eventData
                 })

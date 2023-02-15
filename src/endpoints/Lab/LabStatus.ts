@@ -22,8 +22,8 @@ const LabStatusEndpoint: Endpoint = {
     method: "get",
     handler: async (req, res, next) => {
         // Get the current lab global store.
-        let lab = await req.payload.findGlobal<Lab>({
-            slug: GlobalSlugs.Lab
+        let lab = await req.payload.findGlobal({
+            slug: "lab",
         })
 
         let members = lab.members as Member[] ?? [];

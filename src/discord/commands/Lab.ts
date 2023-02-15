@@ -6,7 +6,7 @@ import { Command } from "./command";
 
 async function onLabInvoke(interaction: ChatInputCommandInteraction<CacheType>) {
     let lab = await payload.findGlobal({
-        slug: GlobalSlugs.Lab,
+        slug: "lab",
         depth: 0
     })
 
@@ -14,7 +14,7 @@ async function onLabInvoke(interaction: ChatInputCommandInteraction<CacheType>) 
         case "open":
             if (!lab.open) {
                 await payload.updateGlobal({
-                    slug: GlobalSlugs.Lab,
+                    slug: "lab",
                     data: {
                         ...lab,
                         open: true
@@ -32,7 +32,7 @@ async function onLabInvoke(interaction: ChatInputCommandInteraction<CacheType>) 
             let checkOutEveryone = interaction.options.getBoolean("check-out-everyone")
             if (lab.open) {
                 await payload.updateGlobal({
-                    slug: GlobalSlugs.Lab,
+                    slug: "lab",
                     data: {
                         ...lab,
                         members: checkOutEveryone ? [] : lab.members,
@@ -49,7 +49,7 @@ async function onLabInvoke(interaction: ChatInputCommandInteraction<CacheType>) 
 
         case "list":
             let fullLab = await payload.findGlobal({
-                slug: GlobalSlugs.Lab
+                slug: "lab"
             })
 
             let members = fullLab.members;

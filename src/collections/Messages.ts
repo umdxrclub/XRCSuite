@@ -11,7 +11,7 @@ const Messages: CollectionConfig = {
     slug: CollectionSlugs.Messages,
     admin: {
         useAsTitle: 'name',
-        group: 'Discord',
+        group: 'Discord'
     },
     hooks: {
         afterDelete: [ DeleteMessageHook ],

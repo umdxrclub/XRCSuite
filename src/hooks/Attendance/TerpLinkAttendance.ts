@@ -36,7 +36,7 @@ const TerpLinkAttendanceHook: CollectionAfterChangeHook = async (args) => {
     // Resolve member if its just a string.
     if (typeof member === "string") {
       member = await payload.findByID({
-        collection: CollectionSlugs.Members,
+        collection: "members",
         id: member,
       });
     }
@@ -44,7 +44,7 @@ const TerpLinkAttendanceHook: CollectionAfterChangeHook = async (args) => {
     // Resolve event if its just a string.
     if (typeof event === "string") {
       event = await payload.findByID({
-        collection: CollectionSlugs.Events,
+        collection: "events",
         id: event,
       });
     }

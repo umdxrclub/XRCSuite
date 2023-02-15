@@ -27,7 +27,7 @@ const Admins: CollectionConfig = {
             return true;
 
           let managers = await args.req.payload.find({
-            collection: CollectionSlugs.Admins,
+            collection: "admins",
             where: {
               casManager: {
                 equals: true

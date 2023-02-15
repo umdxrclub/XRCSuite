@@ -11,7 +11,21 @@ function makeDayFields(): Field[] {
 
 const Schedules: CollectionConfig = {
     slug: CollectionSlugs.Schedules,
-    fields: makeDayFields()
+    admin: {
+        useAsTitle: "name"
+    },
+    fields: [
+        {
+            name: "name",
+            type: "text",
+            required: true
+        },
+        {
+            name: "schedule",
+            type: "group",
+            fields: makeDayFields()
+        }
+    ]
 }
 
 export default Schedules;

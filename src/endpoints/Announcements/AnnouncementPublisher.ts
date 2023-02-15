@@ -53,7 +53,7 @@ const AnnouncementsPublisherHook: CollectionAfterChangeHook = async (args) => {
 
     if (client && wasPublished) {
         let { guild } = await payload.findGlobal({
-            slug: GlobalSlugs.Discord
+            slug: "bot"
         })
 
         if (guild?.channels?.announcements) {

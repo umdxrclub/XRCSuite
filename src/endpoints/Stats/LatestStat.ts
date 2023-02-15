@@ -8,7 +8,7 @@ const LatestStatEndpoint: Endpoint = {
     handler: async (req, res, next) => {
         let allDocs = await req.payload.find({
             sort: "date",
-            collection: CollectionSlugs.Stats,
+            collection: "stats",
             limit: 1
         })
 

@@ -1,5 +1,4 @@
-import { Field, GlobalConfig } from "payload/types";
-import createDiscordMessageField from "../blocks/messages";
+import { GlobalConfig } from "payload/types";
 import { createActionButton } from "../components/ActionButton";
 import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpiont";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
@@ -7,9 +6,8 @@ import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCom
 import { createDiscordChannelField } from "../fields/discord/ChannelField";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
 import DefaultRoleChangedHook from "../hooks/Bot/DefaultRoleHook";
-import GetStartedMessageChanged from "../hooks/Bot/GetStartedMessageHook";
 import { CollectionSlugs, GlobalSlugs } from "../slugs";
-import { ChannelType, StatusChannelType, XRClubDiscordNotificationRoles } from "../types/XRCTypes";
+import { ChannelType, XRClubDiscordNotificationRoles } from "../types/XRCTypes";
 
 const Bot: GlobalConfig = {
     slug: GlobalSlugs.Discord,

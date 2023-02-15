@@ -4,12 +4,11 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CacheType,
-  ChatInputCommandInteraction,
+  ChatInputCommandInteraction
 } from "discord.js";
 import payload from "payload";
 import { getMemberFromDiscordId } from "../../collections/util/MembersUtil";
 import XRC from "../../util/XRC";
-import { CollectionSlugs } from "../../slugs";
 import { Command } from "./command";
 
 async function onLinkInvoke(
@@ -64,13 +63,13 @@ async function onLinkInvoke(
 
         if (isValidSerial) {
           await payload.update({
-            collection: CollectionSlugs.Members,
+            collection: "members",
             id: member.id,
             data: {
               umd: {
                 cardSerial: serial
               }
-            }
+            } as any
           })
 
           await interaction.reply({ content: "Your swipe card has been successfully registered. You can now use it for check-in at the XR Lab and our events!", ephemeral: true });

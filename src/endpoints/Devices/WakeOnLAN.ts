@@ -10,8 +10,8 @@ const WakeOnLANEndpoint: Endpoint = {
     handler: async (req, res) => {
         let id = req.params.id;
 
-        let device = await req.payload.findByID<Device>({
-            collection: Devices.slug,
+        let device = await req.payload.findByID({
+            collection: "devices",
             id: id
         });
 

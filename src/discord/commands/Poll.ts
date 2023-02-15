@@ -1,9 +1,6 @@
-import { EmbedBuilder, RGBTuple } from "@discordjs/builders";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CacheType, ChatInputCommandInteraction, CommandInteraction, Interaction, ModalBuilder, SlashCommandBuilder, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, Interaction, ModalBuilder, SlashCommandBuilder, StringSelectMenuBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import payload from "payload";
-import { CollectionSlugs } from "../../slugs";
 import { Poll } from "../../types/PayloadSchema";
-import { getDiscordClient } from "../bot";
 import { Command } from "./command";
 
 const PollRegex = /POLL-([a-g0-9]{24})-(\d+)/;

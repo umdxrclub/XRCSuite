@@ -1,13 +1,11 @@
 import { Endpoint } from "payload/config";
 import { getDiscordClient } from "../../discord/bot";
-import { CollectionSlugs } from "../../slugs";
-import { Member } from "../../types/PayloadSchema";
 
 const DiscordAvatarEndpoint: Endpoint = {
     path: "/discord/:id",
     method: "get",
     handler: async (req, res) => {
-        let member = await req.payload.findByID<Member>({ collection: CollectionSlugs.Members, id: req.params.id })
+        let member = await req.payload.findByID({ collection: "members", id: req.params.id })
 
         if (member.integrations.discord) {
             let client = await getDiscordClient();

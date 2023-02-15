@@ -1,26 +1,24 @@
 import { EmbedBuilder } from "@discordjs/builders";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder } from "discord.js";
 import payload from "payload";
 import { Where } from "payload/types";
 import { getDiscordClient } from "../../discord/bot";
 import { bulkSendGuildMessages, createAttachmentFromMedia, DiscordMessage } from "../../discord/util";
-import { getOptionLabel, rgbToNumber } from "../../payload";
-import { CollectionSlugs, GlobalSlugs } from "../../slugs";
-import { Bot, Media, Member, Role } from "../../types/PayloadSchema";
+import { rgbToNumber } from "../../payload";
+import { Media, Member, Role } from "../../types/PayloadSchema";
 import { MemberProfile, ResolveMethod } from "../../types/XRCTypes";
 import { getLabTerpLinkEvent } from "../../util/lab";
 import { resolveDocument } from "../../util/payload-backend";
 import { RosterMember } from "../../util/terplink";
 import XRC from "../../util/XRC";
-import Members from "../Members";
 import { getHighestRole, getLeadershipRoles, isMemberLeadership } from "./RolesUtil";
 
 export async function getAllLeadershipMembers(): Promise<Member[]> {
     let leadershipRoles = await getLeadershipRoles();
     let leadershipRoleIds = leadershipRoles.map(r => r.id);
 
-    let leadershipMembersDocs = await payload.find<Member>({
-        collection: CollectionSlugs.Members,
+    let leadershipMembersDocs = await payload.find({
+        collection: "members",
         where: {
             roles: {
                 in: leadershipRoleIds
@@ -36,7 +34,7 @@ export async function getAllLeadershipMembers(): Promise<Member[]> {
 export async function sortMembersByRolePriority(members: Member[]): Promise<Member[]> {
     let memberAndRolePromises = members.map(async m => {
         let roles = m.roles ?? [];
-        let resolvedRolesPromises: Promise<Role>[] = roles.map(r => resolveDocument(r, CollectionSlugs.Roles));
+        let resolvedRolesPromises: Promise<Role>[] = roles.map(r => resolveDocument(r, "roles"));
         let resolvedRoles = await Promise.all(resolvedRolesPromises)
 
         return {
@@ -65,7 +63,7 @@ export async function sortMembersByRolePriority(members: Member[]): Promise<Memb
  */
 export async function getMemberFromDiscordId(id: string): Promise<Member | undefined> {
     let docs = await payload.find({
-        collection: CollectionSlugs.Members,
+        collection: "members",
         where: {
             'integrations.discord': {
                 equals: id
@@ -132,7 +130,7 @@ export async function createMemberEmbedMessage(member: Member): Promise<DiscordM
     }
 
     if (member.roles && member.roles.length > 0) {
-        let roles: Role[] = await Promise.all(member.roles.map(r => resolveDocument(r, CollectionSlugs.Roles)));
+        let roles: Role[] = await Promise.all(member.roles.map(r => resolveDocument(r, "roles")));
         roles.sort((a, b) => a.priority - b.priority)
         let highestRole = roles[0];
 
@@ -188,8 +186,8 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
     }
 
     // Search for the member.
-    let search = await payload.find<Member>({
-        collection: Members.slug,
+    let search = await payload.find({
+        collection: "members",
         where: where
     })
 
@@ -261,7 +259,7 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
             // See if this roster member was already in the database, since they
             // could have been added when we did a roster import.
             let search = await payload.find({
-                collection: Members.slug,
+                collection: "members",
                 where: {
                     'umd.terplink.communityId': {
                         equals: foundRosterMember.communityId
@@ -278,14 +276,14 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
         var member: Member;
         if (existingId) {
             member = await payload.update({
-                collection: Members.slug,
+                collection: "members",
                 id: existingId,
                 data: partialMember
             })
         } else {
             member = await payload.create({
-                collection: Members.slug,
-                data: partialMember
+                collection: "members",
+                data: partialMember as any
             })
         }
 

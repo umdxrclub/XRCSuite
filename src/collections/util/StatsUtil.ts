@@ -1,6 +1,5 @@
 import payload from "payload";
 import { getGuild } from "../../discord/util";
-import { CollectionSlugs } from "../../slugs";
 
 export async function createStatSnapshot() {
     // Retrieve Discord member count
@@ -8,7 +7,7 @@ export async function createStatSnapshot() {
     let discordMemberCount = guild?.memberCount ?? -1;
 
     return await payload.create({
-        collection: CollectionSlugs.Stats,
+        collection: "stats",
         data: {
             count: {
                 discord: discordMemberCount
