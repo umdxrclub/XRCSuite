@@ -1,6 +1,6 @@
 import { GlobalConfig } from "payload/types";
 import Members from "../collections/Members";
-import PasswordField from "../components/dashboard/PasswordField";
+import PasswordField from "../components/fields/PasswordField";
 
 const CAS: GlobalConfig = {
     slug: 'cas',

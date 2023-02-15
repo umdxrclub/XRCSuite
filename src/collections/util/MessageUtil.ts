@@ -57,7 +57,7 @@ export async function createDiscordMessages(message: Message): Promise<DiscordMe
 
     for (var block of message.content) {
         switch (block.blockType) {
-            case "buttonRow":
+            case "linkButtons":
                 let buttonRows = createButtonRowComponents(block.buttons.map(b => ({
                     label: b.title,
                     url: b.url,
@@ -91,7 +91,9 @@ export async function createDiscordMessages(message: Message): Promise<DiscordMe
                 if (block.timestamp) embed.setTimestamp(new Date(block.timestamp))
                 if (block.description) embed.setDescription(block.description)
                 if (block.color) embed.setColor(rgbToNumber(block.color))
-                
+                if (block.fields.length > 0) embed.setFields(block.fields.map(b => ({name: b.name, value: b.value, inline: b.inline })))
+                if (block.url) embed.setURL(block.url)
+
                 messages.push({ embeds: [embed] })
                 break;
         }
@@ -107,8 +109,8 @@ export async function sendMessage(message: string | Message) {
 }
 
 export async function sendDiscordMessages(message: string | Message, messages: DiscordMessage[]) {
-    let resolvedMessage = await resolveDocument(message, "messages");
-    
+    let resolvedMessage = await resolveDocument(message, "messages", true);
+
     let messageChannels = resolvedMessage.channels;
     let newMessageChannels: Message["channels"] = []
     for (var channel of messageChannels) {
@@ -120,9 +122,11 @@ export async function sendDiscordMessages(message: string | Message, messages: D
 
             // Delete previous messages.
             if (shouldCreateNewMessages && channel.messages?.length > 0) {
-                await discordChannel.bulkDelete(channel.messages.map(m => m.messageId));
+                try {
+                    await discordChannel.bulkDelete(channel.messages.map(m => m.messageId));
+                } catch { }
             }
-            
+
             let sentMessagesIds: string[] = []
             for (var i = 0; i < messages.length; i++) {
                 let content = messages[i];
@@ -135,7 +139,7 @@ export async function sendDiscordMessages(message: string | Message, messages: D
                     let editedMessage = await prevMessage.edit(content)
                     updatedMessageId = editedMessage.id;
                 }
-                
+
                 sentMessagesIds.push(updatedMessageId);
                 await Throttle.wait(1000);
             }
@@ -146,7 +150,7 @@ export async function sendDiscordMessages(message: string | Message, messages: D
         }
     }
 
-    await payload.update({
+    let newMsg = await payload.update({
         collection: "messages",
         id: resolvedMessage.id,
         data: {

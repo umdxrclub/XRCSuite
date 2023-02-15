@@ -24,6 +24,7 @@ import Stats from './collections/Stats';
 import Odoo from './globals/Odoo';
 import Roles from './collections/Roles';
 import Integrations from './collections/Integrations';
+import DiscordGuildProvider from './components/providers/DiscordGuildProvider';
 
 const fallbackModules = [
     'util'
@@ -44,6 +45,7 @@ export default buildConfig({
         user: Admins.slug,
         components: {
             beforeDashboard: [ XRCBeforeDashboard ],
+            providers: [ DiscordGuildProvider ],
             graphics: {
                 Icon: XRCLogo
             },

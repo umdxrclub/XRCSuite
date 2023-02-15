@@ -18,6 +18,32 @@ const Embed: Block = {
         {
             name: "timestamp",
             type: "date"
+        },
+        {
+            name: "url",
+            type: "text"
+        },
+        {
+            name: "fields",
+            type: "array",
+            fields: [
+                {
+                    name: "name",
+                    type: "text",
+                    required: true
+                },
+                {
+                    name: "value",
+                    type: "text",
+                    required: true
+                },
+                {
+                    name: "inline",
+                    type: "checkbox",
+                    required: true,
+                    defaultValue: false
+                }
+            ]
         }
     ]
 }

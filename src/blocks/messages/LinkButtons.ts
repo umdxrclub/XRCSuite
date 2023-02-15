@@ -1,11 +1,19 @@
 import { Block } from "payload/types";
+import { createDiscordEmojiField } from "../../fields/discord/EmojiField";
+import { useAsRowTitle } from "../../payload";
 
 const LinkButtons: Block = {
-    slug: "buttonRow",
+    slug: "linkButtons",
     fields:[
         {
             name: "buttons",
             type: "array",
+            admin: {
+                components: {
+                    RowLabel: useAsRowTitle("title")
+                }
+            },
+            maxRows: 25,
             fields: [
                 {
                     name: "title",
@@ -17,10 +25,9 @@ const LinkButtons: Block = {
                     type: "text",
                     required: true
                 },
-                {
-                    name: "emoji",
-                    type: "text",
-                }
+                createDiscordEmojiField({
+                    name: "emoji"
+                })
             ]
         }
     ]

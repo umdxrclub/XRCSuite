@@ -8,22 +8,26 @@ const LabMediaEndpoint: Endpoint = {
     path: "/media/:type",
     method: "get",
     handler: async (req, res) => {
-        let lab = await req.payload.findGlobal<Lab>({ slug: GlobalSlugs.Lab });
+        let lab = await req.payload.findGlobal({ slug: "lab" });
         let mediaType = req.params.type as LabMediaType
 
         var media: Media | string | undefined = undefined
         switch (mediaType) {
             case "accept-sound":
-                media = lab.settings.gatekeeper.acceptSound
+                media = lab.media.gatekeeper.acceptSound
                 break;
 
             case "reject-sound":
-                media = lab.settings.gatekeeper.rejectSound
+                media = lab.media.gatekeeper.rejectSound
+                break;
+
+            case "tv":
+                media = lab.media.tvBanner
                 break;
         }
 
         if (media) {
-            let resolvedMedia = await resolveDocument(media, CollectionSlugs.Media);
+            let resolvedMedia = await resolveDocument(media, "media");
             let redirectUrl = resolvedMedia.url;
             res.redirect(redirectUrl)
         } else {

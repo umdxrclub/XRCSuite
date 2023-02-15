@@ -1,4 +1,7 @@
-import { Field, Option, OptionObject } from "payload/dist/fields/config/types";
+import payload from "payload";
+import { RowLabelFunction } from "payload/dist/admin/components/forms/RowLabel/types";
+import { Field, Option, OptionObject } from "payload/dist/fields/config/types"
+import { hasUncaughtExceptionCaptureCallback } from "process";
 import { FieldBaseNoType } from "./types/XRCTypes";
 
 /**
@@ -103,3 +106,8 @@ export function createTimeBlockField(field: FieldBaseNoType): Field {
         ]
     }
 }  
+
+export function useAsRowTitle(name: string): RowLabelFunction {
+    const func: RowLabelFunction = args => args.data[name];
+    return func;
+}

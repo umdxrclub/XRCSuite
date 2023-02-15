@@ -1,5 +1,5 @@
 import { GlobalConfig } from "payload/types";
-import PasswordField from "../components/dashboard/PasswordField";
+import PasswordField from "../components/fields/PasswordField";
 import { GlobalSlugs } from "../slugs";
 
 const Odoo: GlobalConfig = {
