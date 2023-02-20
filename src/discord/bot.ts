@@ -1,9 +1,8 @@
 import {
-    Client,
-    GatewayIntentBits, Partials
+  Client,
+  GatewayIntentBits, Partials
 } from "discord.js";
 import payload from "payload";
-import { GlobalSlugs } from "../slugs";
 import { BotCommands } from "./commands/command";
 import BotInteractions from "./interactions/interactions";
 import { createAndUpdateStatusChannelManagers } from "./multi/multi";
@@ -14,6 +13,7 @@ const BOT_INTENTS = [
   GatewayIntentBits.GuildMessages,
   GatewayIntentBits.GuildMessageReactions,
   GatewayIntentBits.MessageContent,
+  GatewayIntentBits.GuildMembers
 ];
 
 // Create the bot client.

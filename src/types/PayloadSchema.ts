@@ -621,7 +621,7 @@ export interface Bot {
       events?: string;
       leadership?: string;
     };
-    defaultRole?: string | Role;
+    defaultRole?: string;
     notificationRoles: {
       lab?: string | Role;
       workshop?: string | Role;

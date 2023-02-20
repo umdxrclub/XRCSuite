@@ -181,25 +181,30 @@ export function createAttachmentFromImageData(image: string) {
     return attachment;
 }
 
+
+let roleThrottle = new Throttle(1000);
+
 export async function addRoleToEveryone(roleId: string) {
-    let guild = await getGuild();
-    if (guild) {
-        // Ensure role actually exists first.
-        let role = await getGuildRole(roleId);
-        if (!role) 
-            return;
+    await roleThrottle.exec(async () => {
+        let guild = await getGuild();
+        if (guild) {
+            // Ensure role actually exists first.
+            let role = await getGuildRole(roleId);
+            if (!role) 
+                return;
 
-        let membersMap = await guild.members.fetch()
-        let allMembers = Array.from(membersMap.values())
-        for (var member of allMembers) {
-            let hasRole = member.roles.cache.has(roleId);
-            if (!hasRole) {
-                await member.roles.add(roleId)
+            let membersMap = await guild.members.fetch()
+            let allMembers = Array.from(membersMap.values())
+
+            for (var member of allMembers) {
+                if (!member.user.bot && !member.roles.cache.has(roleId)) {
+                    try {
+                        await member.roles.add(roleId)
+                    } catch { }
+                }
             }
-
-            console.log("added to: " + member.displayName)
         }
-    }
+    })
 }
 
 export async function removeRoleFromEveryone(roleId: string) {

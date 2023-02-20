@@ -4,6 +4,7 @@ import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpiont";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import { createDiscordChannelField } from "../fields/discord/ChannelField";
+import { createDiscordRoleField } from "../fields/discord/RoleField";
 import BotUpdateHook from "../hooks/Bot/BotUpdateHook";
 import DefaultRoleChangedHook from "../hooks/Bot/DefaultRoleHook";
 import { CollectionSlugs, GlobalSlugs } from "../slugs";
@@ -80,19 +81,12 @@ const Bot: GlobalConfig = {
                         label: ct.label,
                     }))
                 },
-                {
+                createDiscordRoleField({
                     name: 'defaultRole',
-                    type: 'relationship',
-                    relationTo: CollectionSlugs.Roles,
                     hooks: {
                         afterChange: [ DefaultRoleChangedHook ]
                     },
-                    filterOptions: {
-                        discordRoleId: {
-                            not_equals: undefined
-                        }
-                    }
-                },
+                }),
                 {
                     name: 'notificationRoles',
                     type: 'group',
