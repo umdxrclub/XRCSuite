@@ -168,7 +168,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
                 console.log("Ending handler...")
                 let keystrokeString = keystrokes.current.join("");
                 console.log("Parsed keystroke string: " + keystrokeString)
-                if (!handler.includeDelimiters ?? true) {
+                if (!(handler.includeDelimiters ?? true)) {
                     let startIndex = handler.key.length;
                     let endIndex = keystrokeString.length - handler.endKey?.length ?? 0 - startIndex;
                     keystrokeString = keystrokeString.slice(startIndex, endIndex)

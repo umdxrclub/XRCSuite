@@ -148,7 +148,16 @@ export async function createLabStatusEmbedMessages(): Promise<
                         blockEmbed.addFields({
                             name: "Staff",
                             inline: true,
-                            value: staff.map(s => s.nickname ?? s.name).join(", ")
+                            value: staff
+                            .map(s => {
+                              if (s.nickname && s.nickname.length > 0) {
+                                return s.nickname;
+                              }
+
+                              return s.name
+                            })
+                            .filter(n => n.length > 0)
+                            .join(", ")
                         })
 
                         break;
