@@ -6,7 +6,11 @@ const Closing: Block = {
     fields: [
         createTimeBlockField({
             name: "time"
-        })
+        }),
+        {
+            name: "note",
+            type: "textarea"
+        }
     ]
 }
 

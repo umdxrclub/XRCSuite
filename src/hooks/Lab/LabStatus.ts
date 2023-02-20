@@ -3,20 +3,12 @@ import { AttachmentBuilder } from "discord.js";
 import payload from "payload";
 import { GlobalAfterChangeHook } from "payload/types";
 import { createAttachmentFromMedia, sendGuildMessage } from "../../discord/util";
-import { updateLabStatusMessage } from "../../globals/util/LabUtil";
+import { updateLabControlMessage, updateLabStatusMessage } from "../../globals/util/LabUtil";
 import { getDocumentId } from "../../payload";
 import { Lab } from "../../types/PayloadSchema";
 import { resolveDocument } from "../../util/payload-backend";
+import { Throttle } from "../../util/throttle";
 
-async function getLabNotificationDiscordRoleId(): Promise<string | null> {
-  let discordDoc = await payload.findGlobal({ slug: "bot" })
-  if (discordDoc.guild.notificationRoles.lab) {
-    let labNotificationRole = await resolveDocument(discordDoc.guild.notificationRoles.lab, "roles");
-    return labNotificationRole.discordRoleId ?? null;
-  }
-
-  return null;
-}
 function createLabNotificationEmbed(): EmbedBuilder {
   let embed = new EmbedBuilder();
 
@@ -27,14 +19,19 @@ function createLabNotificationEmbed(): EmbedBuilder {
   return embed;
 }
 
+const labStatusThrottle = new Throttle(10000);
+
 const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   // Check if the lab status has changed.
   let doc = args.doc as Lab;
   let prevDoc = args.previousDoc as Lab;
-  let notificationRoleId = await getLabNotificationDiscordRoleId();
   var shouldNotify = false
 
-  updateLabStatusMessage();
+  // Update lab status
+  labStatusThrottle.exec(updateLabStatusMessage)
+
+  // Update Control Message
+  updateLabControlMessage();
 
   let embeds = []
   let files = []
@@ -116,8 +113,12 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
 
   // If there is a role to ping, add it.
   var notificationMessageContent: string | undefined = undefined
-  if (shouldNotify && notificationRoleId) {
-    notificationMessageContent = `<@&${notificationRoleId}>`
+  let notificationRole = doc.discord.labNotificationsRole
+  if (shouldNotify && notificationRole) {
+    let role = await resolveDocument(notificationRole, "roles")
+    if (role.discordRoleId) {
+      notificationMessageContent = `<@&${role.discordRoleId}>`
+    }
   }
 
   if (notificationMessageContent?.length > 0 || embeds.length > 0 || files.length > 0) {

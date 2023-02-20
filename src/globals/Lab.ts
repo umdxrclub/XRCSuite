@@ -110,9 +110,19 @@ const Lab: GlobalConfig = {
                     relationTo: CollectionSlugs.Messages
                 },
                 {
+                    name: 'labControlMessage',
+                    type: 'relationship',
+                    relationTo: CollectionSlugs.Messages
+                },
+                {
                     name: 'inventoryMessage',
                     type: 'relationship',
                     relationTo: CollectionSlugs.Messages
+                },
+                {
+                    name: 'labNotificationsRole',
+                    type: 'relationship',
+                    relationTo: CollectionSlugs.Roles
                 }
             ]
         },

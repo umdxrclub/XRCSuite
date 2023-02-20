@@ -35,6 +35,9 @@ export interface Config {
 export interface Admin {
   id: string;
   casManager?: boolean;
+  enableAPIKey?: boolean;
+  apiKey?: string;
+  apiKeyIndex?: string;
   email?: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
@@ -111,9 +114,28 @@ export interface Device {
   description: string | Description;
   status: 'inLab' | 'checkedOut';
   public: boolean;
+  model?: string;
+  originalValue?: number;
   serial?: string;
-  umdSerial?: string;
   mac?: string;
+  sponsor?: string;
+  purchaser?: string;
+  owner?: string;
+  umdSerial?: string;
+  xrTag?: string;
+  location?: string;
+  dateReceived?: string;
+  dateReturned?: string;
+  lastAudited?: string;
+  items: {
+    name: string;
+    quantity: number;
+    modelNumber?: string;
+    serialNumber?: string;
+    xrTag?: string;
+    notes?: string;
+    id?: string;
+  }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -361,6 +383,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -371,6 +394,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -384,6 +408,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -394,6 +419,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -407,6 +433,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -417,6 +444,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -430,6 +458,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -440,6 +469,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -453,6 +483,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -463,6 +494,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -476,6 +508,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -486,6 +519,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -499,6 +533,7 @@ export interface Schedule {
             to?: string;
           };
           staff?: string[] | Member[];
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'opening';
@@ -509,6 +544,7 @@ export interface Schedule {
             from?: string;
             to?: string;
           };
+          note?: string;
           id?: string;
           blockName?: string;
           blockType: 'closing';
@@ -551,7 +587,9 @@ export interface Lab {
   };
   discord: {
     labMessage?: string | Message;
+    labControlMessage?: string | Message;
     inventoryMessage?: string | Message;
+    labNotificationsRole?: string | Role;
   };
   settings: {
     startupLabWhenFirstCheckIn?: boolean;

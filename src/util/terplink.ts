@@ -219,7 +219,7 @@ export class TerpLink {
                     last = parseInt(navLinks[navLinks.length - 1].attributes["href"].split("Page=")[1])
                 }
             }
-            
+
             return {
                 members: matches.map(e => {
                     const membercard = e.attributes["value"]

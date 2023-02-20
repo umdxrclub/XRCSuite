@@ -141,7 +141,7 @@ export async function sendDiscordMessages(message: string | Message, messages: D
                 }
 
                 sentMessagesIds.push(updatedMessageId);
-                await Throttle.wait(1000);
+                await Throttle.wait(100);
             }
             newMessageChannels.push({
                 ...channel,

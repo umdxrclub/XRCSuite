@@ -6,10 +6,13 @@ import querystring from "querystring";
 import XRC from "./XRC";
 import { GlobalSlugs } from "../slugs";
 import {
-  parseForm, queryStringFromForm,
-  retryRequest, X_WWW_FORM_HEADERS_CONFIG
+  parseForm,
+  queryStringFromForm,
+  retryRequest,
+  X_WWW_FORM_HEADERS_CONFIG,
 } from "./scrape-util";
 import { CAS } from "../types/PayloadSchema";
+import { Semaphore } from "./semaphore";
 
 function log(msg: string) {
   console.log(`[CASAuthService] ${msg}`);
@@ -51,8 +54,8 @@ interface DuoAuthResult {
 const HOTP_COUNTER_FILE = ".hotp_counter";
 export async function generateAuthCode(hotpSecret: string): Promise<string> {
   let cas = await payload.findGlobal({
-    slug: "cas"
-  })
+    slug: "cas",
+  });
 
   let counter = cas.hotpCounter as number;
   const code = hotp.generate(hotpSecret, counter);
@@ -66,157 +69,185 @@ export async function generateAuthCode(hotpSecret: string): Promise<string> {
 export async function incrementHOTPCounter() {
   // Get existing CAS global
   let cas = await payload.findGlobal({
-    slug: "cas"
-  })
+    slug: "cas",
+  });
 
   // Update CAS Global with incremented counter
   await payload.updateGlobal({
     slug: "cas",
     data: {
       ...cas,
-      hotpCounter: cas.hotpCounter + 1
-    }
-  })
+      hotpCounter: cas.hotpCounter + 1,
+    },
+  });
 }
 
+let casSemaphore: Semaphore = new Semaphore(1);
+
+// TODO: Ensure that only one login occurs at at time.
 export async function loginWithCAS() {
-  // POST: login (shib.idm.umd.edu) -> GET /frame/frameless/v4/auth
-  // POST: /frame/frameless/v4/auth
+  if (casSemaphore.numLocks() == 0) {
+    console.log("Lock semaphore")
+    await casSemaphore.lock();
 
-  const axios = XRC.axios;
-  const CAS = await payload.findGlobal({
-    slug: "cas"
-  })
+    // POST: login (shib.idm.umd.edu) -> GET /frame/frameless/v4/auth
+    // POST: /frame/frameless/v4/auth
 
-  if (!CAS.duoDeviceName || !CAS.username || !CAS.password || !CAS.hotpSecret)
-    throw new Error("Missing CAS credentials, cannot proceed!")
+    const axios = XRC.axios;
+    const CAS = await payload.findGlobal({
+      slug: "cas",
+    });
 
-  // First get the initial CAS page. If we're authenticated, this will
-  // bring us to the Demo page. Otherwise, this will have the login screen
-  // that we can begin auth with.
-  const authRes = await axios.get(AUTH_URL);
+    if (!CAS.duoDeviceName || !CAS.username || !CAS.password || !CAS.hotpSecret)
+      throw new Error("Missing CAS credentials, cannot proceed!");
 
-  // Check if we're already authenticated. If so, return now, no need to
-  // go through rest of CAS process.
-  if (authRes.request.res.responseUrl == DEMO_URL) {
-    log("Already logged in to CAS!");
-    return;
-  }
+    // First get the initial CAS page. If we're authenticated, this will
+    // bring us to the Demo page. Otherwise, this will have the login screen
+    // that we can begin auth with.
+    const authRes = await axios.get(AUTH_URL);
 
-  // --- UMD Login Page  ---
-  // Not logged into CAS, so we have to authenticate using Duo.
-  const authRoot = parse(authRes.data);
-  const csrf = authRoot.querySelector("input[name=csrf_token]")?.attributes
-    .value;
+    // Check if we're already authenticated. If so, return now, no need to
+    // go through rest of CAS process.
+    if (authRes.request.res.responseUrl == DEMO_URL) {
+      log("Already logged in to CAS!");
+      return;
+    }
 
-  if (!csrf) throw new Error("Could not find CSRF!");
+    // --- UMD Login Page  ---
+    // Not logged into CAS, so we have to authenticate using Duo.
+    const authRoot = parse(authRes.data);
+    const csrf = authRoot.querySelector("input[name=csrf_token]")?.attributes
+      .value;
 
-  // --- Initial Duo Form Request ---
-  // Determine where to POST username/password data
-  const formPostUrl =
-    BASE_AUTH_URL + authRoot.querySelector("form")!.attributes.action;
+    if (!csrf) throw new Error("Could not find CSRF!");
 
-  // Construct form data.
-  const form = querystring.stringify({
-    csrf_token: csrf,
-    j_username: CAS.username,
-    j_password: CAS.password,
-    _eventId_proceed: "",
-  });
+    // --- Initial Duo Form Request ---
+    // Determine where to POST username/password data
+    const formPostUrl =
+      BASE_AUTH_URL + authRoot.querySelector("form")!.attributes.action;
 
-  // Post username/password form and await Duo data.
-  const credentialsRes = await axios.post(
-    formPostUrl,
-    form,
-    X_WWW_FORM_HEADERS_CONFIG
-  );
-  
-  const credentialsRoot = parse(credentialsRes.data);
+    // Construct form data.
+    const form = querystring.stringify({
+      csrf_token: csrf,
+      j_username: CAS.username,
+      j_password: CAS.password,
+      _eventId_proceed: "",
+    });
 
+    // Post username/password form and await Duo data.
+    const credentialsRes = await axios.post(
+      formPostUrl,
+      form,
+      X_WWW_FORM_HEADERS_CONFIG
+    );
 
-  // --- Frameless Auth ---
-  const pluginForm = parseForm(credentialsRoot.getElementById("plugin_form"));
-  pluginForm.inputs["screen_resolution_width"] = 1920;
-  pluginForm.inputs["screen_resolution_height"] = 1080;
-  pluginForm.inputs["parent"] = "None";
-  pluginForm.inputs["color_depth"] = 24;
-  pluginForm.inputs["is_ipad_os"] = false;
-  pluginForm.inputs["is_user_verifying_platform_authenticator_available"] =
-    true;
-  pluginForm.inputs["react_support"] = true;
-  const pluginFormQueryString = querystring.stringify(pluginForm.inputs);
+    const credentialsRoot = parse(credentialsRes.data);
 
-  const duoAuthUrl = credentialsRes.request.res.responseUrl as string;
-  const framelessRes = await axios.post(
-    duoAuthUrl,
-    pluginFormQueryString,
-    X_WWW_FORM_HEADERS_CONFIG
-  );
-  const rawHealthcheckUrl = framelessRes.request.res.responseUrl as string;
-  const sid = rawHealthcheckUrl.split("sid=")[1].split("&")[0];
-  const baseFramelessUrl = rawHealthcheckUrl.split("/v4")[0] + "/v4";
-  const baseFrameUrl = baseFramelessUrl.replace("frameless/", "");
-  const dataUrl = baseFrameUrl + "/preauth/healthcheck/data?sid=" + sid;
-  const xsrf = framelessRes.data.split('xsrf_token": "')[1].split('",')[0];
-  const XSRF_HEADERS = {
-    headers: {
-      ...X_WWW_FORM_HEADERS_CONFIG.headers,
-      "X-Xsrftoken": xsrf,
-    },
-  };
+    // --- Frameless Auth ---
+    const pluginForm = parseForm(credentialsRoot.getElementById("plugin_form"));
+    pluginForm.inputs["screen_resolution_width"] = 1920;
+    pluginForm.inputs["screen_resolution_height"] = 1080;
+    pluginForm.inputs["parent"] = "None";
+    pluginForm.inputs["color_depth"] = 24;
+    pluginForm.inputs["is_ipad_os"] = false;
+    pluginForm.inputs["is_user_verifying_platform_authenticator_available"] =
+      true;
+    pluginForm.inputs["react_support"] = true;
+    const pluginFormQueryString = querystring.stringify(pluginForm.inputs);
 
-  // --- Health Check ---
-  await axios.get(dataUrl, XSRF_HEADERS);
+    const duoAuthUrl = credentialsRes.request.res.responseUrl as string;
+    const framelessRes = await axios.post(
+      duoAuthUrl,
+      pluginFormQueryString,
+      X_WWW_FORM_HEADERS_CONFIG
+    );
+    const rawHealthcheckUrl = framelessRes.request.res.responseUrl as string;
+    const sid = rawHealthcheckUrl.split("sid=")[1].split("&")[0];
+    const baseFramelessUrl = rawHealthcheckUrl.split("/v4")[0] + "/v4";
+    const baseFrameUrl = baseFramelessUrl.replace("frameless/", "");
+    const dataUrl = baseFrameUrl + "/preauth/healthcheck/data?sid=" + sid;
+    const xsrf = framelessRes.data.split('xsrf_token": "')[1].split('",')[0];
+    const XSRF_HEADERS = {
+      headers: {
+        ...X_WWW_FORM_HEADERS_CONFIG.headers,
+        "X-Xsrftoken": xsrf,
+      },
+    };
 
-  // --- Return ---
-  const returnUrl = baseFrameUrl + `/return?sid=${sid}`;
-  const returnRes = await axios.get(returnUrl)
+    // --- Health Check ---
+    await axios.get(dataUrl, XSRF_HEADERS);
 
-  // --- Return Form ---
-  const returnRoot = parse(returnRes.data);
-  const returnForm = parseForm(returnRoot.getElementById("plugin_form"));
-  returnForm.inputs["screen_resolution_width"] = 1920;
-  returnForm.inputs["screen_resolution_height"] = 1080;
-  returnForm.inputs["parent"] = "None";
-  returnForm.inputs["color_depth"] = 24;
-  returnForm.inputs["is_ipad_os"] = false;
-  returnForm.inputs["is_user_verifying_platform_authenticator_available"] =
-    true;
-  returnForm.inputs["react_support"] = true;
-  const returnFormQueryString = querystring.stringify(pluginForm.inputs);
-  await axios.post(returnRes.request.res.responseUrl, returnFormQueryString, X_WWW_FORM_HEADERS_CONFIG)
+    // --- Return ---
+    const returnUrl = baseFrameUrl + `/return?sid=${sid}`;
+    const returnRes = await axios.get(returnUrl);
 
-  // --- Data (see available devices) ---
-  const dataPostUrl = baseFrameUrl + "/auth/prompt/data?post_auth_action=OIDC_EXIT&sid=" + sid;
-  const dataRes = await axios.get(dataPostUrl, XSRF_HEADERS);
+    // --- Return Form ---
+    const returnRoot = parse(returnRes.data);
+    const returnForm = parseForm(returnRoot.getElementById("plugin_form"));
+    returnForm.inputs["screen_resolution_width"] = 1920;
+    returnForm.inputs["screen_resolution_height"] = 1080;
+    returnForm.inputs["parent"] = "None";
+    returnForm.inputs["color_depth"] = 24;
+    returnForm.inputs["is_ipad_os"] = false;
+    returnForm.inputs["is_user_verifying_platform_authenticator_available"] =
+      true;
+    returnForm.inputs["react_support"] = true;
+    const returnFormQueryString = querystring.stringify(pluginForm.inputs);
+    await axios.post(
+      returnRes.request.res.responseUrl,
+      returnFormQueryString,
+      X_WWW_FORM_HEADERS_CONFIG
+    );
 
+    // --- Data (see available devices) ---
+    const dataPostUrl =
+      baseFrameUrl + "/auth/prompt/data?post_auth_action=OIDC_EXIT&sid=" + sid;
+    const dataRes = await axios.get(dataPostUrl, XSRF_HEADERS);
 
-  // --- Use Auth Code ---
-  const passcode = await generateAuthCode(CAS.hotpSecret);
-  const promptRes = await axios.post(baseFrameUrl + "/prompt", querystring.stringify({
-    device: "null",
-    factor: "Passcode",
-    passcode: passcode,
-    sid: sid
-  }).replace("%2B", "+"), XSRF_HEADERS)
-  if (promptRes.data.stat == "OK")
-  {
-    await incrementHOTPCounter();
-    const txid = promptRes.data.response.txid;
-    const statusRes = await axios.post(baseFrameUrl + "/status", querystring.stringify({
-      txid: txid,
-      sid: sid
-    }), XSRF_HEADERS)
-    console.log(statusRes.data)
+    // --- Use Auth Code ---
+    const passcode = await generateAuthCode(CAS.hotpSecret);
+    const promptRes = await axios.post(
+      baseFrameUrl + "/prompt",
+      querystring
+        .stringify({
+          device: "null",
+          factor: "Passcode",
+          passcode: passcode,
+          sid: sid,
+        })
+        .replace("%2B", "+"),
+      XSRF_HEADERS
+    );
+    if (promptRes.data.stat == "OK") {
+      await incrementHOTPCounter();
+      const txid = promptRes.data.response.txid;
+      const statusRes = await axios.post(
+        baseFrameUrl + "/status",
+        querystring.stringify({
+          txid: txid,
+          sid: sid,
+        }),
+        XSRF_HEADERS
+      );
+      console.log(statusRes.data);
 
-    const postRes = await axios.post(baseFrameUrl + "/oidc/exit", querystring.stringify({
-      sid: sid,
-      txid: txid,
-      factor: "Duo+Mobile+Passcode",
-      device_key: "",
-      "_xsrf": xsrf,
-      dampen_choice: false
-    }))
+      const postRes = await axios.post(
+        baseFrameUrl + "/oidc/exit",
+        querystring.stringify({
+          sid: sid,
+          txid: txid,
+          factor: "Duo+Mobile+Passcode",
+          device_key: "",
+          _xsrf: xsrf,
+          dampen_choice: false,
+        })
+      );
+    }
+    console.log("Release semaphore")
+  } else {
+    console.log("Waiting for CAS semaphore...")
+    await casSemaphore.wait()
+    console.log("Done CAS wait!")
   }
 }
 

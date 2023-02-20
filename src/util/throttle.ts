@@ -4,7 +4,7 @@
 export class Throttle {
 
     private _intervalMs: number
-    private _executeTimeout: NodeJS.Timeout | null = null
+    private _pendingExec: boolean
     private _pendingExecFunction: () => void | null = null;
 
     constructor(intervalMs: number) {
@@ -20,22 +20,25 @@ export class Throttle {
      *
      * @param fn The function to execute.
      */
-    public exec(fn: () => void) {
-        if (this._executeTimeout) {
+    public async exec(fn: () => void | Promise<void>) {
+        if (this._pendingExec) {
             this._pendingExecFunction = fn;
         } else {
-            fn();
-            this._executeTimeout = setTimeout(this._execAndClearTimeout.bind(this), this._intervalMs)
-        }
-    }
+            this._pendingExec = true;
 
-    private _execAndClearTimeout() {
-        if (this._pendingExecFunction) {
-            this._pendingExecFunction()
-            this._pendingExecFunction = null;
-        }
+            // Execute function
+            await fn();
 
-        this._executeTimeout = null;
+            // Wait interval
+            await Throttle.wait(this._intervalMs);
+
+            if (this._pendingExecFunction) {
+                this._pendingExecFunction()
+                this._pendingExecFunction = null;
+            }
+
+            this._pendingExec = false;
+        }
     }
 
     public static wait(ms: number): Promise<void> {

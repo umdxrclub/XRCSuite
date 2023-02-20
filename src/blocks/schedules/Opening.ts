@@ -13,6 +13,10 @@ const Opening: Block = {
             type: "relationship",
             hasMany: true,
             relationTo: CollectionSlugs.Members
+        },
+        {
+            name: "note",
+            type: "textarea"
         }
     ]
 }

@@ -242,20 +242,24 @@ export function createButtonRowComponents(buttons: DiscordButton[]): ActionRowBu
         let row = new ActionRowBuilder<ButtonBuilder>();
 
         for (var i = rowStart; i < rowEnd; i++) {
-            let builder = new ButtonBuilder()
             let button = buttons[i]
-
-            builder = builder.setStyle(button.style);
-            builder = builder.setLabel(button.label);
-            if (button.customId) builder = builder.setCustomId(button.customId)
-            if (button.url) builder = builder.setURL(button.url)
-            if (button.emoji) builder = builder.setEmoji(button.emoji)
-
-            row.addComponents(builder)
+            row.addComponents(createButton(button))
         }
 
         rows.push(row)
     }
-    
+
     return rows;
+}
+
+export function createButton(button: DiscordButton) {
+    let builder = new ButtonBuilder()
+
+    builder = builder.setStyle(button.style);
+    builder = builder.setLabel(button.label);
+    if (button.customId) builder = builder.setCustomId(button.customId)
+    if (button.url) builder = builder.setURL(button.url)
+    if (button.emoji) builder = builder.setEmoji(button.emoji)
+
+    return builder;
 }
