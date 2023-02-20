@@ -1,6 +1,7 @@
 import { Endpoint } from "payload/dist/config/types";
 import { resolveMember } from "../../collections/util/MembersUtil";
 import { GlobalSlugs } from "../../slugs";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 /**
  * The required parameters for the lab check in.
@@ -13,7 +14,7 @@ const requiredParameters = [ 'v', 'm' ]
 const LabCheckIn: Endpoint = {
     path: '/checkin',
     method: 'post',
-    handler: async (req, res) => {
+    handler: makeAdminHandler(async (req, res) => {
         // Ensure all the required parameters are provided.
         for (var p of requiredParameters) {
             if (!req.query[p]) {
@@ -57,7 +58,7 @@ const LabCheckIn: Endpoint = {
         } else {
             res.status(200).json({ error: "No member found! "})
         }
-    }
+    })
 }
 
 export default LabCheckIn;

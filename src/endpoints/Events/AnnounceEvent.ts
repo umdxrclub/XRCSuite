@@ -1,10 +1,11 @@
 import { Endpoint } from "payload/dist/config/types";
 import { announceEvent } from "../../collections/util/EventsUtil";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 const AnnounceEventEndpoint: Endpoint = {
     path: "/:id/announce",
     method: "post",
-    handler: async (req, res, next) => {
+    handler: makeAdminHandler(async (req, res) => {
         const eventId = req.params.id;
 
         var event;
@@ -20,7 +21,7 @@ const AnnounceEventEndpoint: Endpoint = {
 
         await announceEvent(event)
         res.status(200).send()
-    }
+    })
 }
 
 export default AnnounceEventEndpoint;

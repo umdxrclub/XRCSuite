@@ -4,10 +4,10 @@ import React, { useEffect, useState } from "react";
 import { GradientCard } from "../../util/GradientCard";
 import { RobotoLink } from "../../util/RobotoLink";
 import { GatekeeperResolver, GatekeeperScanner } from "../scanner/GatekeeperScanner";
-import ContractSVG from "./contract-svgrepo-com.svg";
 import "./lab-gatekeeper.css";
 import NoFoodImage from "./no-food.png";
-import SecurityCameraSVG from "./security-camera-svgrepo-com.svg";
+import ContractSVG from "./contract.svg";
+import SecurityCameraSVG from "./security.svg";
 
 function getCurrentTimeString(): string {
   return moment().format("h:mm A");
@@ -77,22 +77,22 @@ export const LabGatekeeper: React.FC = ({ }) => {
           <Typography fontWeight={"bold"} variant="h2">Welcome to the</Typography>
           <Typography variant="h1">XR LAB</Typography>
         </div>
-        <Typography variant="h1">{time}</Typography>
+        <Typography variant="h1" fontWeight={"bold"}>{time}</Typography>
       </div>
       <div className="lab-rules">
         <Typography variant="h3">Remember that:</Typography>
         <div className="lab-rules-group">
           <GradientCard>
             <img src={ContractSVG} />
-            <Typography>You <u>must</u> be a club member AND sign our agreement.</Typography>
+            <Typography fontSize={36}>You <u>must</u> be a club member AND sign our agreement.</Typography>
           </GradientCard>
           <GradientCard>
             <img src={NoFoodImage} />
-            <Typography>No food or drink is allowed in the lab.</Typography>
+            <Typography fontSize={36}>No food or drink is allowed in the lab.</Typography>
           </GradientCard>
           <GradientCard>
             <img src={SecurityCameraSVG} />
-            <Typography>This lab is under 24/7 video surveillance.</Typography>
+            <Typography fontSize={36}>This lab is under 24/7 video surveillance.</Typography>
           </GradientCard>
         </div>
       </div>

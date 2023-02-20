@@ -269,7 +269,9 @@ export interface Message {
       }
     | {
         title?: string;
-        description?: string;
+        description?: {
+          [k: string]: unknown;
+        }[];
         color?: string;
         timestamp?: string;
         url?: string;
@@ -349,29 +351,170 @@ export interface Project {
 }
 export interface Schedule {
   id: string;
-  name?: string;
-  time: (
-    | {
-        day?: 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
-        allday?: boolean;
-        from?: string;
-        to?: string;
-        reason?: string;
-        id?: string;
-        blockName?: string;
-        blockType: 'Closing';
-      }
-    | {
-        day?: 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
-        allday?: boolean;
-        from?: string;
-        to?: string;
-        staff?: string[] | Member[];
-        id?: string;
-        blockName?: string;
-        blockType: 'Opening';
-      }
-  )[];
+  name: string;
+  schedule: {
+    sunday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+    monday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+    tuesday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+    wednesday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+    thursday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+    friday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+    saturday: (
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          staff?: string[] | Member[];
+          id?: string;
+          blockName?: string;
+          blockType: 'opening';
+        }
+      | {
+          time: {
+            allDay: boolean;
+            from?: string;
+            to?: string;
+          };
+          id?: string;
+          blockName?: string;
+          blockType: 'closing';
+        }
+    )[];
+  };
   createdAt: string;
   updatedAt: string;
 }

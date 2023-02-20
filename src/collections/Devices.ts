@@ -1,7 +1,7 @@
 import { CollectionConfig } from "payload/types";
 import { createActionButton } from "../components/ActionButton";
 import DeviceInventoryEndpoint from "../endpoints/Devices/DeviceInventory";
-import WakeOnLANEndpoint from "../endpoints/Devices/WakeOnLan";
+import WakeOnLANEndpoint from "../endpoints/Devices/WakeOnLAN";
 import { CollectionSlugs } from "../slugs";
 import { DeviceStatus, HardwareDescriptionPrefix } from "../types/XRCTypes";
 import Descriptions from "./Descriptions";
@@ -41,11 +41,15 @@ const Devices: CollectionConfig = {
       required: true,
     },
     {
-      name: "serial",
-      type: "text",
+      name: "model",
+      type: "text"
     },
     {
-      name: "umdSerial",
+      name: "originalValue",
+      type: "number"
+    },
+    {
+      name: "serial",
       type: "text",
     },
     {
@@ -61,6 +65,75 @@ const Devices: CollectionConfig = {
           return "This is not a valid MAC address!";
         }
       },
+    },
+    {
+      name: "sponsor",
+      type: "text"
+    },
+    {
+      name: "purchaser",
+      type: "text"
+    },
+    {
+      name: "owner",
+      type: "text"
+    },
+    {
+      name: "umdSerial",
+      type: "text",
+    },
+    {
+      name: "xrTag",
+      type: "text"
+    },
+    {
+      name: "location",
+      type: "text"
+    },
+    {
+      name: "dateReceived",
+      type: "date"
+    },
+    {
+      name: "dateReturned",
+      type: "date"
+    },
+    {
+      name: "lastAudited",
+      type: "date"
+    },
+    {
+      name: "items",
+      type: "array",
+      fields: [
+        {
+          name: "name",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "quantity",
+          type: "number",
+          required: true,
+          defaultValue: 1
+        },
+        {
+          name: "modelNumber",
+          type: "text"
+        },
+        {
+          name: "serialNumber",
+          type: "text"
+        },
+        {
+          name: "xrTag",
+          type: "text"
+        },
+        {
+          name: "notes",
+          type: "textarea"
+        }
+      ]
     },
     {
       name: "wol",

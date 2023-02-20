@@ -1,6 +1,5 @@
 import { Endpoint } from "payload/dist/config/types";
-import { GlobalSlugs } from "../../slugs";
-import { Lab, Member } from "../../types/PayloadSchema";
+import { Member } from "../../types/PayloadSchema";
 
 /**
  * The schema of the public API for retrieving the status of the XR Lab.

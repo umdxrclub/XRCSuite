@@ -29,7 +29,7 @@ function onCreateClient(guildId: string) {
     // Add slash command handlers
     discordClient.on("interactionCreate", async (interaction) => {
       // Make sure that the interaction comes from the configured guild.
-      if (interaction.guildId != guildId) return;
+      if (interaction.guildId !== guildId) return;
 
       BotInteractions.forEach(i => i(interaction))
 

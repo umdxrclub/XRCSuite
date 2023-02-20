@@ -35,9 +35,12 @@
     height: 125px;
 }
 
-.scanner-status-icon svg {
+.scanner-status-icon img {
     height: 100%;
     width: auto;
+    fill: white;
+    color: white;
+    filter: invert(1);
 }
 
 .scanner-text {

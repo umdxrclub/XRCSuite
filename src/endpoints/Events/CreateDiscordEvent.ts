@@ -1,10 +1,11 @@
 import { Endpoint } from "payload/dist/config/types";
 import { createGuildEvent } from "../../collections/util/EventsUtil";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 const CreateDiscordEventEndpoint: Endpoint = {
     path: "/:id/discord-event",
     method: "post",
-    handler: async (req, res, next) => {
+    handler: makeAdminHandler(async (req, res) => {
         const eventId = req.params.id;
 
         var event;
@@ -20,7 +21,7 @@ const CreateDiscordEventEndpoint: Endpoint = {
 
         await createGuildEvent(event);
         await res.status(200).send();
-    }
+    })
 }
 
 export default CreateDiscordEventEndpoint;

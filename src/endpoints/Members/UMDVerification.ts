@@ -3,7 +3,6 @@ import { Endpoint } from "payload/dist/config/types";
 import { env } from "process";
 import { v4 as uuidv4 } from "uuid";
 import XRC from "../../util/XRC";
-import { CollectionSlugs } from "../../slugs";
 
 const CASLoginBaseUrl = "https://shib.idm.umd.edu/shibboleth-idp/profile/cas/login";
 const CASServiceValidateUrl = "https://shib.idm.umd.edu/shibboleth-idp/profile/cas/serviceValidate";

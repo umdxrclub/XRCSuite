@@ -70,7 +70,8 @@ type KeypressParser = {
     key: string,
     endKey?: string,
     onComplete: (value: string) => void,
-    timeout?: number
+    timeout?: number,
+    includeDelimiters?: boolean
 }
 
 const SWIPECARD_TRACK_LENGTH = 15
@@ -89,6 +90,13 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
             onComplete: onEventPassScan,
             timeout: 2000
         },
+        {
+            key: "A",
+            endKey: "B",
+            timeout: 2000,
+            onComplete: onSwipe,
+            includeDelimiters: false
+        }, 
         {
             key: "`",
             onComplete: () => setResolveDialogOpen(true)
@@ -145,7 +153,8 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
                     }, handler.timeout)
                 } else {
                     // If there's no end key, then just call on complete
-                    // immediately.
+                    // immediately. 
+
                     handler.onComplete(key)
                 }
             }
@@ -159,6 +168,12 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
                 console.log("Ending handler...")
                 let keystrokeString = keystrokes.current.join("");
                 console.log("Parsed keystroke string: " + keystrokeString)
+                if (!handler.includeDelimiters ?? true) {
+                    let startIndex = handler.key.length;
+                    let endIndex = keystrokeString.length - handler.endKey?.length ?? 0 - startIndex;
+                    keystrokeString = keystrokeString.slice(startIndex, endIndex)
+                }  
+
                 handler.onComplete(keystrokeString)
 
                 // Reset for next handler
@@ -180,7 +195,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         const eventPassObj = JSON.parse(text);
         const issuanceId = eventPassObj.issuanceId;
         if (issuanceId) {
-            
+            resolve("terplink", issuanceId)
         }
     }
 
@@ -196,7 +211,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     // }
 
     function onSwipe(cardId: string) {
-        // showResultStatus("found");
+        resolve("card", cardId)
     }
 
     function showResultStatus(status: ScannerStatus) {
@@ -227,17 +242,21 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         }
     }, [])
 
+    // A21430016007142B
+    // A21430015885332B
+
+
     return <div className="scanner-bar" style={{backgroundColor: STATUS_COLOR}}>
         <ResolveDialog open={resolveDialogOpen} onClose={() => setResolveDialogOpen(false)} submitResolve={resolve}/>
         <div className="scanner-content">
             <div className="scanner-status-bg" >
-                <Typography variant="h4">{STATUS_TITLE}</Typography>
+                <Typography variant="h4" fontWeight="bold">{STATUS_TITLE}</Typography>
                 <div className="scanner-status-icon">
                     <img src={STATUS_ICON} />
                 </div>
             </div>
             <div className="scanner-text">
-                <Typography variant="h5">{STATUS_DESCRIPTION}</Typography>
+                <Typography fontSize={36}>{STATUS_DESCRIPTION}</Typography>
             </div>
         </div>
     </div>

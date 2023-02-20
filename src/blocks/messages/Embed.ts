@@ -1,4 +1,5 @@
 import { Block } from "payload/types";
+import { createDiscordMessageField } from "../../fields/discord/DiscordMessageField";
 
 const Embed: Block = {
     slug: "embed",
@@ -7,10 +8,9 @@ const Embed: Block = {
             name: "title",
             type: "text"
         },
-        {
-            name: "description",
-            type: "text"
-        },
+        createDiscordMessageField({
+            name: "description"
+        }),
         {
             name: "color",
             type: "text"

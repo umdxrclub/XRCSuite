@@ -89,7 +89,7 @@ export async function createDiscordMessages(message: Message): Promise<DiscordMe
                 let embed = new EmbedBuilder();
                 embed.setTitle(block.title)
                 if (block.timestamp) embed.setTimestamp(new Date(block.timestamp))
-                if (block.description) embed.setDescription(block.description)
+                if (block.description) embed.setDescription(convertRichTextToDiscordString(block.description))
                 if (block.color) embed.setColor(rgbToNumber(block.color))
                 if (block.fields.length > 0) embed.setFields(block.fields.map(b => ({name: b.name, value: b.value, inline: b.inline })))
                 if (block.url) embed.setURL(block.url)

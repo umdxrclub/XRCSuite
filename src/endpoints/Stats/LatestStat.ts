@@ -1,11 +1,11 @@
 import { Endpoint } from "payload/config";
 import { createStatSnapshot } from "../../collections/util/StatsUtil";
-import { CollectionSlugs } from "../../slugs";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 const LatestStatEndpoint: Endpoint = {
     method: "get",
     path: "/current",
-    handler: async (req, res, next) => {
+    handler: makeAdminHandler(async (req, res, next) => {
         let allDocs = await req.payload.find({
             sort: "date",
             collection: "stats",
@@ -20,7 +20,7 @@ const LatestStatEndpoint: Endpoint = {
         }
 
         res.status(200).send(snapshot)
-    }
+    })
 }
 
 export default LatestStatEndpoint;

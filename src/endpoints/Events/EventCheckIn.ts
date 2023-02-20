@@ -1,6 +1,7 @@
 import { Endpoint } from "payload/dist/config/types";
 import { resolveMember } from "../../collections/util/MembersUtil";
 import XRC from "../../util/XRC";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 /**
  * The required parameters for event check in:
@@ -14,7 +15,7 @@ let requiredParameters = ['a', 'm', 'v'];
 const EventCheckIn: Endpoint = {
     path: '/checkin',
     method: 'post',
-    handler: async (req, res, next) =>  {
+    handler: makeAdminHandler(async (req, res) =>  {
         // Ensure all the required parameters are provided.
         for (var p of requiredParameters) {
             if (!req.query[p]) {
@@ -63,7 +64,7 @@ const EventCheckIn: Endpoint = {
                 })
             }
         }
-    }
+    })
 }
 
 export default EventCheckIn;

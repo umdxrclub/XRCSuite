@@ -2,6 +2,7 @@ import { Endpoint } from "payload/dist/config/types";
 import Members from "../../collections/Members";
 import { Member } from "../../types/PayloadSchema";
 import XRC from "../../util/XRC";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 /**
  * This endpoint fetches the current roster and adds any unknown email as a
@@ -10,7 +11,7 @@ import XRC from "../../util/XRC";
 const ImportRosterEndpoint: Endpoint = {
     path: "/roster",
     method: "post",
-    handler: async (req, res, next) => {
+    handler: makeAdminHandler(async (req, res) => {
         let roster = await XRC.terplink.getRosterMembers();
 
         let promises = roster.map(async rosterMember => {
@@ -53,7 +54,7 @@ const ImportRosterEndpoint: Endpoint = {
 
         // Send successful response.
         res.status(200).send()
-    }
+    })
 }
 
 export default ImportRosterEndpoint;

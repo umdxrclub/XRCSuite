@@ -10,12 +10,12 @@ import { resolveDocument } from "../../util/payload-backend";
 
 async function getLabNotificationDiscordRoleId(): Promise<string | null> {
   let discordDoc = await payload.findGlobal({ slug: "bot" })
-    if (discordDoc.guild.notificationRoles.lab) {
-      let labNotificationRole = await resolveDocument(discordDoc.guild.notificationRoles.lab, "roles");
-      return labNotificationRole.discordRoleId ?? null;
-    }
+  if (discordDoc.guild.notificationRoles.lab) {
+    let labNotificationRole = await resolveDocument(discordDoc.guild.notificationRoles.lab, "roles");
+    return labNotificationRole.discordRoleId ?? null;
+  }
 
-    return null;
+  return null;
 }
 function createLabNotificationEmbed(): EmbedBuilder {
   let embed = new EmbedBuilder();
@@ -53,7 +53,7 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   changedMemberIds = changedMemberIds.concat(removedMemberIds.map(id => ({ id, type: "out" })));
 
   // Create attendance events.
-  changedMemberIds.forEach(async ({id, type}) => {
+  changedMemberIds.forEach(async ({ id, type }) => {
     await payload.create({
       collection: "attendances",
       data: {
@@ -72,44 +72,46 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
 
     let statusChangeEmbed = createLabNotificationEmbed();
     statusChangeEmbed.setDescription(open ? "The XR Lab is now open!" : "The XR Lab is now closed.")
-    statusChangeEmbed.setColor(open ? [133, 212, 49] : [212,71,49])
+    statusChangeEmbed.setColor(open ? [133, 212, 49] : [212, 71, 49])
     embeds.push(statusChangeEmbed)
   }
 
-  // Process the newly checked-in members.
-  if (newMemberIds.length > 0) {
-    let newMembers = await Promise.all(
-      newMemberIds.map(
-        async (id) =>
-          await payload.findByID({
-            collection: "members",
-            id: id,
-          })
-      )
-    );
+  if (doc.open) {
+    // Process the newly checked-in members.
+    if (newMemberIds.length > 0) {
+      let newMembers = await Promise.all(
+        newMemberIds.map(
+          async (id) =>
+            await payload.findByID({
+              collection: "members",
+              id: id,
+            })
+        )
+      );
 
-    let membersToAnnounce = newMembers.filter((m) =>
-      (m.roles ?? []).some((r) => announceRoles.includes(getDocumentId(r)))
-    );
+      let membersToAnnounce = newMembers.filter((m) =>
+        (m.roles ?? []).some((r) => announceRoles.includes(getDocumentId(r)))
+      );
 
-    
-    membersToAnnounce.forEach(async (m) => {
-      // Send Discord notification.
-      let embed = createLabNotificationEmbed();
-      let name = m.nickname ?? m.name;
-      embed.setDescription(`${name} has checked into the XR Lab!`);
-      embed.setColor([133, 212, 49]);
 
-      var profileFile : AttachmentBuilder | undefined
-      if (m.profile.picture) {
-        let profileAttachment = await createAttachmentFromMedia(m.profile.picture);
-        profileFile = profileAttachment.attachment
-        embed.setThumbnail(profileAttachment.url)
-        files.push(profileFile)
-      }
+      membersToAnnounce.forEach(async (m) => {
+        // Send Discord notification.
+        let embed = createLabNotificationEmbed();
+        let name = m.nickname ?? m.name;
+        embed.setDescription(`${name} has checked into the XR Lab!`);
+        embed.setColor([133, 212, 49]);
 
-      embeds.push(embed)
-    });
+        var profileFile: AttachmentBuilder | undefined
+        if (m.profile.picture) {
+          let profileAttachment = await createAttachmentFromMedia(m.profile.picture);
+          profileFile = profileAttachment.attachment
+          embed.setThumbnail(profileAttachment.url)
+          files.push(profileFile)
+        }
+
+        embeds.push(embed)
+      });
+    }
   }
 
   // If there is a role to ping, add it.
@@ -118,7 +120,9 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     notificationMessageContent = `<@&${notificationRoleId}>`
   }
 
-  await sendGuildMessage("notifications", { content: notificationMessageContent, embeds: embeds, files: files });
+  if (notificationMessageContent?.length > 0 || embeds.length > 0 || files.length > 0) {
+    await sendGuildMessage("notifications", { content: notificationMessageContent, embeds: embeds, files: files });
+  }
 };
 
 export default LabStatusHook;

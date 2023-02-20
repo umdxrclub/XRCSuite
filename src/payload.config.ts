@@ -44,8 +44,8 @@ export default buildConfig({
     admin: {
         user: Admins.slug,
         components: {
-            beforeDashboard: [ XRCBeforeDashboard ],
-            providers: [ DiscordGuildProvider ],
+            beforeDashboard: [XRCBeforeDashboard],
+            providers: [DiscordGuildProvider],
             graphics: {
                 Icon: XRCLogo
             },
@@ -59,7 +59,7 @@ export default buildConfig({
             let aliasFiles = aliasDirectories.reduce((arr, dir) => {
                 let dirPath = path.resolve(__dirname, dir)
                 let files = walkDirectory(dirPath, ".ts")
-                return [...arr, ...files];
+                return arr.concat(files)
             }, [] as string[]);
 
             let newConfig = {
@@ -80,8 +80,11 @@ export default buildConfig({
                     rules: [
                         ...config.module?.rules,
                         {
-                            test: /\.svg$/,
-                            use: ['@svgr/webpack']
+                            test: /\.svg%/i,
+                            type: 'asset/resource',
+                            generator: {
+                                filename: 'admin[hash][ext][query]'
+                            }
                         }
                     ]
                 }
@@ -90,7 +93,6 @@ export default buildConfig({
             return newConfig;
         },
     },
-    cors: '*',
     collections: [
         Admins,
         Members,

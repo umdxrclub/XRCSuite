@@ -2,6 +2,7 @@ import parse from "node-html-parser";
 import { Endpoint } from "payload/dist/config/types";
 import { XR_CLUB_ID } from "../../util/terplink";
 import XRC from "../../util/XRC";
+import { makeAdminHandler } from "../RejectIfNoUser";
 
 /**
  * Imports all TerpLink events into the database.
@@ -9,7 +10,7 @@ import XRC from "../../util/XRC";
 const ImportEventsEndpoint: Endpoint = {
     path: "/terplink",
     method: "post",
-    handler: async (req, res, next) => {
+    handler: makeAdminHandler(async (req, res) => {
         let clubEvents = await XRC.terplink.getEvents(XR_CLUB_ID);
         let promises = clubEvents.map(async event => {
             console.log("Got event: " + event.name)
@@ -69,7 +70,7 @@ const ImportEventsEndpoint: Endpoint = {
         await Promise.all(promises);
 
         res.status(200).send();
-    }
+    })
 }
 
 export default ImportEventsEndpoint;

@@ -3,7 +3,9 @@ import { CollectionSlugs } from '../slugs';
 
 const Admins: CollectionConfig = {
   slug: CollectionSlugs.Admins,
-  auth: true,
+  auth: {
+    useAPIKey: true
+  },
   admin: {
     useAsTitle: 'email',
     group: 'Users',

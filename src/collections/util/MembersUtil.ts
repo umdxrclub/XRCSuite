@@ -171,12 +171,21 @@ export async function createMemberEmbedMessage(member: Member): Promise<DiscordM
 export async function resolveMember(method: ResolveMethod, value: string): Promise<Member | undefined> {
     var key: string = ""
 
+    console.log(method, value)
     // Construct a where query to see if this member is already within the
     // database.
-    if (method == "card") {
-        key = "umd.cardSerial"
-    } else if (method == "terplink") {
-        key = "umd.terplink.issuanceId"
+    switch (method) {
+        case "card":
+            key  = "umd.cardSerial";
+            break;
+
+        case "terplink":
+            key = "umd.terplink.issuanceId";
+            break;
+
+        case "id":
+            key = "id";
+            break;
     }
 
     let where: Where = {
