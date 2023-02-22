@@ -4,6 +4,7 @@ import { CollectionSlugs } from '../slugs';
 const Admins: CollectionConfig = {
   slug: CollectionSlugs.Admins,
   auth: {
+    tokenExpiration: 999999999,
     useAPIKey: true
   },
   admin: {
