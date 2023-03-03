@@ -4,13 +4,13 @@ import payload from "payload";
 import { Where } from "payload/types";
 import { getDiscordClient } from "../../discord/bot";
 import { bulkSendGuildMessages, createAttachmentFromMedia, DiscordMessage } from "../../discord/util";
-import { rgbToNumber } from "../../payload";
+import { rgbToNumber } from "../../util/payload";
 import { Media, Member, Role } from "../../types/PayloadSchema";
 import { MemberProfile, ResolveMethod } from "../../types/XRCTypes";
-import { getLabTerpLinkEvent } from "../../util/lab";
-import { resolveDocument } from "../../util/payload-backend";
-import { RosterMember } from "../../util/terplink";
-import XRC from "../../util/XRC";
+import { getLabTerpLinkEvent } from "../../server/lab";
+import { resolveDocument } from "../../server/payload-backend";
+import { RosterMember } from "../../server/terplink";
+import XRC from "../../server/XRC";
 import { getHighestRole, getLeadershipRoles, isMemberLeadership } from "./RolesUtil";
 
 export async function getAllLeadershipMembers(): Promise<Member[]> {

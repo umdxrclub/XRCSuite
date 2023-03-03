@@ -13,10 +13,8 @@ async function createBanner(bgPath: string, text: string, font: string): Promise
     let canvas = createCanvas(bg.width, bg.height)
     let ctx = canvas.getContext('2d')
 
-
     // Draw banner
     ctx.drawImage(bg, 0, 0)
-
 
     ctx.fillStyle = "white"
     let fontSize = Math.round(0.6 * bg.height)

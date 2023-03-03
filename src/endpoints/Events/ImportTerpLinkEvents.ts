@@ -1,7 +1,7 @@
 import parse from "node-html-parser";
 import { Endpoint } from "payload/dist/config/types";
-import { XR_CLUB_ID } from "../../util/terplink";
-import XRC from "../../util/XRC";
+import { XR_CLUB_ID } from "../../server/terplink";
+import XRC from "../../server/XRC";
 import { makeAdminHandler } from "../RejectIfNoUser";
 
 /**

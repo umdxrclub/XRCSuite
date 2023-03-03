@@ -1,6 +1,6 @@
 import { Block } from "payload/types";
 import { createDiscordEmojiField } from "../../fields/discord/EmojiField";
-import { useAsRowTitle } from "../../payload";
+import { useAsRowTitle } from "../../util/payload";
 
 const LinkButtons: Block = {
     slug: "linkButtons",

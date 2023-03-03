@@ -14,7 +14,6 @@ function getCurrentTimeString(): string {
 }
 
 const XRLabResolver: GatekeeperResolver = async (method, value) => {
-  console.log(method, value)
   var checkInURL = new URL('/api/globals/lab/checkin', window.location.origin)
   checkInURL.searchParams.set('m', method)
   checkInURL.searchParams.set('v', value)
@@ -29,7 +28,6 @@ const XRLabResolver: GatekeeperResolver = async (method, value) => {
   }
 
   let j = await res.json()
-  console.log(j)
   if (j.error) {
     return {
       error: j.error

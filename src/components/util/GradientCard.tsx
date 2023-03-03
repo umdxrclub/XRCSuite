@@ -7,7 +7,7 @@ type GradientCardProps = {
 }
 
 export const GradientCard: React.FC<GradientCardProps> = ({ children, style }) => {
-    return <div className="gradient-card" style={{padding: 16}}>
+    return <div className="gradient-card" style={{...style, padding: 16}}>
         {children}
     </div>
 }

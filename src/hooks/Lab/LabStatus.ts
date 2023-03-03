@@ -4,9 +4,9 @@ import payload from "payload";
 import { GlobalAfterChangeHook } from "payload/types";
 import { createAttachmentFromMedia, sendGuildMessage } from "../../discord/util";
 import { updateLabControlMessage, updateLabStatusMessage } from "../../globals/util/LabUtil";
-import { getDocumentId } from "../../payload";
+import { getDocumentId } from "../../util/payload";
 import { Lab } from "../../types/PayloadSchema";
-import { resolveDocument } from "../../util/payload-backend";
+import { resolveDocument } from "../../server/payload-backend";
 import { Throttle } from "../../util/throttle";
 
 function createLabNotificationEmbed(): EmbedBuilder {

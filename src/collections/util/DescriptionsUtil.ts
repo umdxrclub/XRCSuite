@@ -1,11 +1,11 @@
 import { AttachmentBuilder, EmbedBuilder } from "discord.js";
 import payload from "payload";
 import { bulkSendGuildMessages, createAttachmentFromImageData, createAttachmentFromMedia, DiscordMessage, sendGuildMessage } from "../../discord/util";
-import { getDocumentId, getOptionLabel } from "../../payload";
+import { getDocumentId, getOptionLabel } from "../../util/payload";
 import { CollectionSlugs } from "../../slugs";
 import { Description } from "../../types/PayloadSchema";
 import { DescriptionType } from "../../types/XRCTypes";
-import { createImageBanner } from "../../util/image";
+import { createImageBanner } from "../../server/image";
 import { getPublicDevices } from "./DevicesUtil";
 
 export async function createDeviceDescriptionMessage(description: Description): Promise<DiscordMessage> {

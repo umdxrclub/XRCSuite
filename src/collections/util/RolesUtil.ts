@@ -3,7 +3,7 @@ import payload from "payload";
 import { createButtonRowComponents, DiscordMessage } from "../../discord/util";
 import { CollectionSlugs } from "../../slugs";
 import { Member, Role } from "../../types/PayloadSchema";
-import { resolveDocument } from "../../util/payload-backend";
+import { resolveDocument } from "../../server/payload-backend";
 
 export async function getLeadershipRoles(): Promise<Role[]> {
     let roleDocs = await payload.find({

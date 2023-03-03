@@ -1,5 +1,5 @@
 import { Endpoint } from "payload/config";
-import XRC from "../../util/XRC";
+import XRC from "../../server/XRC";
 import { makeAdminHandler } from "../RejectIfNoUser";
 
 const DirectorySearchEndpoint: Endpoint = {

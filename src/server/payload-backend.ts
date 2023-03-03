@@ -2,7 +2,7 @@ import { Response } from "express";
 import payload from "payload";
 import { Config } from "payload/generated-types";
 import { PayloadRequest } from "payload/types";
-import { getDocumentId } from "../payload";
+import { getDocumentId } from "../util/payload";
 
 type Collections = keyof Config["collections"]
 type CollectionData<T extends Collections> = Config["collections"][T]

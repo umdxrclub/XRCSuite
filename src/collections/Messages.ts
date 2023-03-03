@@ -5,7 +5,7 @@ import DeleteMessageHook from "../hooks/Messages/DeleteMessageHook";
 import UpdateMessageHook from "../hooks/Messages/UpdateMessageHook";
 import { CollectionSlugs } from "../slugs";
 import { createDiscordChannelField } from "../fields/discord/ChannelField";
-import { useAsRowTitle } from "../payload";
+import { useAsRowTitle } from "../util/payload";
 
 const Messages: CollectionConfig = {
     slug: CollectionSlugs.Messages,

@@ -1,11 +1,11 @@
 import { ButtonStyle, EmbedBuilder, NewsChannel, TextChannel } from "discord.js";
 import payload from "payload";
 import { createAttachmentFromImageData, createAttachmentFromMedia, createButtonRowComponents, DiscordMessage, getGuildChannelById } from "../../discord/util";
-import { rgbToNumber } from "../../payload";
+import { rgbToNumber } from "../../util/payload";
 import { CollectionSlugs } from "../../slugs";
 import { Message } from "../../types/PayloadSchema";
-import { createImageBanner } from "../../util/image";
-import { resolveDocument } from "../../util/payload-backend";
+import { createImageBanner } from "../../server/image";
+import { resolveDocument } from "../../server/payload-backend";
 import { Throttle } from "../../util/throttle";
 import { createRoleSelectMessage } from "./RolesUtil";
 

@@ -1,7 +1,7 @@
 import { Endpoint } from "payload/config";
 import { Media } from "../../types/PayloadSchema";
 import { LabMediaType } from "../../types/XRCTypes";
-import { resolveDocument } from "../../util/payload-backend";
+import { resolveDocument } from "../../server/payload-backend";
 
 const LabMediaEndpoint: Endpoint = {
     path: "/media/:type",

@@ -1,11 +1,15 @@
+import { Box, Paper, Stack } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { LabMediaType, ResolveMethod } from "../../../types/XRCTypes";
+import { GradientCard } from "../../util/GradientCard";
 import "./gatekeeper-scanner.css";
 import ProceedSVG from "./proceed.svg";
 import ProcessingSVG from "./processing.svg";
+import ErrorSVG from "./error.svg";
 import { ResolveDialog } from "./ResolveDialog";
 import StopSVG from "./stop.svg";
+import TerpLinkQRCode from "./terplink_qr.png";
 
 type ScannerStatus = "scanning" | "processing" | "checkin" | "checkout" | "error";
 type ScannerConfig = {
@@ -30,8 +34,8 @@ export const DefaultScannerConfig: ScannerConfig = {
         checkin: "#54B845",
         checkout: "#54B845",
         processing: "#DCAC13",
-        scanning: "#E61A31",
-        error: "red",
+        scanning: undefined,
+        error: "#E61A31",
     },
 
     titles: {
@@ -54,7 +58,7 @@ export const DefaultScannerConfig: ScannerConfig = {
         checkin: ProceedSVG,
         checkout: ProceedSVG,
         processing: ProcessingSVG,
-        error: StopSVG,
+        error: ErrorSVG,
         scanning: StopSVG,
     },
 
@@ -77,7 +81,7 @@ type KeypressParser = {
 const SWIPECARD_TRACK_LENGTH = 15
 const SWIPECARD_TIMEOUT = 1000;
 
-export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, resolver}) => {
+export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({ config, resolver }) => {
     // Swipe card
     const keystrokes = useRef<string[]>([]);
     const currentKeypressHandler = useRef<KeypressParser | undefined>(undefined);
@@ -96,7 +100,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
             timeout: 2000,
             onComplete: onSwipe,
             includeDelimiters: false
-        }, 
+        },
         {
             key: "`",
             onComplete: () => setResolveDialogOpen(true)
@@ -120,20 +124,20 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
     // const qr = useRef<Html5Qrcode>();
 
     // State
-    const [ scannerStatus, setScannerStatus ] = useState<ScannerStatus>("scanning");
-    const [ checkedInMemberName, setCheckedInMemberName ] = useState("");
-    const [ errorString, setErrorString ] = useState("");
-    const [ resolveDialogOpen, setResolveDialogOpen ] = useState<boolean>(false);
+    const [scannerStatus, setScannerStatus] = useState<ScannerStatus>("scanning");
+    const [checkedInMemberName, setCheckedInMemberName] = useState("");
+    const [errorString, setErrorString] = useState("");
+    const [resolveDialogOpen, setResolveDialogOpen] = useState<boolean>(false);
 
     // Load default scanner config if one wasn't provided.
     config ??= DefaultScannerConfig;
 
     // Current scanner status metadata.
-    const STATUS_TITLE = config!.titles[scannerStatus];
-    const STATUS_COLOR = config!.colors[scannerStatus];
-    const STATUS_ICON = config!.icons[scannerStatus];
-    const STATUS_DESCRIPTION = config!.descriptions[scannerStatus].replace("{NAME}", checkedInMemberName).replace("{ERROR}", errorString);
-    
+    const statusTitle = config!.titles[scannerStatus];
+    const statusColor = config!.colors[scannerStatus];
+    const statusIcon = config!.icons[scannerStatus];
+    const statusDescription = config!.descriptions[scannerStatus].replace("{NAME}", checkedInMemberName).replace("{ERROR}", errorString);
+
 
     function newKeypressHandler(e: KeyboardEvent) {
         const key = e.key;
@@ -172,7 +176,7 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
                     let startIndex = handler.key.length;
                     let endIndex = keystrokeString.length - handler.endKey?.length ?? 0 - startIndex;
                     keystrokeString = keystrokeString.slice(startIndex, endIndex)
-                }  
+                }
 
                 handler.onComplete(keystrokeString)
 
@@ -242,22 +246,29 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({config, res
         }
     }, [])
 
-    // A21430016007142B
-    // A21430015885332B
+    return <div className="scanner-bar">
+        <ResolveDialog open={resolveDialogOpen} onClose={() => setResolveDialogOpen(false)} submitResolve={resolve} />
+        <GradientCard style={{backgroundColor: statusColor, height: "100%", background: statusColor, borderRadius: 0 }}>
+            <Stack padding={2} spacing={2} height="100%">
+            <Box>
+                <Stack alignItems={"center"}>
+                    <Typography variant="h4" fontWeight="bold">{statusTitle}</Typography>
+                    <div className="scanner-status-icon">
+                        <img src={statusIcon} />
+                    </div>
+                </Stack>
+            </Box>
 
+            <Box flex={1} display="flex" alignItems="center" justifyContent="center">
+                <Typography fontSize={36}>{statusDescription}</Typography>
+            </Box>
 
-    return <div className="scanner-bar" style={{backgroundColor: STATUS_COLOR}}>
-        <ResolveDialog open={resolveDialogOpen} onClose={() => setResolveDialogOpen(false)} submitResolve={resolve}/>
-        <div className="scanner-content">
-            <div className="scanner-status-bg" >
-                <Typography variant="h4" fontWeight="bold">{STATUS_TITLE}</Typography>
-                <div className="scanner-status-icon">
-                    <img src={STATUS_ICON} />
-                </div>
-            </div>
-            <div className="scanner-text">
-                <Typography fontSize={36}>{STATUS_DESCRIPTION}</Typography>
-            </div>
-        </div>
-    </div>
+            <Stack alignItems="center" spacing={2}>
+                <Typography variant="h5" fontSize={24}>Scan me to access your TerpLink event pass!</Typography>
+                <img src={TerpLinkQRCode} style={{ borderRadius: 4, maxWidth: "60%" }} />
+            </Stack>
+
+        </Stack>
+    </GradientCard>
+    </div >
 }

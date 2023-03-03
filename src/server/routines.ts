@@ -4,7 +4,7 @@ import { postLeadershipInDiscord } from "../collections/util/MembersUtil";
 import { createRoleSelectMessage } from "../collections/util/RolesUtil";
 import MultiMessageManager from "../discord/multi/MultiMessageManager";
 import { createAttachmentFromImageData, getGuildChannel, sendGuildMessage } from "../discord/util";
-import { Throttle } from "./throttle";
+import { Throttle } from "../util/throttle";
 
 const Routines: { name: string, invoke: () => void }[] = [
     {

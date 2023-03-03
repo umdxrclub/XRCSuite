@@ -2,7 +2,7 @@ import payload from "payload";
 import { RowLabelFunction } from "payload/dist/admin/components/forms/RowLabel/types";
 import { Field, Option, OptionObject } from "payload/dist/fields/config/types"
 import { hasUncaughtExceptionCaptureCallback } from "process";
-import { FieldBaseNoType } from "./types/XRCTypes";
+import { FieldBaseNoType } from "../types/XRCTypes";
 
 /**
  * Retrieves the id of a specified document. Payload sometimes represents documents
@@ -77,11 +77,21 @@ export function createTimeRangeField(field: Omit<FieldBaseNoType, "name">): Fiel
         fields: [
             {
                 name: "from",
-                type: "text"
+                type: "date",
+                admin: {
+                    date: {
+                        pickerAppearance: "timeOnly"
+                    }
+                }
             },
             {
                 name: "to",
-                type: "text"
+                type: "date",
+                admin: {
+                    date: {
+                        pickerAppearance: "timeOnly"
+                    }
+                }
             }
         ]
     }

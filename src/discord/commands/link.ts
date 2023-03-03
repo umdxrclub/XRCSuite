@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import payload from "payload";
 import { getMemberFromDiscordId } from "../../collections/util/MembersUtil";
-import XRC from "../../util/XRC";
+import XRC from "../../server/XRC";
 import { Command } from "./command";
 
 async function onLinkInvoke(

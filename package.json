@@ -64,6 +64,7 @@
     "@types/node-schedule": "^2.1.0",
     "@types/passport": "^1.0.11",
     "@types/react-color": "^3.0.6",
+    "@types/react-router-dom": "^5.3.3",
     "@types/tough-cookie": "^4.0.1",
     "@types/tough-cookie-file-store": "^2.0.1",
     "@types/uuid": "^8.3.4",

@@ -18,13 +18,15 @@ import Projects from './collections/Projects'
 import Media from './collections/Media'
 import Schedules from './collections/Schedules'
 import Polls from './collections/Polls'
-import GatekeeperRoute from './routes/Gatekeeper';
+import LabGatekeeperRoute from './routes/LabGatekeeperRoute';
 import XRCBeforeDashboard from './components/dashboard/XRCBeforeDashboard';
 import Stats from './collections/Stats';
 import Odoo from './globals/Odoo';
 import Roles from './collections/Roles';
 import Integrations from './collections/Integrations';
 import DiscordGuildProvider from './components/providers/DiscordGuildProvider';
+import EventGatekeeperRoute from './routes/EventGatekeeperRoute';
+import { MUIThemeProvider } from './components/providers/MUIThemeProvider';
 
 const fallbackModules = [
     'util'
@@ -32,7 +34,7 @@ const fallbackModules = [
 
 const aliasDirectories = [
     './endpoints/',
-    './util/',
+    './server/',
     './hooks/',
     './discord/',
     './ws/'
@@ -45,16 +47,17 @@ export default buildConfig({
         user: Admins.slug,
         components: {
             beforeDashboard: [XRCBeforeDashboard],
-            providers: [DiscordGuildProvider],
+            providers: [ DiscordGuildProvider, MUIThemeProvider ],
             graphics: {
                 Icon: XRCLogo
             },
             routes: [
-                GatekeeperRoute
+                LabGatekeeperRoute,
+                EventGatekeeperRoute
             ]
         },
         webpack: (config) => {
-            let { walkDirectory } = require('./util/directory')
+            let { walkDirectory } = require('./server/directory')
 
             let aliasFiles = aliasDirectories.reduce((arr, dir) => {
                 let dirPath = path.resolve(__dirname, dir)
@@ -127,4 +130,5 @@ export default buildConfig({
     graphQL: {
         disable: true,
     },
+    cors: '*'
 });

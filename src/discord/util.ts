@@ -12,7 +12,7 @@ import { MediaDirectory } from "../collections/Media";
 import { isDiscordMemberLeadership } from "../collections/util/MembersUtil";
 import { Media } from "../types/PayloadSchema";
 import { XRCSuiteChannelType } from "../types/XRCTypes";
-import { resolveDocument } from "../util/payload-backend";
+import { resolveDocument } from "../server/payload-backend";
 import { Throttle } from "../util/throttle";
 import { getDiscordClient } from "./bot";
 import { BotCommands } from "./commands/command";

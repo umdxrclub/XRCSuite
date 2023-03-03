@@ -1,5 +1,5 @@
 import { CacheType, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import RoutineMap from "../../util/routines";
+import RoutineMap from "../../server/routines";
 import { Command } from "./command";
 
 async function onExecInvoke(interaction: ChatInputCommandInteraction<CacheType>) {

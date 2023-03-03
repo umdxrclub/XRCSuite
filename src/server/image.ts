@@ -20,6 +20,7 @@ async function sendAndAwaitIPCMessage(msg: string) {
     let promise = new Promise<child_process.Serializable>(resolve => {
         child.once('message', returnMsg => resolve(returnMsg))
     })
+    
     child.send(msg)
     let res = await promise as string;
     return res;

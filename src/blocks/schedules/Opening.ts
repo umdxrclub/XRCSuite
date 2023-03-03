@@ -1,5 +1,5 @@
 import { Block } from "payload/types";
-import { createTimeBlockField } from "../../payload";
+import { createTimeBlockField } from "../../util/payload";
 import { CollectionSlugs } from "../../slugs";
 
 const Opening: Block = {

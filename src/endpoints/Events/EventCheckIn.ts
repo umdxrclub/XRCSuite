@@ -1,6 +1,6 @@
 import { Endpoint } from "payload/dist/config/types";
 import { resolveMember } from "../../collections/util/MembersUtil";
-import XRC from "../../util/XRC";
+import XRC from "../../server/XRC";
 import { makeAdminHandler } from "../RejectIfNoUser";
 
 /**

@@ -6,6 +6,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
 } from "discord.js";
+import moment from "moment";
 import payload from "payload";
 import Embed from "../../blocks/messages/Embed";
 import { sendDiscordMessages } from "../../collections/util/MessageUtil";
@@ -16,8 +17,8 @@ import {
   DiscordMessage,
 } from "../../discord/util";
 import { Lab, Media, Schedule } from "../../types/PayloadSchema";
-import { createImageBanner } from "../../util/image";
-import { resolveDocument, resolveDocuments } from "../../util/payload-backend";
+import { createImageBanner } from "../../server/image";
+import { resolveDocument, resolveDocuments } from "../../server/payload-backend";
 
 let LabGoogleMapsURL = "https://goo.gl/maps/y9SHsm25SB874n6H8";
 
@@ -126,16 +127,19 @@ export async function createLabStatusEmbedMessages(): Promise<
                 let time = block.time;
                 if (time.allDay) {
                     blockEmbed.setDescription("**All Day**")
-                } else {
+                } else if (time.from && time.to) {
+                    let timeFormat = 'h:mm A'
+                    let fromTime = moment(time.from).format(timeFormat)
+                    let toTime = moment(time.to).format(timeFormat)
                     blockEmbed.addFields([
                         {
                             name: "Time",
-                            value: time.from,
+                            value: fromTime,
                             inline: true
                         },
                         {
                             name: "To",
-                            value: time.to,
+                            value: toTime,
                             inline: true
                         }
                     ])
@@ -144,22 +148,24 @@ export async function createLabStatusEmbedMessages(): Promise<
                 switch (block.blockType) {
                     case "opening":
                         blockEmbed.setColor([133, 212, 49])
-                        let staff = await resolveDocuments(block.staff, "members");
-                        blockEmbed.addFields({
-                            name: "Staff",
-                            inline: true,
-                            value: staff
-                            .map(s => {
-                              if (s.nickname && s.nickname.length > 0) {
-                                return s.nickname;
-                              }
+                        if (block.staff && block.staff.length > 0) {
+                          let staff = await resolveDocuments(block.staff, "members");
+                          blockEmbed.addFields({
+                              name: "Staff",
+                              inline: true,
+                              value: staff
+                              .map(s => {
+                                if (s.nickname && s.nickname.length > 0) {
+                                  return s.nickname;
+                                }
 
-                              return s.name
-                            })
-                            .filter(n => n.length > 0)
-                            .join(", ")
-                        })
-
+                                return s.name
+                              })
+                              .filter(n => n.length > 0)
+                              .join(", ")
+                          })
+                        }
+                        
                         break;
 
                     case "closing":

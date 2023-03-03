@@ -2,7 +2,7 @@ import axios from "axios";
 import crypto from "crypto";
 import { CookieJar } from "tough-cookie";
 import { FileCookieStore } from "tough-cookie-file-store";
-import { CAS_LOGIN_SSO, CAS_LOGIN_URL, loginWithCAS, loginWithCASUsingSAML } from "../util/cas";
+import { CAS_LOGIN_SSO, CAS_LOGIN_URL, loginWithCAS, loginWithCASUsingSAML } from "./cas";
 import { wasRequestRedirectedTo } from "./scrape-util";
 import { HttpCookieAgent, HttpsCookieAgent } from 'http-cookie-agent/http';
 

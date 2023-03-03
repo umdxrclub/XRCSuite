@@ -64,11 +64,21 @@ const Events: CollectionConfig = {
         },
         {
             name: 'startDate',
-            type: 'date'
+            type: 'date',
+            admin: {
+                date: {
+                    pickerAppearance: "dayAndTime"
+                }
+            }
         },
         {
             name: 'endDate',
-            type: 'date'
+            type: 'date',
+            admin: {
+                date: {
+                    pickerAppearance: "dayAndTime"
+                }
+            }
         },
         {
             name: 'imageUrl',

@@ -1,7 +1,7 @@
 import payload from "payload";
-import { getDocumentId } from "../../payload";
+import { getDocumentId } from "../../util/payload";
 import { Description, Device } from "../../types/PayloadSchema";
-import { resolveDocument } from "../../util/payload-backend";
+import { resolveDocument } from "../../server/payload-backend";
 
 export type DeviceListing = {
     description: Description,
