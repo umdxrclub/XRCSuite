@@ -7,7 +7,7 @@ import { ExecCommand } from "./exec";
 import { LabCommand } from "./Lab";
 import { LinkCommand } from "./link";
 import { PollCommand } from "./Poll";
-import { RolesCommand } from "./roles";
+import { RolesCommand } from "./Roles";
 
 type CommandData = SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder | Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand">
 
