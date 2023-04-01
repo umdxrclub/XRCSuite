@@ -1,7 +1,7 @@
 import { Box, Paper, Stack } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { LabMediaType, ResolveMethod } from "../../../types/XRCTypes";
+import { LabMediaType, ResolveMethod, ResolveResult } from "../../../types/XRCTypes";
 import { GradientCard } from "../../util/GradientCard";
 import "./gatekeeper-scanner.css";
 import ProceedSVG from "./proceed.svg";
@@ -20,13 +20,6 @@ type ScannerConfig = {
     statusDisplayTime: number
 }
 
-export type ResolveResult = {
-    error: string | undefined,
-    member?: {
-        name: string,
-        type: "checkin" | "checkout"
-    }
-}
 export type GatekeeperResolver = (method: ResolveMethod, value: string) => Promise<ResolveResult>
 
 export const DefaultScannerConfig: ScannerConfig = {
@@ -67,7 +60,7 @@ export const DefaultScannerConfig: ScannerConfig = {
 
 type GatekeeperScannerProps = {
     resolver: GatekeeperResolver
-    config?: ScannerConfig
+    config?: Partial<ScannerConfig>
 }
 
 type KeypressParser = {
@@ -130,7 +123,10 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({ config, re
     const [resolveDialogOpen, setResolveDialogOpen] = useState<boolean>(false);
 
     // Load default scanner config if one wasn't provided.
-    config ??= DefaultScannerConfig;
+    config = {
+        ...DefaultScannerConfig, 
+        ...config
+    }
 
     // Current scanner status metadata.
     const statusTitle = config!.titles[scannerStatus];

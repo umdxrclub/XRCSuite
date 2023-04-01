@@ -1,70 +1,64 @@
 import { Endpoint } from "payload/dist/config/types";
+import { Event } from "payload/generated-types";
 import { resolveMember } from "../../collections/util/MembersUtil";
 import XRC from "../../server/XRC";
-import { makeAdminHandler } from "../RejectIfNoUser";
-
+import { ResolveMethod, ResolveResult } from "../../types/XRCTypes";
+import { makeAdminHandler, RejectIfNoUserHandler } from "../RejectIfNoUser";
+import { validateQueryParameters } from "../ValidateQueryParams";
 /**
  * The required parameters for event check in:
  *
- * a - event access code
  * m - member resolve method
  * v - member resolve data
  */
-let requiredParameters = ['a', 'm', 'v'];
+let requiredParameters = ['m', 'v'];
 
 const EventCheckIn: Endpoint = {
-    path: '/checkin',
+    path: '/:id/checkin',
     method: 'post',
-    handler: makeAdminHandler(async (req, res) =>  {
-        // Ensure all the required parameters are provided.
-        for (var p of requiredParameters) {
-            if (!req.query[p]) {
-                res.status(400).json({err: 'Missing query parameter: ' + p});
-                return;
-            }
+    handler: [RejectIfNoUserHandler, validateQueryParameters(requiredParameters), async (req, res) => {
+        let resolveMethod = req.query.m as ResolveMethod;
+        let resolveContent = req.query.v as string;
+        let response: ResolveResult
+
+        let event: Event
+        try {
+            event = await req.payload.findByID({
+                collection: "events",
+                id: req.params.id
+            })
+        } catch {
+            res.status(400).send({ error: "Could not find an event with that id!" })
+            return;
         }
 
-        let accessCode = req.query.a as string;
-        let resolveMethod = req.query.m as string;
-        let resolveContent = req.query.v as string;
-
-        let tlEvent = await XRC.terplink.getEvent(accessCode);
-        if (tlEvent) {
-            let member = await resolveMember(resolveMethod as any, resolveContent)
-
-            if (member) {
-                res.status(200).send()
-            }
-
-            // Get the event within the database.
-            let eventSearch = await req.payload.find({
-                collection: "events",
-                where:  {
-                    'terplink.accessCode': {
-                        equals: accessCode
-                    }
+        let member = await resolveMember(resolveMethod, resolveContent);
+        if (member) {
+            
+            // Create attendance event
+            await req.payload.create({
+                collection: "attendances",
+                data: {
+                    event: event.id,
+                    member: member.id,
+                    date: (new Date()).toString(),
+                    type: "in"
                 }
             })
 
-            if (eventSearch.totalDocs == 1) {
-                let event = eventSearch.docs[0];
-
-                // Check the member in on terplink.
-                tlEvent.checkIn(member.umd.terplink.accountId);
-
-                // Create an attendance
-                req.payload.create({
-                    collection: "attendances",
-                    data: {
-                        member: member.id,
-                        date: (new Date()).toString(),
-                        event: event.id,
-                        type: "in"
-                    }
-                })
+            response = { 
+                member: {
+                    name: member.name, 
+                    type: "checkin"
+                }
             }
+        } else {
+            response = { error: "Cannot resolve member" }
         }
-    })
+
+        await res.status(200).send(response)
+
+    }]
 }
 
 export default EventCheckIn;

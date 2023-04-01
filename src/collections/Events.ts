@@ -1,12 +1,14 @@
 import ImportEventsEndpoint from "../endpoints/Events/ImportTerpLinkEvents";
 import { CollectionConfig } from "payload/types";
 import { EventThumbnail } from "../components/EventThumbnail";
-import EventCheckIn from "../endpoints/Events/EventCheckIn";
+import TerpLinkEventCheckIn from "../endpoints/Events/TerpLinkEventCheckIn";
 import { CollectionSlugs } from "../slugs";
 import { createActionButton } from "../components/ActionButton";
 import AnnounceEventEndpoint from "../endpoints/Events/AnnounceEvent";
 import { XRClubEventTypes } from "../types/XRCTypes";
 import CreateDiscordEventEndpoint from "../endpoints/Events/CreateDiscordEvent";
+import EventCheckIn from "../endpoints/Events/EventCheckIn";
+import { createLinkButton } from "../components/LinkButton";
 
 const Events: CollectionConfig = {
     slug: CollectionSlugs.Events,
@@ -14,7 +16,7 @@ const Events: CollectionConfig = {
         useAsTitle: 'name',
         defaultColumns: [ 'name', 'startDate', 'endDate' ],
     },
-    endpoints: [ ImportEventsEndpoint, EventCheckIn, AnnounceEventEndpoint, CreateDiscordEventEndpoint ],
+    endpoints: [ ImportEventsEndpoint, EventCheckIn, TerpLinkEventCheckIn, AnnounceEventEndpoint, CreateDiscordEventEndpoint ],
     fields: [
         {
             name: 'announceEvent',
@@ -31,6 +33,15 @@ const Events: CollectionConfig = {
             admin: {
                 components: {
                     Field: createActionButton({ title: "Create Discord Event", postUrl: "/api/events/:id/discord-event" })
+                }
+            }
+        },
+        {
+            name: 'openGatekeeper',
+            type: 'ui',
+            admin: {
+                components: {
+                    Field: createLinkButton("Launch Gatekeeper", "/admin/gatekeeper/event/:id")
                 }
             }
         },

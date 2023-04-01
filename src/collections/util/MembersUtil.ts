@@ -168,7 +168,7 @@ export async function createMemberEmbedMessage(member: Member): Promise<DiscordM
     return { embeds: [embed], files, components: row.components.length > 0 ? [row] : undefined }
 }
 
-export async function resolveMember(method: ResolveMethod, value: string): Promise<Member | undefined> {
+export async function resolveMember(method: ResolveMethod, value: string): Promise<Member | null> {
     var key: string = ""
 
     console.log(method, value)
@@ -186,6 +186,9 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
         case "id":
             key = "id";
             break;
+
+        default:
+            return null;
     }
 
     let where: Where = {
@@ -213,11 +216,12 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
             return undefined;
         }
 
-        console.log("trying to resolve with issuance ", method, value)
+        console.log("Trying to resolve with issuance ", method, value)
 
         // Fetch the member on TerpLink by their issuance id using the XR Lab
         // event.
         let tlEvent = await getLabTerpLinkEvent();
+        console.log("Trying to resolve with issuance id: ", value)
         let tlMember = await tlEvent.getMemberFromIssuanceId(value);
 
         // If we couldn't find a TerpLink member by their issuance id, then
@@ -229,9 +233,11 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
         // Now try to search for them in the roster and match them by their
         // email.
         let rosterName = tlMember.getRosterName();
+        console.log("Searching roster for name: " + rosterName)
         let roster = await XRC.terplink.getRosterMembers(rosterName);
         var foundRosterMember: RosterMember | undefined = undefined
         var foundEmail: string | undefined = undefined;
+
 
         for (var i = 0; i < roster.length && !foundRosterMember; i++) {
             let rosterMember = roster[i];
@@ -247,6 +253,7 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
                 }
             }
         }
+        console.log("Roster search complete, found: " + foundRosterMember?.name)
 
         var existingId: string | undefined = undefined
         var partialMember: Partial<Member> = {
@@ -256,7 +263,7 @@ export async function resolveMember(method: ResolveMethod, value: string): Promi
                 terplink: {
                     accountId: tlMember.getMemberId(),
                     issuanceId: value,
-                    communityId: foundRosterMember.communityId
+                    communityId: foundRosterMember?.communityId
                 }
             }
         }
