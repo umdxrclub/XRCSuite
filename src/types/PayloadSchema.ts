@@ -297,6 +297,8 @@ export interface Message {
         color?: string;
         timestamp?: string;
         url?: string;
+        thumbnail?: string;
+        image?: string;
         fields: {
           name: string;
           value: string;

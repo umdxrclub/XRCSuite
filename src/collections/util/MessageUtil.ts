@@ -93,7 +93,9 @@ export async function createDiscordMessages(message: Message): Promise<DiscordMe
                 if (block.color) embed.setColor(rgbToNumber(block.color))
                 if (block.fields.length > 0) embed.setFields(block.fields.map(b => ({name: b.name, value: b.value, inline: b.inline })))
                 if (block.url) embed.setURL(block.url)
-
+                if (block.thumbnail) embed.setThumbnail(block.thumbnail)
+                if (block.image) embed.setImage(block.image)
+                
                 messages.push({ embeds: [embed] })
                 break;
         }

@@ -24,6 +24,14 @@ const Embed: Block = {
             type: "text"
         },
         {
+            name: "thumbnail",
+            type: "text"
+        },
+        {
+            name: "image",
+            type: "text"
+        },
+        {
             name: "fields",
             type: "array",
             fields: [
