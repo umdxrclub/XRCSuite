@@ -140,6 +140,10 @@ const Members: CollectionConfig = {
                 {
                     name: 'scoresaber',
                     type: 'text'
+                },
+                {
+                    name: 'trello',
+                    type: 'text'
                 }
             ]
         }

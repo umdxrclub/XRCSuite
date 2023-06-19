@@ -30,6 +30,7 @@ export interface Config {
     cas: CAS;
     wishlist: Wishlist;
     odoo: Odoo;
+    trello: Trello;
   };
 }
 export interface Admin {
@@ -651,4 +652,10 @@ export interface Odoo {
   db?: string;
   uid?: number;
   password?: string;
+}
+export interface Trello {
+  id: string;
+  key?: string;
+  token?: string;
+  organization?: string;
 }

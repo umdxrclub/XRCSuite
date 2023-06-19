@@ -23,5 +23,6 @@ export const GlobalSlugs = {
     Lab: 'lab',
     Wishlist: 'wishlist',
     Gatekeeper: 'gatekeeper',
-    Odoo: 'odoo'
+    Odoo: 'odoo',
+    Trello: 'trello'
 }

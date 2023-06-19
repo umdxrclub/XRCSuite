@@ -27,6 +27,7 @@ import Integrations from './collections/Integrations';
 import DiscordGuildProvider from './components/providers/DiscordGuildProvider';
 import EventGatekeeperRoute from './routes/EventGatekeeperRoute';
 import { MUIThemeProvider } from './components/providers/MUIThemeProvider';
+import Trello from './globals/Trello';
 
 const fallbackModules = [
     'util'
@@ -119,7 +120,8 @@ export default buildConfig({
         Bot,
         CAS,
         Wishlist,
-        Odoo
+        Odoo,
+        Trello
     ],
     typescript: {
         outputFile: path.resolve(__dirname, './types/PayloadSchema.ts'),
