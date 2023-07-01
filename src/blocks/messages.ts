@@ -10,24 +10,25 @@ import Profile from "./messages/Profile";
 import RoleSelect from "./messages/RoleSelect";
 import Event from "./messages/Event";
 
-
-function createDiscordMessageField(field: Omit<BlockField, "type" | "blocks">): BlockField {
-    return {
-        ...field,
-        type: "blocks",
-        blocks: [
-            Message, 
-            Banner,
-            RoleSelect,
-            Profile, 
-            Device,
-            Poll,
-            Event,
-            LinkButtons, 
-            Image, 
-            Embed 
-        ]
-    }
+function createDiscordMessageField(
+  field: Omit<BlockField, "type" | "blocks">
+): BlockField {
+  return {
+    ...field,
+    type: "blocks",
+    blocks: [
+      Message,
+      Banner,
+      RoleSelect,
+      Profile,
+      Device,
+      Poll,
+      Event,
+      LinkButtons,
+      Image,
+      Embed,
+    ],
+  };
 }
 
 export default createDiscordMessageField;

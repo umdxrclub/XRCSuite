@@ -1,6 +1,6 @@
 import { ActionRowBuilder, CacheType, ChannelType, ChatInputCommandInteraction, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
 import payload from "payload";
-import { Command } from "./command";
+import { Command } from "./Command";
 
 const EventAnnounceId = "EventAnnounce";
 

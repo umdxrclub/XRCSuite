@@ -9,6 +9,10 @@ async function checkInOrOut(
   type: string
 ) {
   let tlEvent = await XRC.terplink.getEvent(accessCode);
+  if (!tlEvent) {
+    console.error(`Could not find event with access code ${accessCode}`);
+    return;
+  };
   try {
     if (type == "in") {
         await tlEvent.checkIn(memberId);

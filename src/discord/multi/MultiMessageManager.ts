@@ -35,6 +35,7 @@ class MultiMessageManager {
 
     public async deleteAllMessages() {
         let channel = await this.getMessageChannel();
+        if (!channel) return;
         await channel.bulkDelete(this._messageIds);
         this.setMessageIds([])
     }
@@ -55,7 +56,7 @@ class MultiMessageManager {
         if (channel) {
             let ids = []
             for (var messageContent of messages) {
-                let createdMsg = await this._channel.send(messageContent)
+                let createdMsg = await channel.send(messageContent)
                 ids.push(createdMsg.id)
 
                 await Throttle.wait(this.messageUpdateDelayMs)

@@ -5,6 +5,7 @@ import { useGuildContext } from "../providers/DiscordGuildProvider";
 import { OptionObject } from "payload/dist/fields/config/types";
 
 const DiscordRoleField: React.FC<Props> = ({ path, label, required, name }) => {
+    if (!path) return null;
     const { value, setValue } = useField<string>({ path: path });
     const [ channelOptions, setChannelOptions ] = useState<OptionObject[]>([])
     const guild = useGuildContext();

@@ -1,9 +1,8 @@
 import { ButtonStyle } from "discord.js";
 import payload from "payload";
 import { createButtonRowComponents, DiscordMessage } from "../../discord/util";
-import { CollectionSlugs } from "../../slugs";
-import { Member, Role } from "../../types/PayloadSchema";
 import { resolveDocument } from "../../server/payload-backend";
+import { Member, Role } from "../../types/PayloadSchema";
 
 export async function getLeadershipRoles(): Promise<Role[]> {
     let roleDocs = await payload.find({

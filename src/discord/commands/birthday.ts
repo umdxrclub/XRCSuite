@@ -1,6 +1,6 @@
 import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, Interaction, ModalBuilder, SlashCommandBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { getMemberFromDiscordId } from "../../collections/util/MembersUtil";
-import { Command } from "./command";
+import { Command } from "./Command";
 
 const BirthdayModalId = "BirthdayModal"
 const BirthdayRegex = /\d{1,2}\/\d{1,2}\/\d{4}/

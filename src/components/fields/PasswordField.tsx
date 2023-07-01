@@ -1,15 +1,15 @@
 import { Props } from "payload/components/fields/Text";
 import { TextInput, useField } from "payload/components/forms";
-import { Button } from "payload/components/elements";
-import React, {useRef, useLayoutEffect} from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 const PasswordField: React.FC<Props> = ({ path, label, required, name }) => {
+  if (!path) return null;
   const { value, setValue } = useField<string>({ path: path });
-  const ref = useRef<HTMLInputElement>();
+  const ref = useRef<HTMLInputElement | null>(null) as React.MutableRefObject<HTMLInputElement>;
 
   useLayoutEffect(() => {
-    ref.current.type = "password"
-  }, [])
+    ref.current.type = "password";
+  }, []);
 
   return (
     <TextInput

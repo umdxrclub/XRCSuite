@@ -12,7 +12,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({title, postUrl}) => {
     const document = useDocumentInfo();
 
     async function post() {
-        let response = await fetch(postUrl.replace(":id", document.id?.toString()), {
+        if (document.id) postUrl = postUrl.replace(":id", document.id.toString())
+
+        let response = await fetch(postUrl, {
             method: 'POST'
         })
 

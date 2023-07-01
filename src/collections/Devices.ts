@@ -5,17 +5,31 @@ import WakeOnLANEndpoint from "../endpoints/Devices/WakeOnLAN";
 import { CollectionSlugs } from "../slugs";
 import { DeviceStatus, HardwareDescriptionPrefix } from "../types/XRCTypes";
 import Descriptions from "./Descriptions";
+import { useAsRowTitle } from "../util/payload";
 
 const MACAddressRegex = /^[a-fA-F0-9]{2}(:[a-fA-F0-9]{2}){5}$/;
 
 const Devices: CollectionConfig = {
   slug: CollectionSlugs.Devices,
   admin: {
-    useAsTitle: "description",
+    useAsTitle: "name",
     group: "Inventory",
+    defaultColumns: [
+      "name",
+      "status",
+      "lastAudited",
+      "xrTag",
+      "departmentTag",
+      "public",
+    ],
   },
   endpoints: [DeviceInventoryEndpoint, WakeOnLANEndpoint],
   fields: [
+    {
+      name: "name",
+      type: "text",
+      required: true,
+    },
     {
       name: "description",
       type: "relationship",
@@ -25,13 +39,6 @@ const Devices: CollectionConfig = {
           contains: HardwareDescriptionPrefix,
         },
       },
-      required: true,
-    },
-    {
-      name: "status",
-      type: "select",
-      options: DeviceStatus,
-      required: true,
     },
     {
       name: "public",
@@ -41,16 +48,15 @@ const Devices: CollectionConfig = {
       required: true,
     },
     {
-      name: "model",
-      type: "text"
-    },
-    {
-      name: "originalValue",
-      type: "number"
+      name: "status",
+      type: "select",
+      options: DeviceStatus,
+      required: true,
     },
     {
       name: "serial",
       type: "text",
+      label: "Serial Number",
     },
     {
       name: "mac",
@@ -67,40 +73,21 @@ const Devices: CollectionConfig = {
       },
     },
     {
-      name: "sponsor",
-      type: "text"
-    },
-    {
-      name: "purchaser",
-      type: "text"
-    },
-    {
-      name: "owner",
-      type: "text"
-    },
-    {
-      name: "umdSerial",
+      name: "departmentTag",
       type: "text",
     },
     {
       name: "xrTag",
-      type: "text"
-    },
-    {
-      name: "location",
-      type: "text"
+      type: "text",
+      label: "XR Tag",
     },
     {
       name: "dateReceived",
-      type: "date"
-    },
-    {
-      name: "dateReturned",
-      type: "date"
+      type: "date",
     },
     {
       name: "lastAudited",
-      type: "date"
+      type: "date",
     },
     {
       name: "items",
@@ -115,25 +102,30 @@ const Devices: CollectionConfig = {
           name: "quantity",
           type: "number",
           required: true,
-          defaultValue: 1
-        },
-        {
-          name: "modelNumber",
-          type: "text"
+          defaultValue: 1,
         },
         {
           name: "serialNumber",
+          type: "text",
+        },
+        {
+          name: "departmentTag",
           type: "text"
         },
         {
           name: "xrTag",
-          type: "text"
+          type: "text",
         },
         {
           name: "notes",
-          type: "textarea"
-        }
-      ]
+          type: "textarea",
+        },
+      ],
+      admin: {
+        components: {
+          RowLabel: useAsRowTitle("name"),
+        },
+      },
     },
     {
       name: "wol",

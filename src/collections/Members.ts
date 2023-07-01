@@ -19,7 +19,8 @@ const Members: CollectionConfig = {
     fields: [
         {
             name: 'name',
-            type: 'text'
+            type: 'text',
+            required: true
         },
         {
             name: 'nickname',
@@ -139,6 +140,10 @@ const Members: CollectionConfig = {
                 },
                 {
                     name: 'scoresaber',
+                    type: 'text'
+                },
+                {
+                    name: 'trello',
                     type: 'text'
                 }
             ]

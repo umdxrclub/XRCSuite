@@ -1,6 +1,4 @@
 import { Endpoint } from "payload/dist/config/types";
-import Members from "../../collections/Members";
-import { Member } from "../../types/PayloadSchema";
 import XRC from "../../server/XRC";
 import { makeAdminHandler } from "../RejectIfNoUser";
 

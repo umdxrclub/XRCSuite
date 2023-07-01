@@ -23,7 +23,8 @@ function createProgressBar(percentage: number) {
 }
 
 export async function createPollEmbedAndRow(poll: Poll) {
-    let client = await getDiscordClient();
+    let client = getDiscordClient();
+    if (!client) return;
     
     // Extract info from the poll
     let title = poll.title;

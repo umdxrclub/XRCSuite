@@ -1,5 +1,6 @@
 import schedule from "node-schedule";
 import TakeStatsJob from "./TakeStats";
+import { ApproveRoster } from "./ApproveRoster";
 
 export type Job = {
     cron: string,
@@ -7,7 +8,8 @@ export type Job = {
 }
 
 const Jobs: Job[] = [
-    TakeStatsJob
+    TakeStatsJob,
+    ApproveRoster
 ]
 
 /**

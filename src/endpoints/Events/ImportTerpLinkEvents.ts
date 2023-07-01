@@ -12,6 +12,11 @@ const ImportEventsEndpoint: Endpoint = {
     method: "post",
     handler: makeAdminHandler(async (req, res) => {
         let clubEvents = await XRC.terplink.getEvents(XR_CLUB_ID);
+        if (!clubEvents) {
+            res.status(501).send();
+            return;
+        }
+
         let promises = clubEvents.map(async event => {
             console.log("Got event: " + event.name)
 
@@ -43,6 +48,7 @@ const ImportEventsEndpoint: Endpoint = {
             if (result.totalDocs == 0) {
                 // Get access code
                 let page = await XRC.terplink.parseEventPage(event.id);
+                if(!page) return;
 
                 console.log("Got access code " + page.accessCode + " for event " + event.name);
 

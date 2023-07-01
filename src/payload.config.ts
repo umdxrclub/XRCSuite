@@ -27,6 +27,7 @@ import Integrations from './collections/Integrations';
 import DiscordGuildProvider from './components/providers/DiscordGuildProvider';
 import EventGatekeeperRoute from './routes/EventGatekeeperRoute';
 import { MUIThemeProvider } from './components/providers/MUIThemeProvider';
+import TrelloConfig from './globals/Trello';
 
 const fallbackModules = [
     'util'
@@ -71,17 +72,17 @@ export default buildConfig({
                     ...config.resolve,
                     fallback: {
                         ...config.resolve?.fallback,
-                        ...fallbackModules.reduce((a, m) => { a[m] = false; return a; }, {})
+                        ...fallbackModules.reduce((a, m) => { a[m] = false; return a; }, ({} as Record<string, boolean>))
                     },
                     alias: {
                         ...config.resolve?.alias,
-                        ...aliasFiles.reduce((a, f) => { a[f] = emptyObjPath; return a }, {})
+                        ...aliasFiles.reduce((a, f) => { a[f] = emptyObjPath; return a }, ({} as Record<string, string>))
                     }
                 },
                 module: {
                     ...config.module,
                     rules: [
-                        ...config.module?.rules,
+                        ...config.module?.rules ?? [],
                         {
                             test: /\.svg%/i,
                             type: 'asset/resource',
@@ -119,7 +120,8 @@ export default buildConfig({
         Bot,
         CAS,
         Wishlist,
-        Odoo
+        Odoo,
+        TrelloConfig
     ],
     typescript: {
         outputFile: path.resolve(__dirname, './types/PayloadSchema.ts'),

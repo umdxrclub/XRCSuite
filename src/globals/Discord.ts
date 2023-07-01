@@ -98,6 +98,15 @@ const Bot: GlobalConfig = {
                     }))
                 }
             ]
+        },
+        {
+            name: "processDms",
+            type: "checkbox",
+            required: true,
+            defaultValue: false,
+            admin: {
+                description: "If checked, the bot will process interactions for all direct messages."
+            }
         }
     ]
 };

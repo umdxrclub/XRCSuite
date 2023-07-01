@@ -62,7 +62,8 @@ const Events: CollectionConfig = {
         },
         {
             name: 'name',
-            type: 'text'
+            type: 'text',
+            required: true
         },
         {
             name: 'type',
@@ -80,7 +81,8 @@ const Events: CollectionConfig = {
                 date: {
                     pickerAppearance: "dayAndTime"
                 }
-            }
+            },
+            required: true
         },
         {
             name: 'endDate',
@@ -89,7 +91,8 @@ const Events: CollectionConfig = {
                 date: {
                     pickerAppearance: "dayAndTime"
                 }
-            }
+            },
+            required: true
         },
         {
             name: 'imageUrl',

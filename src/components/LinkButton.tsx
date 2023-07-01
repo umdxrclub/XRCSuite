@@ -9,9 +9,7 @@ type LinkButtonProps = {
 
 export const LinkButton: React.FC<LinkButtonProps> = ({name, url}) => {
     const document = useDocumentInfo();
-    if (document) {
-        url = url.replace(":id", document.id?.toString())
-    }
+    if (document?.id) url = url.replace(":id", document.id?.toString())
    
     return <div style={{padding: 16, marginTop: 6, marginBottom: 6}}>
         <Button key={"LB-" + name} el={url.startsWith("/") ? "link" : "anchor"} url={url} newTab={true}>

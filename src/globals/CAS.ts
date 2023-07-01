@@ -40,7 +40,8 @@ const CAS: GlobalConfig = {
         {
             name: 'hotpCounter',
             type: 'number',
-            defaultValue: 0
+            defaultValue: 0,
+            required: true
         }
     ],
     typescript: {

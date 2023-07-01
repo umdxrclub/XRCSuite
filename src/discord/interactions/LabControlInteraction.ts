@@ -9,7 +9,7 @@ export type LabControlAction = "Open" | "Close" | "CheckOutAll"
 
 const LabControlInteractionHandler: InteractionHandler = async interaction => {
     if (interaction.isButton() && LabRegex.test(interaction.customId)) {
-        let match = LabRegex.exec(interaction.customId);
+        let match = LabRegex.exec(interaction.customId)!;
         let action = match[1] as LabControlAction;
         let lab = await payload.findGlobal({ slug: "lab", depth: 0})
 
