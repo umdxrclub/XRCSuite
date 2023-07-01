@@ -50,7 +50,7 @@ export const ResolveDialog: React.FC<ResolveDialogProps> = ({
           >
             {Object.keys(ResolveMethods).map((k) => (
               <MenuItem key={k} value={k}>
-                {ResolveMethods[k]}
+                {ResolveMethods[k as ResolveMethod]}
               </MenuItem>
             ))}
           </Select>

@@ -16,12 +16,14 @@ const Polls: CollectionConfig = {
     fields: [
         {
             name: 'title',
-            type: 'text'
+            type: 'text',
+            required: true
         },
         {
             name: 'open',
             type: 'checkbox',
-            defaultValue: true
+            defaultValue: true,
+            required: true
         },
         {
             name: 'allowRevote',
@@ -30,18 +32,21 @@ const Polls: CollectionConfig = {
         },
         createDiscordMemberField({
             name: "author",
-            index: true
+            index: true,
+            required: true
         }),
         {
             name: 'messages',
             type: 'array',
             fields: [
                 createDiscordChannelField({
-                    name: 'channel'
+                    name: 'channel',
+                    required: true
                 }),
                 {
                     name: 'msg',
-                    type: 'text'
+                    type: 'text',
+                    required: true
                 }
             ]
         },
@@ -51,14 +56,16 @@ const Polls: CollectionConfig = {
             fields: [
                 {
                     name: 'name',
-                    type: 'text'
+                    type: 'text',
+                    required: true
                 },
                 {
                     name: 'voters',
                     type: 'array',
                     fields: [
                         createDiscordMemberField({
-                            name: "id"
+                            name: "id",
+                            required: true
                         })
                     ]
                 }

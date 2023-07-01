@@ -4,8 +4,8 @@
 export class Throttle {
 
     private _intervalMs: number
-    private _pendingExec: boolean
-    private _pendingExecFunction: () => void | null = null;
+    private _pendingExec: boolean = false
+    private _pendingExecFunction: (() => void) | null = null;
 
     constructor(intervalMs: number) {
         this._intervalMs = intervalMs;

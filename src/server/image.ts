@@ -44,12 +44,13 @@ async function execFunction<T extends keyof ImageFunctions>(name: T, ...args: Im
     return res;
 }
 
-export async function createImageBanner(text: string): Promise<string> {
+export async function createImageBanner(text: string): Promise<string | undefined> {
     let discord = await payload.findGlobal({ slug: "bot" })
     if (discord.media.banner) {
         let banner = await resolveDocument(discord.media.banner, "media")
+        if (!banner.filename) return;
+        
         // TODO: allow for custom font.
         return await execFunction("createBanner", path.resolve(MediaDirectory, banner.filename), text, "Bahnschrift")
     }
-    return undefined
 }

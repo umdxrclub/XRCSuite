@@ -3,7 +3,7 @@ import {
   GatewayIntentBits, Partials
 } from "discord.js";
 import payload from "payload";
-import { BotCommands } from "./commands/command";
+import { BotCommands } from "./commands/Command";
 import BotInteractions from "./interactions/interactions";
 import { createAndUpdateStatusChannelManagers } from "./multi/multi";
 import { rejectInteractionIfNotLeadership } from "./util";
@@ -19,7 +19,7 @@ const BOT_INTENTS = [
 // Create the bot client.
 var discordClient: Client | undefined = undefined;
 
-function onCreateClient(guildId: string) {
+function onCreateClient(guildId: string, processDms: boolean) {
   if (discordClient) {
     discordClient.once("ready", async (client) => {
       console.log("Logged in as " + client.user.username);
@@ -29,7 +29,7 @@ function onCreateClient(guildId: string) {
     // Add slash command handlers
     discordClient.on("interactionCreate", async (interaction) => {
       // Make sure that the interaction comes from the configured guild.
-      if (interaction.guildId !== guildId) return;
+      if (interaction.guildId !== guildId && !(processDms && interaction.channel?.isDMBased())) return;
 
       BotInteractions.forEach(i => i(interaction))
 
@@ -66,7 +66,7 @@ export function getDiscordClient(): Client | undefined {
 
 export async function serveDiscordBot() {
   let discordConfig = await payload.findGlobal({ slug: "bot" });
-  if (discordConfig.enabled) {
+  if (discordConfig.enabled && discordConfig.guild.guildId) {
     console.log("Starting Discord Bot...");
     let token = discordConfig.auth.token;
     if (token) {
@@ -75,7 +75,7 @@ export async function serveDiscordBot() {
         partials: [Partials.Channel, Partials.Message, Partials.Reaction],
       });
 
-      onCreateClient(discordConfig.guild.guildId);
+      onCreateClient(discordConfig.guild.guildId, discordConfig.processDms);
 
       // Login to the Discord bot.
       try {

@@ -11,14 +11,17 @@ import payload from "payload";
 import Embed from "../../blocks/messages/Embed";
 import { sendDiscordMessages } from "../../collections/util/MessageUtil";
 import {
-    createAttachmentFromImageData,
+  createAttachmentFromImageData,
   createAttachmentFromMedia,
   createButton,
   DiscordMessage,
 } from "../../discord/util";
 import { Lab, Media, Schedule } from "../../types/PayloadSchema";
 import { createImageBanner } from "../../server/image";
-import { resolveDocument, resolveDocuments } from "../../server/payload-backend";
+import {
+  resolveDocument,
+  resolveDocuments,
+} from "../../server/payload-backend";
 
 let LabGoogleMapsURL = "https://goo.gl/maps/y9SHsm25SB874n6H8";
 
@@ -114,79 +117,81 @@ export async function createLabStatusEmbedMessages(): Promise<
     ];
 
     for (var day of days) {
-        let agenda = schedule.schedule[day]
-        if (agenda && agenda.length > 0) {
-            let dayString = day.charAt(0).toUpperCase() + day.substring(1);
-            let imgBanner = await createImageBanner(dayString)
-            let attachment = createAttachmentFromImageData(imgBanner).attachment
-            messages.push({ files: [attachment]})
-
-            let embedPromises = agenda.map(async block => {
-                let blockEmbed = new EmbedBuilder();
-
-                let time = block.time;
-                if (time.allDay) {
-                    blockEmbed.setDescription("**All Day**")
-                } else if (time.from && time.to) {
-                    let timeFormat = 'h:mm A'
-                    let fromTime = moment(time.from).format(timeFormat)
-                    let toTime = moment(time.to).format(timeFormat)
-                    blockEmbed.addFields([
-                        {
-                            name: "Time",
-                            value: fromTime,
-                            inline: true
-                        },
-                        {
-                            name: "To",
-                            value: toTime,
-                            inline: true
-                        }
-                    ])
-                }
-
-                switch (block.blockType) {
-                    case "opening":
-                        blockEmbed.setColor([133, 212, 49])
-                        if (block.staff && block.staff.length > 0) {
-                          let staff = await resolveDocuments(block.staff, "members");
-                          blockEmbed.addFields({
-                              name: "Staff",
-                              inline: true,
-                              value: staff
-                              .map(s => {
-                                if (s.nickname && s.nickname.length > 0) {
-                                  return s.nickname;
-                                }
-
-                                return s.name
-                              })
-                              .filter(n => n.length > 0)
-                              .join(", ")
-                          })
-                        }
-                        
-                        break;
-
-                    case "closing":
-                        blockEmbed.setTitle("Lab Closed")
-                        blockEmbed.setColor([212, 71, 49])
-                        break;
-                }
-
-                if (block.note && block.note.length > 0) {
-                    blockEmbed.addFields({
-                        name: "Note",
-                        value: block.note
-                    })
-                }
-
-                return blockEmbed;
-            })
-
-            let scheduleEmbeds = await Promise.all(embedPromises)
-            messages.push({ embeds: scheduleEmbeds })
+      let agenda = schedule.schedule[day];
+      if (agenda && agenda.length > 0) {
+        let dayString = day.charAt(0).toUpperCase() + day.substring(1);
+        let imgBanner = await createImageBanner(dayString);
+        if (imgBanner) {
+          let attachment = createAttachmentFromImageData(imgBanner).attachment;
+          messages.push({ files: [attachment] });
         }
+
+        let embedPromises = agenda.map(async (block) => {
+          let blockEmbed = new EmbedBuilder();
+
+          let time = block.time;
+          if (time.allDay) {
+            blockEmbed.setDescription("**All Day**");
+          } else if (time.from && time.to) {
+            let timeFormat = "h:mm A";
+            let fromTime = moment(time.from).format(timeFormat);
+            let toTime = moment(time.to).format(timeFormat);
+            blockEmbed.addFields([
+              {
+                name: "Time",
+                value: fromTime,
+                inline: true,
+              },
+              {
+                name: "To",
+                value: toTime,
+                inline: true,
+              },
+            ]);
+          }
+
+          switch (block.blockType) {
+            case "opening":
+              blockEmbed.setColor([133, 212, 49]);
+              if (block.staff && block.staff.length > 0) {
+                let staff = await resolveDocuments(block.staff, "members");
+                blockEmbed.addFields({
+                  name: "Staff",
+                  inline: true,
+                  value: staff
+                    .map((s) => {
+                      if (s.nickname && s.nickname.length > 0) {
+                        return s.nickname;
+                      }
+
+                      return s.name;
+                    })
+                    .filter((n) => n.length > 0)
+                    .join(", "),
+                });
+              }
+
+              break;
+
+            case "closing":
+              blockEmbed.setTitle("Lab Closed");
+              blockEmbed.setColor([212, 71, 49]);
+              break;
+          }
+
+          if (block.note && block.note.length > 0) {
+            blockEmbed.addFields({
+              name: "Note",
+              value: block.note,
+            });
+          }
+
+          return blockEmbed;
+        });
+
+        let scheduleEmbeds = await Promise.all(embedPromises);
+        messages.push({ embeds: scheduleEmbeds });
+      }
     }
   }
 
@@ -214,8 +219,10 @@ export async function createLabStatusEmbedMessages(): Promise<
   var bannerAttachment: AttachmentBuilder | undefined = undefined;
   if (bannerMedia) {
     let attachment = await createAttachmentFromMedia(bannerMedia);
-    bannerAttachment = attachment.attachment;
-    embed.setImage(attachment.url);
+    if (attachment) {
+      bannerAttachment = attachment.attachment;
+      embed.setImage(attachment.url);
+    }
   }
 
   embed.setFooter({ text: "AVW 4176" });
@@ -249,9 +256,12 @@ export async function createLabStatusEmbedMessages(): Promise<
   );
 
   // Create "Lab Status" banner
-  let labStatusBannerImg = await createImageBanner("Lab Status")
-  let labStatusAttachment = createAttachmentFromImageData(labStatusBannerImg).attachment
-  messages.push({ files: [ labStatusAttachment ]})
+  let labStatusBannerImg = await createImageBanner("Lab Status");
+  if (labStatusBannerImg) {
+    let labStatusAttachment =
+      createAttachmentFromImageData(labStatusBannerImg).attachment;
+    messages.push({ files: [labStatusAttachment] });
+  }
 
   // Add Lab status embed
   let labStausMsg: DiscordMessage = {

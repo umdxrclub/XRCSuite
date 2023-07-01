@@ -9,7 +9,7 @@ import {
 import payload from "payload";
 import { getMemberFromDiscordId } from "../../collections/util/MembersUtil";
 import XRC from "../../server/XRC";
-import { Command } from "./command";
+import { Command } from "./Command";
 
 async function onLinkInvoke(
   interaction: ChatInputCommandInteraction<CacheType>
@@ -57,7 +57,7 @@ async function onLinkInvoke(
 
     case "swipecard":
       if (member) {
-        let serial = interaction.options.getString("serial");
+        let serial = interaction.options.getString("serial")!;
         const re = /[0-9]{14}/;
         let isValidSerial = re.test(serial)
 

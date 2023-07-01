@@ -1,20 +1,10 @@
-import startWebServer from "./server";
-import { serveDiscordBot } from "./discord/bot"
 import dotenv from "dotenv";
-import { scheduleJobs } from "./jobs/Scheduler";
+import startXRCSuite from "./suite";
 
 // Load environment
 dotenv.config();
 
 (async () => {
-    // Create web server.
-    await startWebServer();
-
-    console.log("Backend server ready, starting Discord bot...")
-    await serveDiscordBot();
-
-    scheduleJobs();
-
-    console.log("XRCSuite is now ready.")
+    await startXRCSuite();
 })();
 

@@ -198,7 +198,7 @@ export type MemberProfile = {
     nickname?: string,
     leadershipRoles?: string[],
     profilePictureUrl?: string,
-    bio: string,
+    bio?: string,
     links: {
         type: string,
         url: string

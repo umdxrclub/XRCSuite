@@ -1,22 +1,23 @@
 import { AttachmentBuilder, EmbedBuilder } from "discord.js";
 import payload from "payload";
-import { bulkSendGuildMessages, createAttachmentFromImageData, createAttachmentFromMedia, DiscordMessage, sendGuildMessage } from "../../discord/util";
-import { getDocumentId, getOptionLabel } from "../../util/payload";
-import { CollectionSlugs } from "../../slugs";
+import { DiscordMessage, bulkSendGuildMessages, createAttachmentFromImageData, createAttachmentFromMedia } from "../../discord/util";
+import { createImageBanner } from "../../server/image";
 import { Description } from "../../types/PayloadSchema";
 import { DescriptionType } from "../../types/XRCTypes";
-import { createImageBanner } from "../../server/image";
+import { getDocumentId, getOptionLabel } from "../../util/payload";
 import { getPublicDevices } from "./DevicesUtil";
 
 export async function createDeviceDescriptionMessage(description: Description): Promise<DiscordMessage> {
     let embed = new EmbedBuilder()
     embed.setTitle(description.name)
 
-    var attachment: AttachmentBuilder = undefined
+    var attachment: AttachmentBuilder | undefined = undefined
     if (description.image) {
         let image = await createAttachmentFromMedia(description.image);
-        attachment = image.attachment;
-        embed.setThumbnail(image.url)
+        if (image) {
+            attachment = image.attachment;
+            embed.setThumbnail(image.url)
+        }
     }
 
     return { embeds: [embed], files: attachment ? [attachment] : [] }
@@ -24,7 +25,7 @@ export async function createDeviceDescriptionMessage(description: Description): 
 
 export async function postPublicInventoryInDiscord() {
     let devices = await getPublicDevices()
-    let descriptionIds = new Set<string>(devices.map(d => getDocumentId(d.description)))
+    let descriptionIds = new Set<string>(devices.filter(d => d.description).map(d => getDocumentId(d.description!)))
     let descriptionPromises: Promise<Description>[] = []
     descriptionIds.forEach(id => descriptionPromises.push(payload.findByID({ id: id, collection: "descriptions" })))
     let allDescriptions = await Promise.all(descriptionPromises);
@@ -35,14 +36,15 @@ export async function postPublicInventoryInDiscord() {
             descriptionMap.set(d.type, [])
         }
 
-        descriptionMap.get(d.type).push(d)
+        descriptionMap.get(d.type)!.push(d)
     })
 
     let messages: DiscordMessage[] = []
 
     for (var pair of Array.from(descriptionMap.entries())) {
         let [ type, descriptions ] = pair;
-        let bannerImage = await createImageBanner(getOptionLabel(DescriptionType, type))
+        let bannerImage = await createImageBanner(getOptionLabel(DescriptionType, type)!)
+        if (!bannerImage) continue;
         let bannerAttachment = createAttachmentFromImageData(bannerImage);
 
         let descriptionMessages = await Promise.all(descriptions.map(createDeviceDescriptionMessage))

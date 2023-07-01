@@ -50,7 +50,7 @@ export interface Admin {
 }
 export interface Member {
   id: string;
-  name?: string;
+  name: string;
   nickname?: string;
   birthday?: string;
   email?: string;
@@ -79,6 +79,7 @@ export interface Member {
     oculus?: string;
     steam?: string;
     scoresaber?: string;
+    trello?: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -112,21 +113,15 @@ export interface Integration {
 }
 export interface Device {
   id: string;
-  description: string | Description;
-  status: 'inLab' | 'checkedOut';
+  name: string;
+  description?: string | Description;
   public: boolean;
-  model?: string;
-  originalValue?: number;
+  status: 'inLab' | 'checkedOut';
   serial?: string;
   mac?: string;
-  sponsor?: string;
-  purchaser?: string;
-  owner?: string;
-  umdSerial?: string;
+  departmentTag?: string;
   xrTag?: string;
-  location?: string;
   dateReceived?: string;
-  dateReturned?: string;
   lastAudited?: string;
   items: {
     name: string;
@@ -205,11 +200,11 @@ export interface Attendance {
 }
 export interface Event {
   id: string;
-  name?: string;
+  name: string;
   type?: 'Workshop' | 'Interest Meeting' | 'Speaker Event' | 'Game Night' | 'Tournament' | 'Field Trip' | 'Other';
   location?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate: string;
+  endDate: string;
   imageUrl?: string;
   description?: string;
   terplink: {
@@ -324,19 +319,19 @@ export interface Message {
 }
 export interface Poll {
   id: string;
-  title?: string;
-  open?: boolean;
+  title: string;
+  open: boolean;
   allowRevote?: boolean;
-  author?: string;
+  author: string;
   messages: {
-    channel?: string;
-    msg?: string;
+    channel: string;
+    msg: string;
     id?: string;
   }[];
   choices: {
-    name?: string;
+    name: string;
     voters: {
-      id?: string;
+      id: string;
     }[];
     id?: string;
   }[];
@@ -629,6 +624,7 @@ export interface Bot {
       project?: string | Role;
     };
   };
+  processDms: boolean;
 }
 export interface CAS {
   id: string;
@@ -636,7 +632,7 @@ export interface CAS {
   password?: string;
   duoDeviceName?: string;
   hotpSecret?: string;
-  hotpCounter?: number;
+  hotpCounter: number;
 }
 export interface Wishlist {
   id: string;
@@ -656,6 +652,7 @@ export interface Odoo {
 export interface Trello {
   id: string;
   key?: string;
+  secret?: string;
   token?: string;
   organization?: string;
 }

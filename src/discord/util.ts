@@ -1,10 +1,21 @@
 import {
-    ActionRowBuilder, AttachmentBuilder, ButtonBuilder,
-    ButtonStyle, CacheType, ChatInputCommandInteraction, Guild, GuildBasedChannel, Message, MessageCreateOptions,
-    MessagePayload, NewsChannel, REST,
-    RESTPostAPIApplicationCommandsJSONBody,
-    Routes,
-    TextChannel
+  ActionRowBuilder,
+  AttachmentBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CacheType,
+  ChatInputCommandInteraction,
+  Guild,
+  GuildBasedChannel,
+  Message,
+  MessageCreateOptions,
+  MessageEditOptions,
+  MessagePayload,
+  NewsChannel,
+  REST,
+  RESTPostAPIApplicationCommandsJSONBody,
+  Routes,
+  TextChannel,
 } from "discord.js";
 import path from "path";
 import payload from "payload";
@@ -15,9 +26,11 @@ import { XRCSuiteChannelType } from "../types/XRCTypes";
 import { resolveDocument } from "../server/payload-backend";
 import { Throttle } from "../util/throttle";
 import { getDiscordClient } from "./bot";
-import { BotCommands } from "./commands/command";
+import { BotCommands } from "./commands/Command";
 
-export type DiscordMessage = string | MessagePayload | MessageCreateOptions
+export type DiscordCreatableMessage = string | MessagePayload | MessageCreateOptions;
+export type DiscordEditableMessage = string | MessagePayload | MessageEditOptions;
+export type DiscordMessage = DiscordCreatableMessage & DiscordEditableMessage;
 
 /**
  * Sends a message to the specified announcement channel of all registered
@@ -26,15 +39,18 @@ export type DiscordMessage = string | MessagePayload | MessageCreateOptions
  * @param channelType The type of channel to send the message to
  * @param content The message content
  */
-export async function sendGuildMessage (
+export async function sendGuildMessage(
   channelType: XRCSuiteChannelType,
   content: DiscordMessage
 ): Promise<Message | undefined> {
-    let channel = await getGuildChannel(channelType);
+  let channel = await getGuildChannel(channelType);
 
-    if (channel && (channel instanceof TextChannel || channel instanceof NewsChannel)) {
-        return await channel.send(content);
-    }
+  if (
+    channel &&
+    (channel instanceof TextChannel || channel instanceof NewsChannel)
+  ) {
+    return await channel.send(content);
+  }
 }
 
 /**
@@ -43,55 +59,60 @@ export async function sendGuildMessage (
  * @returns The current Discord guild.
  */
 export async function getGuild(): Promise<Guild | null> {
-    let client = getDiscordClient();
+  let client = getDiscordClient();
+  if (!client) return null;
 
-    let { guild } = await payload.findGlobal({
-        slug: "bot"
-    })
+  let { guild } = await payload.findGlobal({
+    slug: "bot",
+  });
 
-    if (guild.guildId) {
-        return await client.guilds.fetch(guild.guildId)
-    } else {
-        return null;
-    }
+  if (guild.guildId) {
+    return await client.guilds.fetch(guild.guildId);
+  } else {
+    return null;
+  }
 }
 
-export async function getGuildChannel(channelType: XRCSuiteChannelType): Promise<GuildBasedChannel | null>{
-    let { guild } = await payload.findGlobal({
-        slug: "bot"
-    });
+export async function getGuildChannel(
+  channelType: XRCSuiteChannelType
+): Promise<GuildBasedChannel | null> {
+  let { guild } = await payload.findGlobal({
+    slug: "bot",
+  });
 
-    let channelId: string | undefined = guild.channels[channelType];
+  let channelId: string | undefined = guild.channels[channelType];
 
-    // Check to see that a channel was successfully retrieved.
-    if (channelId) {
-        let channel = await getGuildChannelById(channelId);
-        return channel;
-    }
+  // Check to see that a channel was successfully retrieved.
+  if (channelId) {
+    let channel = await getGuildChannelById(channelId);
+    return channel;
+  }
 
-    return null;
+  return null;
 }
 
-export async function getGuildChannelById(channelId: string): Promise<GuildBasedChannel | null> {
-    let guild = await getGuild();
-    if (guild) {
-        let channel = await guild.channels.fetch(channelId)
-        return channel;
-    }
+export async function getGuildChannelById(
+  channelId: string
+): Promise<GuildBasedChannel | null> {
+  let guild = await getGuild();
+  if (guild) {
+    let channel = await guild.channels.fetch(channelId);
+    return channel;
+  }
 
-    return null;
+  return null;
 }
 
 export async function getGuildRole(roleId: string) {
-    let guild = await getGuild()
-    if (guild) {
-        let role = await guild.roles.resolve(roleId)
-        if (role) {
-            return role;
-        }
+  let guild = await getGuild();
+  if (guild) {
+    let role = await guild.roles.resolve(roleId);
+    if (role) {
+      return role;
     }
+  }
 
-    return null;
+  return null;
 }
 
 /**
@@ -99,30 +120,34 @@ export async function getGuildRole(roleId: string) {
  * currently configured guild in Payload.
  */
 export async function registerCommands() {
-    let client = await getDiscordClient();
-    let discordConfig = await payload.findGlobal({
-        slug: "bot"
-    })
+  let client = getDiscordClient();
+  let discordConfig = await payload.findGlobal({
+    slug: "bot",
+  });
 
-    if (client && discordConfig) {
-        // Create the REST handler.
-        const rest = new REST({ version: '9' }).setToken(client.token);
+  if (
+    client &&
+    client.token &&
+    discordConfig.auth.clientId &&
+    discordConfig.guild.guildId
+  ) {
+    // Create the REST handler.
+    const rest = new REST({ version: "9" }).setToken(client.token);
 
-        // Create the JSON body for each command.
-        var commands: RESTPostAPIApplicationCommandsJSONBody[] = [];
-        BotCommands.forEach((command) => {
-            commands.push(command.data.toJSON());
-        });
+    // Create the JSON body for each command.
+    var commands: RESTPostAPIApplicationCommandsJSONBody[] = [];
+    BotCommands.forEach((command) => {
+      commands.push(command.data.toJSON());
+    });
 
-        let clientId = discordConfig.auth.clientId
+    let clientId = discordConfig.auth.clientId;
 
-        // Add commands to all servers.
-        let guildId = discordConfig.guild.guildId;
-        await rest.put(
-            Routes.applicationGuildCommands(clientId, guildId),
-            { body: commands }
-        )
-    }
+    // Add commands to all servers.
+    let guildId = discordConfig.guild.guildId;
+    await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+      body: commands,
+    });
+  }
 }
 
 /**
@@ -132,13 +157,18 @@ export async function registerCommands() {
  * @param interaction The interaction to verify
  * @returns Whether the interaction was rejected
  */
-export async function rejectInteractionIfNotLeadership(interaction: ChatInputCommandInteraction<CacheType>): Promise<boolean> {
-    if (await isDiscordMemberLeadership(interaction.user.id)) {
-        return false;
-    }
+export async function rejectInteractionIfNotLeadership(
+  interaction: ChatInputCommandInteraction<CacheType>
+): Promise<boolean> {
+  if (await isDiscordMemberLeadership(interaction.user.id)) {
+    return false;
+  }
 
-    await interaction.reply({ content: "You do not have permission to use this command!", ephemeral: true })
-    return true;
+  await interaction.reply({
+    content: "You do not have permission to use this command!",
+    ephemeral: true,
+  });
+  return true;
 }
 
 /**
@@ -149,122 +179,127 @@ export async function rejectInteractionIfNotLeadership(interaction: ChatInputCom
  * @returns An attachment builder and url
  */
 export async function createAttachmentFromMedia(media: Media | string) {
-    let resolvedMedia = await resolveDocument(media, "media");
-    let attachment = new AttachmentBuilder(path.join(MediaDirectory, resolvedMedia.filename))
-    let url = "attachment://" + resolvedMedia.filename
+  let resolvedMedia = await resolveDocument(media, "media");
+  if (!resolvedMedia.filename) return null;
+  let attachment = new AttachmentBuilder(
+    path.join(MediaDirectory, resolvedMedia.filename)
+  );
+  let url = "attachment://" + resolvedMedia.filename;
 
-    return {
-        attachment, url
-    }
+  return {
+    attachment,
+    url,
+  };
 }
 
-export async function bulkSendGuildMessages(channel: XRCSuiteChannelType, messages: DiscordMessage[]): Promise<Message[]> {
-    let sentMessages: Message[] = []
+export async function bulkSendGuildMessages(
+  channel: XRCSuiteChannelType,
+  messages: DiscordMessage[]
+): Promise<Message[]> {
+  let sentMessages: Message[] = [];
 
-    for (var msg of messages) {
-        let sentMsg = await sendGuildMessage(channel, msg)
-        if (sentMsg) {
-            sentMessages.push(sentMsg)
-        }
-        await Throttle.wait(1000)
+  for (var msg of messages) {
+    let sentMsg = await sendGuildMessage(channel, msg);
+    if (sentMsg) {
+      sentMessages.push(sentMsg);
     }
+    await Throttle.wait(1000);
+  }
 
-    return sentMessages
+  return sentMessages;
 }
-
 
 export function createAttachmentFromImageData(image: string) {
-    // TODO: Fixme! Doesn't work when missing image banner.
-    let buff = Buffer.from(image.split(",")[1], "base64")
-    let attachment = new AttachmentBuilder(buff)
+  // TODO: Fixme! Doesn't work when missing image banner.
+  let buff = Buffer.from(image.split(",")[1], "base64");
+  let attachment = new AttachmentBuilder(buff);
 
-    return attachment;
+  return attachment;
 }
-
 
 let roleThrottle = new Throttle(1000);
 
 export async function addRoleToEveryone(roleId: string) {
-    await roleThrottle.exec(async () => {
-        let guild = await getGuild();
-        if (guild) {
-            // Ensure role actually exists first.
-            let role = await getGuildRole(roleId);
-            if (!role) 
-                return;
+  await roleThrottle.exec(async () => {
+    let guild = await getGuild();
+    if (guild) {
+      // Ensure role actually exists first.
+      let role = await getGuildRole(roleId);
+      if (!role) return;
 
-            let membersMap = await guild.members.fetch()
-            let allMembers = Array.from(membersMap.values())
+      let membersMap = await guild.members.fetch();
+      let allMembers = Array.from(membersMap.values());
 
-            for (var member of allMembers) {
-                if (!member.user.bot && !member.roles.cache.has(roleId)) {
-                    try {
-                        await member.roles.add(roleId)
-                    } catch { }
-                }
-            }
+      for (var member of allMembers) {
+        if (!member.user.bot && !member.roles.cache.has(roleId)) {
+          try {
+            await member.roles.add(roleId);
+          } catch {}
         }
-    })
+      }
+    }
+  });
 }
 
 export async function removeRoleFromEveryone(roleId: string) {
-    let guild = await getGuild();
-    if (guild) {
-        // Ensure role actually exists first.
-        let role = await getGuildRole(roleId);
-        if (!role) 
-            return;
+  let guild = await getGuild();
+  if (guild) {
+    // Ensure role actually exists first.
+    let role = await getGuildRole(roleId);
+    if (!role) return;
 
-        let membersMap =  await guild.members.fetch()
-        let allMembers = Array.from(membersMap.values())
-        for (var member of allMembers) {
-            let hasRole = member.roles.cache.has(roleId);
-            if (hasRole) {
-                await member.roles.remove(roleId)
-            }
-        }
+    let membersMap = await guild.members.fetch();
+    let allMembers = Array.from(membersMap.values());
+    for (var member of allMembers) {
+      let hasRole = member.roles.cache.has(roleId);
+      if (hasRole) {
+        await member.roles.remove(roleId);
+      }
     }
+  }
 }
 
 type DiscordButton = {
-    style: ButtonStyle,
-    label: string,
-    customId?: string,
-    url?: string,
-    emoji?: string,
-}
+  style: ButtonStyle;
+  label: string;
+  customId?: string;
+  url?: string;
+  emoji?: string;
+};
 
-export function createButtonRowComponents(buttons: DiscordButton[]): ActionRowBuilder<ButtonBuilder>[] {
-    let maxRows = 5;
-    let maxButtonsPerRow = 5;
-    let totalButtons = Math.min(buttons.length, maxRows * maxButtonsPerRow);
+export function createButtonRowComponents(
+  buttons: DiscordButton[]
+): ActionRowBuilder<ButtonBuilder>[] {
+  let maxRows = 5;
+  let maxButtonsPerRow = 5;
+  let totalButtons = Math.min(buttons.length, maxRows * maxButtonsPerRow);
 
-    let numRows = Math.min(5, Math.ceil(buttons.length / 5));
-    let rows: ActionRowBuilder<ButtonBuilder>[] = []
-    for (var r = 0; r < numRows; r++) {
-        let rowStart = maxButtonsPerRow * r;
-        let rowEnd = Math.min(rowStart + maxButtonsPerRow, totalButtons);
-        let row = new ActionRowBuilder<ButtonBuilder>();
+  let numRows = Math.min(5, Math.ceil(buttons.length / 5));
+  let rows: ActionRowBuilder<ButtonBuilder>[] = [];
+  for (var r = 0; r < numRows; r++) {
+    let rowStart = maxButtonsPerRow * r;
+    let rowEnd = Math.min(rowStart + maxButtonsPerRow, totalButtons);
+    let row = new ActionRowBuilder<ButtonBuilder>();
 
-        for (var i = rowStart; i < rowEnd; i++) {
-            let button = buttons[i]
-            row.addComponents(createButton(button))
-        }
-
-        rows.push(row)
+    for (var i = rowStart; i < rowEnd; i++) {
+      let button = buttons[i];
+      row.addComponents(createButton(button));
     }
 
-    return rows;
+    rows.push(row);
+  }
+
+  return rows;
 }
 
 export function createButton(button: DiscordButton) {
-    let builder = new ButtonBuilder()
+  let builder = new ButtonBuilder();
 
-    builder = builder.setStyle(button.style);
-    builder = builder.setLabel(button.label);
-    if (button.customId) builder = builder.setCustomId(button.customId)
-    if (button.url) builder = builder.setURL(button.url)
-    if (button.emoji) builder = builder.setEmoji(button.emoji)
+  builder = builder.setStyle(button.style);
+  builder = builder.setLabel(button.label);
+  if (button.customId) builder = builder.setCustomId(button.customId);
+  if (button.url) builder = builder.setURL(button.url);
+  if (button.emoji) builder = builder.setEmoji(button.emoji);
 
-    return builder;
+  return builder;
 }

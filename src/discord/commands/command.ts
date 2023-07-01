@@ -1,13 +1,13 @@
 import { SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
-import { CacheType, ChatInputCommandInteraction, Interaction } from "discord.js";
+import { CacheType, ChatInputCommandInteraction } from "discord.js";
 import { InteractionHandler } from "../interactions/interactions";
-import { BirthdayCommand } from "./birthday";
-import { EventsCommand } from "./events";
-import { ExecCommand } from "./exec";
 import { LabCommand } from "./Lab";
-import { LinkCommand } from "./link";
 import { PollCommand } from "./Poll";
-import { RolesCommand } from "./roles";
+import { BirthdayCommand } from "./Birthday";
+import { EventsCommand } from "./Events";
+import { ExecCommand } from "./Exec";
+import { LinkCommand } from "./Link";
+import { RolesCommand } from "./Roles";
 
 type CommandData = SlashCommandBuilder | SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder | Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand">
 

@@ -7,9 +7,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { DiscordMemberInfo } from "../../types/XRCTypes";
 
 const DiscordMemberField: React.FC<Props> = ({ path, label, required, name }) => {
+  if (!path) return null;
+  
   const { value, setValue } = useField<string>({ path: path });
   const [ memberInfo, setMemberInfo ] = useState<DiscordMemberInfo | null>(null);
-  const ref = useRef<HTMLInputElement>();
+  const ref = useRef<HTMLInputElement | null>(null) as React.MutableRefObject<HTMLInputElement>;
 
   useEffect(() => {
     if (value.length == 18) {

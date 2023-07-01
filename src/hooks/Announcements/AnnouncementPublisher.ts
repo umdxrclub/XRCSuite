@@ -17,7 +17,7 @@ function convertRichTextToDiscordString(richText: any[]) {
     let message = ""
 
     richText.forEach((parent, i) => {
-        parent.children.forEach(child => {
+        parent.children.forEach((child: any) => {
             if (child.text) {
                 let childText = child.text
                 if (child.bold) {

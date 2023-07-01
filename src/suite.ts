@@ -4,7 +4,10 @@ import https from "https";
 import http from "http";
 import payload from "payload";
 import process from "process"
+import dotenv from "dotenv";
 import { createWebSocketEndpoints } from "./ws/WebSocketServer";
+import { serveDiscordBot } from "./discord/bot";
+import { scheduleJobs } from "./jobs/Scheduler";
 
 export type ExpressRequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 
@@ -19,7 +22,10 @@ function createLogger(app: express.Express) {
     });
 }
 
-export default async function startWebServer() {
+export default async function startXRCSuite(light?: boolean) {
+    // Load environment
+    dotenv.config();
+
     const app = express();
 
     // Enable JSON parsing for requests.
@@ -31,6 +37,9 @@ export default async function startWebServer() {
     const callback = (https: boolean) => {
         console.log(`XRC Backend running on port ${process.env.port} (https=${https})`);
     }
+
+    if (!process.env.MONGO_SECRET || !process.env.MONGO_URL)
+        throw new Error("Missing mongo environment variables!")
 
     // Start payload
     await payload.init({
@@ -53,4 +62,20 @@ export default async function startWebServer() {
 
     // Create WebSocket servers
     createWebSocketEndpoints(server);
+
+    // Create redirect
+    if (process.env.REDIRECT) {
+        app.get("/", async (_, res) => {
+            res.redirect(process.env.REDIRECT!)
+        })
+    }
+
+    if (!light) {
+        console.log("Backend server ready, starting Discord bot...")
+        await serveDiscordBot();
+
+        scheduleJobs();
+
+        console.log("XRCSuite is now ready.")
+    }
 }

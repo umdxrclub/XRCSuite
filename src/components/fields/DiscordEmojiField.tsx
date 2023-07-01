@@ -10,6 +10,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { useGuildContext } from "../providers/DiscordGuildProvider";
 
 const DiscordEmojiField: React.FC<Props> = ({ path, label, required, name }) => {
+  if (!path) return null;
+
   const { value, setValue } = useField<string>({ path: path });
   const [ open, setPickerOpen ] = useState<boolean>(false);
   const [ emojiUrl, setEmojiUrl ] = useState<string | null>(null);

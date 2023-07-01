@@ -60,16 +60,16 @@ export function createWebSocketEndpoints(httpServer: http.Server | https.Server)
 
         // Add handlers to the server
         if (endpoint.onConnection)
-            wsServer.on('connection', (socket, req) => endpoint.onConnection(wsServer, socket, req))
+            wsServer.on('connection', (socket, req) => endpoint.onConnection!(wsServer, socket, req))
 
         if (endpoint.onError)
-            wsServer.on('error', err => endpoint.onError(wsServer, err))
+            wsServer.on('error', err => endpoint.onError!(wsServer, err))
 
         if (endpoint.onHeaders)
-            wsServer.on('headers', (headers, req) => endpoint.onHeaders(wsServer, headers, req))
+            wsServer.on('headers', (headers, req) => endpoint.onHeaders!(wsServer, headers, req))
 
         if (endpoint.onClose)
-            wsServer.on('close', () => endpoint.onClose(wsServer))
+            wsServer.on('close', () => endpoint.onClose!(wsServer))
 
         if (endpoint.onListening)
             wsServer.on('listening', () => endpoint.onListening)

@@ -2,15 +2,24 @@ import { GlobalConfig } from "payload/types";
 import { GlobalSlugs } from "../slugs";
 import PasswordField from "../components/fields/PasswordField";
 import TrelloTest from "../endpoints/Trello/TrelloTest";
-import TrelloWebhookEndpoint from "../endpoints/Trello/TrelloWebhookEndpoint";
+import { TrelloWebhookHEADEndpoint, TrelloWebhookPOSTEndpoint } from "../endpoints/Trello/TrelloWebhookEndpoint";
 
-const Trello: GlobalConfig = {
+const TrelloConfig: GlobalConfig = {
     slug: GlobalSlugs.Trello,
-    endpoints: [ TrelloWebhookEndpoint, TrelloTest ],
+    endpoints: [ TrelloWebhookHEADEndpoint, TrelloWebhookPOSTEndpoint, TrelloTest ],
     fields: [
         {
             name: "key",
             type: "text"
+        },
+        {
+            name: "secret",
+            type: "text",
+            admin: {
+                components: {
+                    Field: PasswordField
+                }
+            }
         },
         {
             name: 'token',
@@ -28,4 +37,4 @@ const Trello: GlobalConfig = {
     ]
 }
 
-export default Trello;
+export default TrelloConfig;

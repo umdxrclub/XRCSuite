@@ -19,7 +19,8 @@ const Members: CollectionConfig = {
     fields: [
         {
             name: 'name',
-            type: 'text'
+            type: 'text',
+            required: true
         },
         {
             name: 'nickname',

@@ -22,7 +22,7 @@ function convertRichTextToDiscordString(richText: any[]) {
     let message = ""
 
     richText.forEach((parent, i) => {
-        parent.children.forEach(child => {
+        parent.children.forEach((child: any) => {
             if (child.text) {
                 let childText = child.text
                 if (child.bold) {
@@ -69,12 +69,14 @@ export async function createDiscordMessages(message: Message): Promise<DiscordMe
                 break;
             case "image":
                 let attachment = await createAttachmentFromMedia(block.image)
-                messages.push({ files: [attachment.attachment]})
+                if (attachment) messages.push({ files: [attachment.attachment]})
                 break;
             case "banner":
                 let banner = await createImageBanner(block.title)
-                let bannerAttachment = await createAttachmentFromImageData(banner)
-                messages.push({ files: [ bannerAttachment ]})
+                if (banner) {
+                    let bannerAttachment = await createAttachmentFromImageData(banner)
+                    messages.push({ files: [ bannerAttachment ]})
+                }
                 break;
             case "roleSelect":
                 let roles = await createRoleSelectMessage();
@@ -87,7 +89,7 @@ export async function createDiscordMessages(message: Message): Promise<DiscordMe
                 break;
             case "embed":
                 let embed = new EmbedBuilder();
-                embed.setTitle(block.title)
+                if (block.title) embed.setTitle(block.title)
                 if (block.timestamp) embed.setTimestamp(new Date(block.timestamp))
                 if (block.description) embed.setDescription(convertRichTextToDiscordString(block.description))
                 if (block.color) embed.setColor(rgbToNumber(block.color))

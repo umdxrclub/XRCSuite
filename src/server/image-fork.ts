@@ -31,12 +31,13 @@ async function createBanner(bgPath: string, text: string, font: string): Promise
 let Functions = [ createBanner ]
 
 process.on("message", async msg => {
+    if (!process.send) return;
     let func = JSON.parse(msg as string) as ForkFunction
 
     let foundFunc = Functions.find(f => f.name == func.name);
     if (foundFunc) {
-        let output = foundFunc.call(this, ...func.args)
-        process.send(await output)
+        let output = await foundFunc.call<any, any, any>(this, ...func.args)
+        process.send(output)
     } else {
         process.send("FAIL")
     }

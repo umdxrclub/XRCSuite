@@ -27,7 +27,8 @@ const Descriptions: CollectionConfig = {
         },
         {
             name: 'description',
-            type: 'richText',
+            type: "textarea",
+            required: true,
         }
     ]
 }
