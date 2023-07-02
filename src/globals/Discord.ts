@@ -1,5 +1,5 @@
 import { GlobalConfig } from "payload/types";
-import { createActionButton } from "../components/ActionButton";
+import { createPostActionButton } from "../components/PostActionButton";
 import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpiont";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
@@ -29,7 +29,7 @@ const Bot: GlobalConfig = {
             type: 'ui',
             admin: {
                 components: {
-                    Field: createActionButton({ title: "Register Slash Commands", postUrl: "/api/globals/bot/registerCommands" })
+                    Field: createPostActionButton({ title: "Register Slash Commands", postUrl: "/api/globals/bot/registerCommands" })
                 }
             }
         },
@@ -78,8 +78,8 @@ const Bot: GlobalConfig = {
                     type: 'group',
                     fields: ChannelType.map(ct => createDiscordChannelField({
                         name: ct.value,
-                        label: ct.label,
-                    }))
+                        label: ct.label
+                    }, [0,5]))
                 },
                 createDiscordRoleField({
                     name: 'defaultRole',

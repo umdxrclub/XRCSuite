@@ -1,5 +1,5 @@
 import { CollectionConfig } from "payload/types";
-import { createActionButton } from "../components/ActionButton";
+import { createPostActionButton } from "../components/PostActionButton";
 import DeviceInventoryEndpoint from "../endpoints/Devices/DeviceInventory";
 import WakeOnLANEndpoint from "../endpoints/Devices/WakeOnLAN";
 import { CollectionSlugs } from "../slugs";
@@ -133,7 +133,7 @@ const Devices: CollectionConfig = {
       admin: {
         condition: (data) => !!data.macAddress,
         components: {
-          Field: createActionButton({
+          Field: createPostActionButton({
             title: "Send WOL Packet",
             postUrl: "/api/devices/:id/wol",
           }),

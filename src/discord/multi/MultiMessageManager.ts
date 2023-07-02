@@ -36,6 +36,7 @@ class MultiMessageManager {
     public async deleteAllMessages() {
         let channel = await this.getMessageChannel();
         if (!channel) return;
+        
         await channel.bulkDelete(this._messageIds);
         this.setMessageIds([])
     }

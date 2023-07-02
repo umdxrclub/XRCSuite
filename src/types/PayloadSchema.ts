@@ -126,8 +126,8 @@ export interface Device {
   items: {
     name: string;
     quantity: number;
-    modelNumber?: string;
     serialNumber?: string;
+    departmentTag?: string;
     xrTag?: string;
     notes?: string;
     id?: string;
@@ -151,9 +151,7 @@ export interface Description {
     | 'h_misc'
     | 's_game'
     | 's_software';
-  description?: {
-    [k: string]: unknown;
-  }[];
+  description: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -201,8 +199,11 @@ export interface Attendance {
 export interface Event {
   id: string;
   name: string;
-  type?: 'Workshop' | 'Interest Meeting' | 'Speaker Event' | 'Game Night' | 'Tournament' | 'Field Trip' | 'Other';
-  location?: string;
+  type?: string;
+  location: {
+    isDiscordChannel: boolean;
+    name: string;
+  };
   startDate: string;
   endDate: string;
   imageUrl?: string;

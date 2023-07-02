@@ -25,4 +25,20 @@ class XRCManager
 
 const XRC = new XRCManager();
 
+export function useTerpLink() {
+    return XRC.terplink;
+}
+
+export function useDirectory() {
+    return XRC.directory;
+}
+
+export function useOdoo() {
+    return XRC.odoo;
+}
+
+export function useUMDVerifier() {
+    return XRC.umd;
+}
+
 export default XRC;

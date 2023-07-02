@@ -1,18 +1,15 @@
-import { FieldBase } from "payload/dist/fields/config/types"
 import { Field } from "payload/types"
-import DiscordChannelField from "../../components/fields/DiscordChannelField"
+import { createDiscordChannelComponent } from "../../components/fields/DiscordChannelField"
+import { FieldBaseNoType } from "../../types/XRCTypes"
 
-type DiscordChannelField = Omit<FieldBase, "type"> & {
-
-}
-
-export const createDiscordChannelField: (field: DiscordChannelField) => Field = field => {
+export function createDiscordChannelField(field: FieldBaseNoType, channelTypes: number[]): Field {
+    let component = createDiscordChannelComponent(channelTypes)
     return {
         ...field,
         type: "text",
         admin: {
             components: {
-                Field: DiscordChannelField
+                Field: component
             }
         }
     }
