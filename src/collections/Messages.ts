@@ -42,7 +42,7 @@ const Messages: CollectionConfig = {
                 createDiscordChannelField({
                     name: 'channelId',
                     required: true
-                }),
+                }, [0, 2]),
                 {
                     name: 'alwaysResendMessages',
                     type: 'checkbox',

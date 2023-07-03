@@ -6,7 +6,7 @@ import { Box } from "@mui/system";
 import { Button } from "payload/components/elements";
 import { Props } from "payload/components/fields/Text";
 import { TextInput, useField } from "payload/components/forms";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useGuildContext } from "../providers/DiscordGuildProvider";
 
 const DiscordEmojiField: React.FC<Props> = ({ path, label, required, name }) => {

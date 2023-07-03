@@ -30,6 +30,7 @@ const RolesMessageInteractionHandler: InteractionHandler = async (
     if (role.discordRoleId) {
       let guild = await getGuild();
       if (!guild) return;
+      
       let discordRole = await guild.roles.fetch(role.discordRoleId);
       if (discordRole) {
         let member = await guild.members.fetch(interaction.user.id);

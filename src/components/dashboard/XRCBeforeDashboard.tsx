@@ -1,6 +1,5 @@
-import { Divider, Stack } from "@mui/material";
-import { Button } from "payload/components/elements";
 import React from "react";
+import { createActionButtons } from "../ActionButtons";
 import ClubStats from "./ClubStats";
 import XRLabStatus from "./XRLabStatus";
 
@@ -24,14 +23,11 @@ const Links: { name: string, url: string }[] = [
 ]
 
 const XRCBeforeDashboard: React.FC = () => {
+    let LinkButtons = createActionButtons(Links.map(l => ({type: "link", ...l})))
     return <div>
         <h1>Welcome to the XR Club Management System!</h1>
         <h2>Useful Links</h2>
-        <Stack direction="row" spacing={2} alignItems="center" sx={{marginTop: 4, marginBottom: 4}}>
-            {Links.map(l => (
-                <div><Button key={l.name} el={l.url.startsWith("/") ? "link" : "anchor"} url={l.url} newTab={true}>{l.name}</Button></div>
-            ))}
-        </Stack>
+        <LinkButtons />
         <h2>XR Lab</h2>
         <XRLabStatus />
         <h2>Stats</h2>

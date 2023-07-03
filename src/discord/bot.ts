@@ -3,10 +3,10 @@ import {
   GatewayIntentBits, Partials
 } from "discord.js";
 import payload from "payload";
-import { BotCommands } from "./commands/Command";
 import BotInteractions from "./interactions/interactions";
 import { createAndUpdateStatusChannelManagers } from "./multi/multi";
 import { rejectInteractionIfNotLeadership } from "./util";
+import { BotCommands } from "./commands/Command";
 
 const BOT_INTENTS = [
   GatewayIntentBits.Guilds,

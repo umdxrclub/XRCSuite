@@ -41,8 +41,8 @@ const Polls: CollectionConfig = {
             fields: [
                 createDiscordChannelField({
                     name: 'channel',
-                    required: true
-                }),
+                    required: true,
+                }, [0, 2]),
                 {
                     name: 'msg',
                     type: 'text',

@@ -29,12 +29,13 @@ export function createEventEmbed(event: Event): EmbedBuilder {
     });
   }
 
-  if (event.location) {
-    embed.addFields({
-      name: "Where",
-      value: event.location,
-    });
-  }
+  // If the event location is a discord channel, we format it such that that
+  // channel will be clickable by using the Discord <#ID> format. Otherwise,
+  // we put the location's name as it is.
+  embed.addFields({
+    name: "Where",
+    value: event.location.isDiscordChannel ? `<#${event.location.name}>` : event.location.name,
+  });
 
   let startMoment = moment(event.startDate);
   let endMoment = moment(event.endDate);
@@ -72,10 +73,11 @@ export async function createGuildEvent(event: Event) {
     description: description,
     scheduledStartTime: event.startDate,
     scheduledEndTime: event.endDate,
-    entityType: GuildScheduledEventEntityType.External,
+    entityType: event.location.isDiscordChannel ? GuildScheduledEventEntityType.Voice : GuildScheduledEventEntityType.External,
+    channel: event.location.isDiscordChannel ? event.location.name : undefined,
     privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
     entityMetadata: {
-      location: event.location ?? "Unknown",
+      location: event.location.isDiscordChannel == false ? event.location.name : undefined
     },
     image: event.imageUrl,
   });
@@ -83,7 +85,7 @@ export async function createGuildEvent(event: Event) {
   return guildEvent;
 }
 
-export async function announceEvent(event: Event, channel?: TextChannel) {
+export async function announceEvent(event: Event) {
   // Create Discord event if necessary.
   let guild = await getGuild();
   if (!guild) return;
@@ -97,16 +99,6 @@ export async function announceEvent(event: Event, channel?: TextChannel) {
   let guildEvent = await createGuildEvent(event);
   if (!guildEvent?.id) return;
   discordEventId = guildEvent.id;
-
-  await payload.update({
-    collection: "events",
-    id: event.id,
-    data: {
-      discord: {
-        eventId: discordEventId,
-      },
-    },
-  });
 
   let embed = createEventEmbed(event);
   var row = new ActionRowBuilder<ButtonBuilder>();
@@ -130,9 +122,16 @@ export async function announceEvent(event: Event, channel?: TextChannel) {
   );
 
   let content = { embeds: [embed], components: [row] };
-  if (channel) {
-    await channel.send(content);
-  } else {
-    await sendGuildMessage("events", content);
-  }
+  let msg = await sendGuildMessage("events", content);
+
+  await payload.update({
+    collection: "events",
+    id: event.id,
+    data: {
+      discord: {
+        eventId: discordEventId,
+        messageId: msg?.id
+      },
+    },
+  });
 }
