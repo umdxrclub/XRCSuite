@@ -29,13 +29,13 @@ export function createEventEmbed(event: Event): EmbedBuilder {
     });
   }
 
-  if (event.location) {
-    embed.addFields({
-      name: "Where",
-      // TODO: Fetch discord channel name from id
-      value: event.location.isDiscordChannel ? "Discord" : event.location.name,
-    });
-  }
+  // If the event location is a discord channel, we format it such that that
+  // channel will be clickable by using the Discord <#ID> format. Otherwise,
+  // we put the location's name as it is.
+  embed.addFields({
+    name: "Where",
+    value: event.location.isDiscordChannel ? `<#${event.location.name}>` : event.location.name,
+  });
 
   let startMoment = moment(event.startDate);
   let endMoment = moment(event.endDate);

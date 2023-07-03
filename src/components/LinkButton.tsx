@@ -1,8 +1,8 @@
 import { Button } from "payload/components/elements";
 import { useDocumentInfo } from "payload/components/utilities";
 import React from "react";
-import "./ActionButton.css"
 import { Box } from "@mui/system";
+import "./ActionButton.css"
 
 export type LinkButtonProps = {
   name: string;

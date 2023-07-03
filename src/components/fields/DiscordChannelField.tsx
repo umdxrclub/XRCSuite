@@ -4,7 +4,7 @@ import { OptionObject } from "payload/dist/fields/config/types";
 import React, { useEffect, useState } from "react";
 import { useGuildContext } from "../providers/DiscordGuildProvider";
 
-export function createDiscordChannelComponent(channelTypes: number[]) {
+export function createDiscordChannelComponent(channelTypes?: number[]) {
   let DiscordChannelField: React.FC<Props> = ({
     path,
     label,
@@ -21,7 +21,7 @@ export function createDiscordChannelComponent(channelTypes: number[]) {
       setChannelOptions(
         guild
           ? guild.channels
-              .filter((c) => channelTypes.includes(c.type))
+              .filter((c) => channelTypes?.includes(c.type) ?? true)
               .map((c) => ({
                 label: c.name,
                 value: c.id,
