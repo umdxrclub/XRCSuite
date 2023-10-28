@@ -87,7 +87,7 @@ export async function announceEvent(event: Event) {
   let guild = await getGuild();
   if (!guild) return;
 
-  var discordEventId = event.discord.eventId;
+  var discordEventId = event.discord?.eventId;
 
   // If there's already a discord event created (hence an id exists), then do
   // nothing.
@@ -101,7 +101,7 @@ export async function announceEvent(event: Event) {
   var row = new ActionRowBuilder<ButtonBuilder>();
 
   // Add a View on TerpLink button
-  if (event.terplink.eventId) {
+  if (event.terplink?.eventId) {
     row.addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)

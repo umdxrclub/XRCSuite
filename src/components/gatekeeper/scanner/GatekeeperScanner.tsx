@@ -205,30 +205,13 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({
     }
   }
 
-  // function configureQRScanner() {
-  //     qr.current = new Html5Qrcode("scanner");
-  //     qr.current!.start({ facingMode: "user"}, QrScannerConfig, onQRScan, onQRError);
-  // }
-
   function onEventPassScan(text: string) {
-    console.log(text);
     const eventPassObj = JSON.parse(text);
     const issuanceId = eventPassObj.issuanceId;
     if (issuanceId) {
       resolve("terplink", issuanceId);
     }
   }
-
-  // function onQRScan(text: string, result: Html5QrcodeResult) {
-  //     // Only allow
-  //     if (result.result.format?.format == Html5QrcodeSupportedFormats.AZTEC && isScanning.current) {
-  //         onEventPassScan(text);
-  //     }
-  // }
-
-  // function onQRError(err: string) {
-
-  // }
 
   function onSwipe(cardId: string) {
     resolve("card", cardId);
@@ -252,14 +235,8 @@ export const GatekeeperScanner: React.FC<GatekeeperScannerProps> = ({
     // Process key presses for handling a swipe login.
     document.addEventListener("keypress", newKeypressHandler);
 
-    // // Create the QR code scanner
-    // configureQRScanner();
-
     return () => {
       document.removeEventListener("keypress", newKeypressHandler);
-      // if (qr.current) {
-      //     qr.current.stop();
-      // }
     };
   }, []);
 

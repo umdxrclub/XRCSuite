@@ -1,34 +1,32 @@
 import { EmbedBuilder } from "@discordjs/builders";
 import {
-  ActionRow,
   ActionRowBuilder,
   AttachmentBuilder,
   ButtonBuilder,
-  ButtonStyle,
+  ButtonStyle
 } from "discord.js";
 import moment from "moment";
 import payload from "payload";
-import Embed from "../../blocks/messages/Embed";
 import { sendDiscordMessages } from "../../collections/util/MessageUtil";
 import {
+  DiscordMessage,
   createAttachmentFromImageData,
   createAttachmentFromMedia,
   createButton,
-  DiscordMessage,
 } from "../../discord/util";
-import { Lab, Media, Schedule } from "../../types/PayloadSchema";
 import { createImageBanner } from "../../server/image";
 import {
   resolveDocument,
   resolveDocuments,
 } from "../../server/payload-backend";
+import { Media, Schedule } from "../../types/PayloadSchema";
 
 let LabGoogleMapsURL = "https://goo.gl/maps/y9SHsm25SB874n6H8";
 
 export async function updateLabStatusMessage() {
   let lab = await payload.findGlobal({ slug: "lab" });
   // Update status message
-  if (lab.discord.labMessage) {
+  if (lab.discord?.labMessage) {
     let labStatusMsg = await createLabStatusEmbedMessages();
     await sendDiscordMessages(lab.discord.labMessage, labStatusMsg);
   }
@@ -37,7 +35,7 @@ export async function updateLabStatusMessage() {
 export async function updateLabControlMessage() {
   let lab = await payload.findGlobal({ slug: "lab" });
   // Update status message
-  if (lab.discord.labControlMessage) {
+  if (lab.discord?.labControlMessage) {
     let labControlMessage = await createLabControlMessages();
     await sendDiscordMessages(lab.discord.labControlMessage, labControlMessage);
   }
@@ -106,91 +104,94 @@ export async function createLabStatusEmbedMessages(): Promise<
   if (lab.schedule) {
     let schedule = await resolveDocument(lab.schedule, "schedules");
 
-    let days: (keyof Schedule["schedule"])[] = [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
-    ];
+    if (schedule.schedule) {
+      let days: (keyof Required<Required<Schedule>["schedule"]>)[] = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ];
 
-    for (var day of days) {
-      let agenda = schedule.schedule[day];
-      if (agenda && agenda.length > 0) {
-        let dayString = day.charAt(0).toUpperCase() + day.substring(1);
-        let imgBanner = await createImageBanner(dayString);
-        if (imgBanner) {
-          let attachment = createAttachmentFromImageData(imgBanner).attachment;
-          messages.push({ files: [attachment] });
-        }
-
-        let embedPromises = agenda.map(async (block) => {
-          let blockEmbed = new EmbedBuilder();
-
-          let time = block.time;
-          if (time.allDay) {
-            blockEmbed.setDescription("**All Day**");
-          } else if (time.from && time.to) {
-            let timeFormat = "h:mm A";
-            let fromTime = moment(time.from).format(timeFormat);
-            let toTime = moment(time.to).format(timeFormat);
-            blockEmbed.addFields([
-              {
-                name: "Time",
-                value: fromTime,
-                inline: true,
-              },
-              {
-                name: "To",
-                value: toTime,
-                inline: true,
-              },
-            ]);
+      for (var day of days) {
+        let agenda = schedule.schedule[day];
+        if (agenda && agenda.length > 0) {
+          let dayString = day.charAt(0).toUpperCase() + day.substring(1);
+          let imgBanner = await createImageBanner(dayString);
+          if (imgBanner) {
+            let attachment =
+              createAttachmentFromImageData(imgBanner).attachment;
+            messages.push({ files: [attachment] });
           }
 
-          switch (block.blockType) {
-            case "opening":
-              blockEmbed.setColor([133, 212, 49]);
-              if (block.staff && block.staff.length > 0) {
-                let staff = await resolveDocuments(block.staff, "members");
-                blockEmbed.addFields({
-                  name: "Staff",
+          let embedPromises = agenda.map(async (block) => {
+            let blockEmbed = new EmbedBuilder();
+
+            let time = block.time;
+            if (time.allDay) {
+              blockEmbed.setDescription("**All Day**");
+            } else if (time.from && time.to) {
+              let timeFormat = "h:mm A";
+              let fromTime = moment(time.from).format(timeFormat);
+              let toTime = moment(time.to).format(timeFormat);
+              blockEmbed.addFields([
+                {
+                  name: "Time",
+                  value: fromTime,
                   inline: true,
-                  value: staff
-                    .map((s) => {
-                      if (s.nickname && s.nickname.length > 0) {
-                        return s.nickname;
-                      }
+                },
+                {
+                  name: "To",
+                  value: toTime,
+                  inline: true,
+                },
+              ]);
+            }
 
-                      return s.name;
-                    })
-                    .filter((n) => n.length > 0)
-                    .join(", "),
-                });
-              }
+            switch (block.blockType) {
+              case "opening":
+                blockEmbed.setColor([133, 212, 49]);
+                if (block.staff && block.staff.length > 0) {
+                  let staff = await resolveDocuments(block.staff, "members");
+                  blockEmbed.addFields({
+                    name: "Staff",
+                    inline: true,
+                    value: staff
+                      .map((s) => {
+                        if (s.nickname && s.nickname.length > 0) {
+                          return s.nickname;
+                        }
 
-              break;
+                        return s.name;
+                      })
+                      .filter((n) => n.length > 0)
+                      .join(", "),
+                  });
+                }
 
-            case "closing":
-              blockEmbed.setTitle("Lab Closed");
-              blockEmbed.setColor([212, 71, 49]);
-              break;
-          }
+                break;
 
-          if (block.note && block.note.length > 0) {
-            blockEmbed.addFields({
-              name: "Note",
-              value: block.note,
-            });
-          }
+              case "closing":
+                blockEmbed.setTitle("Lab Closed");
+                blockEmbed.setColor([212, 71, 49]);
+                break;
+            }
 
-          return blockEmbed;
-        });
+            if (block.note && block.note.length > 0) {
+              blockEmbed.addFields({
+                name: "Note",
+                value: block.note,
+              });
+            }
 
-        let scheduleEmbeds = await Promise.all(embedPromises);
-        messages.push({ embeds: scheduleEmbeds });
+            return blockEmbed;
+          });
+
+          let scheduleEmbeds = await Promise.all(embedPromises);
+          messages.push({ embeds: scheduleEmbeds });
+        }
       }
     }
   }

@@ -23,7 +23,7 @@ const Schedules: CollectionConfig = {
         {
             name: "schedule",
             type: "group",
-            fields: makeDayFields()
+            fields: makeDayFields(),
         }
     ]
 }
