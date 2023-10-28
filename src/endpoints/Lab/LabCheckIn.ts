@@ -50,7 +50,6 @@ const LabCheckIn: Endpoint = {
             await req.payload.updateGlobal({
                 slug: "lab",
                 data: {
-                    ...lab,
                     members: currentLabMembers
                 },
                 depth: 0

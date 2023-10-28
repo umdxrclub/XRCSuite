@@ -7,148 +7,157 @@ import ResolveMemberEndpoint from "../endpoints/Members/ResolveMember";
 import UMDVerificationEndpoint from "../endpoints/Members/UMDVerification";
 import { CollectionSlugs } from "../slugs";
 import Media from "./Media";
+import ApproveRosterEndpoint from "../endpoints/Members/ApproveRoster";
 
 const Members: CollectionConfig = {
-    slug: CollectionSlugs.Members,
-    admin: {
-        useAsTitle: 'name',
-        group: 'Users',
-        defaultColumns: [ 'name', 'nickname', 'email', 'isClubMember' ]
+  slug: CollectionSlugs.Members,
+  admin: {
+    useAsTitle: "name",
+    group: "Users",
+    defaultColumns: ["name", "nickname", "email", "isClubMember"],
+  },
+  endpoints: [
+    ImportRosterEndpoint,
+    ApproveRosterEndpoint,
+    ResolveMemberEndpoint,
+    UMDVerificationEndpoint,
+    LeadershipEndpoint,
+    DirectorySearchEndpoint,
+    DiscordAvatarEndpoint,
+  ],
+  fields: [
+    {
+      name: "name",
+      type: "text",
+      required: true,
     },
-    endpoints: [ImportRosterEndpoint, ResolveMemberEndpoint, UMDVerificationEndpoint, LeadershipEndpoint, DirectorySearchEndpoint, DiscordAvatarEndpoint ],
-    fields: [
+    {
+      name: "nickname",
+      type: "text",
+    },
+    {
+      name: "birthday",
+      type: "date",
+    },
+    {
+      name: "email",
+      type: "text",
+      index: true,
+    },
+    {
+      name: "isClubMember",
+      type: "checkbox",
+    },
+    {
+      name: "roles",
+      type: "relationship",
+      relationTo: CollectionSlugs.Roles,
+      hasMany: true,
+    },
+    {
+      name: "profile",
+      type: "group",
+      fields: [
         {
-            name: 'name',
-            type: 'text',
-            required: true
+          name: "picture",
+          type: "upload",
+          relationTo: Media.slug,
         },
         {
-            name: 'nickname',
-            type: 'text'
+          name: "links",
+          type: "array",
+          fields: [
+            {
+              name: "type",
+              type: "relationship",
+              relationTo: CollectionSlugs.Integrations,
+              required: true,
+            },
+            {
+              name: "url",
+              type: "text",
+              required: true,
+            },
+          ],
         },
         {
-            name: 'birthday',
-            type: 'date'
+          name: "bio",
+          type: "textarea",
+        },
+      ],
+    },
+    {
+      name: "umd",
+      label: "UMD",
+      type: "group",
+      fields: [
+        {
+          name: "directoryId",
+          type: "text",
         },
         {
-            name: 'email',
-            type: 'text',
-            index: true
+          name: "cardSerial",
+          type: "text",
+          index: true,
+          admin: {
+            description: "The serial number on the back of a UMD swipe card",
+          },
         },
         {
-            name: 'isClubMember',
-            type: 'checkbox'
+          name: "terplink",
+          type: "group",
+          fields: [
+            {
+              name: "accountId",
+              type: "text",
+            },
+            {
+              name: "issuanceId",
+              admin: {
+                description: "The id stored within an event pass",
+              },
+              type: "text",
+              index: true,
+            },
+            {
+              name: "communityId",
+              admin: {
+                description: "Used to identify members within the club roster",
+              },
+              type: "text",
+              index: true,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "integrations",
+      type: "group",
+      fields: [
+        {
+          name: "discord",
+          type: "text",
         },
         {
-            name: 'roles',
-            type: 'relationship',
-            relationTo: CollectionSlugs.Roles,
-            hasMany: true
+          name: "oculus",
+          type: "text",
         },
         {
-            name: 'profile',
-            type: 'group',
-            fields: [
-                {
-                    name: 'picture',
-                    type: 'upload',
-                    relationTo: Media.slug
-                },
-                {
-                    name: 'links',
-                    type: 'array',
-                    fields: [
-                        {
-                            name: 'type',
-                            type: 'relationship',
-                            relationTo: CollectionSlugs.Integrations,
-                            required: true
-                        },
-                        {
-                            name: 'url',
-                            type: 'text',
-                            required: true
-                        }
-                    ]
-                },
-                {
-                    name: 'bio',
-                    type: 'textarea'
-                }
-            ]
+          name: "steam",
+          type: "text",
         },
         {
-            name: 'umd',
-            label: 'UMD',
-            type: 'group',
-            fields: [
-                {
-                    name: 'directoryId',
-                    type: 'text',
-                },
-                {
-                    name: 'cardSerial',
-                    type: 'text',
-                    index: true,
-                    admin: {
-                        description: "The serial number on the back of a UMD swipe card"
-                    }
-                },
-                {
-                    name: 'terplink',
-                    type: 'group',
-                    fields: [
-                        {
-                            name: 'accountId',
-                            type: 'text',
-                        },
-                        {
-                            name: 'issuanceId',
-                            admin: {
-                                description: "The id stored within an event pass"
-                            },
-                            type: 'text',
-                            index: true
-                        },
-                        {
-                            name: 'communityId',
-                            admin: {
-                                description: "Used to identify members within the club roster"
-                            },
-                            type: 'text',
-                            index: true
-                        }
-                    ]
-                }
-            ]
+          name: "scoresaber",
+          type: "text",
         },
         {
-            name: 'integrations',
-            type: 'group',
-            fields: [
-                {
-                    name: 'discord',
-                    type: 'text',
-                },
-                {
-                    name: 'oculus',
-                    type: 'text'
-                },
-                {
-                    name: 'steam',
-                    type: 'text'
-                },
-                {
-                    name: 'scoresaber',
-                    type: 'text'
-                },
-                {
-                    name: 'trello',
-                    type: 'text'
-                }
-            ]
-        }
-    ]
-}
+          name: "trello",
+          type: "text",
+        },
+      ],
+    },
+  ],
+};
 
 export default Members;

@@ -4,15 +4,11 @@ import {
   ChatInputCommandInteraction,
   GuildMember,
 } from "discord.js";
-import payload from "payload";
 import {
-  XRClubDiscordRole,
   XRClubDiscordNotificationRoles,
+  XRClubDiscordRole,
 } from "../../types/XRCTypes";
-import { GlobalSlugs } from "../../slugs";
-import { getGuild } from "../util";
 import { Command } from "./Command";
-import { Bot } from "../../types/PayloadSchema";
 
 async function resolveMemberAndRole(
   memberId: string,

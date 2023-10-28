@@ -2,10 +2,7 @@ import { EmbedBuilder } from "@discordjs/builders";
 import {
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonStyle,
-  GuildScheduledEventEntityType,
-  GuildScheduledEventPrivacyLevel,
-  TextChannel,
+  ButtonStyle
 } from "discord.js";
 import moment from "moment";
 import payload from "payload";
@@ -73,9 +70,9 @@ export async function createGuildEvent(event: Event) {
     description: description,
     scheduledStartTime: event.startDate,
     scheduledEndTime: event.endDate,
-    entityType: event.location.isDiscordChannel ? GuildScheduledEventEntityType.Voice : GuildScheduledEventEntityType.External,
+    entityType: event.location.isDiscordChannel ? 2 : 3,
     channel: event.location.isDiscordChannel ? event.location.name : undefined,
-    privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+    privacyLevel: 2,
     entityMetadata: {
       location: event.location.isDiscordChannel == false ? event.location.name : undefined
     },

@@ -346,6 +346,7 @@ export class TerpLink {
   > {
     let requestVerificationToken: string | undefined = undefined;
     return await this.fetchRosterTable((communityId, title, body) => {
+      console.log("got table?")
       if (!requestVerificationToken) {
         // The request verification token is stored at the root for this table,
         // so just extract its value.
