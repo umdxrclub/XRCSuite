@@ -7,6 +7,7 @@ import BotInteractions from "./interactions/interactions";
 import { createAndUpdateStatusChannelManagers } from "./multi/multi";
 import { rejectInteractionIfNotLeadership } from "./util";
 import { BotCommands } from "./commands/Command";
+import { setClient } from "club.js/dist/discord/bot"
 
 const BOT_INTENTS = [
   GatewayIntentBits.Guilds,
@@ -24,6 +25,7 @@ function onCreateClient(guildId: string, processDms: boolean) {
     discordClient.once("ready", async (client) => {
       console.log("Logged in as " + client.user.username);
       await createAndUpdateStatusChannelManagers();
+      setClient(discordClient);
     });
 
     // Add slash command handlers
@@ -66,9 +68,9 @@ export function getDiscordClient(): Client | undefined {
 
 export async function serveDiscordBot() {
   let discordConfig = await payload.findGlobal({ slug: "bot" });
-  if (discordConfig.enabled && discordConfig.guild.guildId) {
+  if (discordConfig.enabled && discordConfig.guild?.guildId) {
     console.log("Starting Discord Bot...");
-    let token = discordConfig.auth.token;
+    let token = discordConfig.auth?.token;
     if (token) {
       discordClient = new Client({
         intents: BOT_INTENTS,
@@ -90,5 +92,6 @@ export async function serveDiscordBot() {
     console.log("Disabling Discord Bot");
     discordClient.destroy();
     discordClient = undefined;
+    setClient(undefined)
   }
 }

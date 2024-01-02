@@ -1,9 +1,20 @@
 import { Axios } from 'axios';
+import { ClubEventData } from "club.js/dist/events/event";
+import {
+    DiscordClubEventData, DiscordClubEventExtension
+} from "club.js/dist/events/extensions/discord";
+import {
+    GCalClubEventData, GCalClubEventExtension
+} from "club.js/dist/events/extensions/gcal";
+import { ModelManager } from 'club.js/dist/util/model-manager';
+import payload from 'payload';
 import { UMDVerificationManager } from '../endpoints/Members/UMDVerification';
 import { useAxios } from "./axios";
 import { Odoo } from './odoo';
 import { TerpLink } from './terplink';
 import { UMDDirectory } from './umd-directory';
+
+export type XRCEvent = ClubEventData & DiscordClubEventData & GCalClubEventData;
 
 class XRCManager
 {
@@ -12,6 +23,9 @@ class XRCManager
     public umd: UMDVerificationManager
     public terplink: TerpLink
     public odoo: Odoo
+    public events: ModelManager<XRCEvent>
+    private _discordEventExtension: DiscordClubEventExtension<XRCEvent>
+    private _gcalEventExtension: GCalClubEventExtension<XRCEvent>
 
     constructor() {
         this.axios = useAxios();
@@ -19,7 +33,41 @@ class XRCManager
         this.terplink = new TerpLink(this.axios);
         this.odoo = new Odoo();
         this.umd = new UMDVerificationManager();
+
+        // Initialize events
+        this.events = new ModelManager();
+        this._discordEventExtension = new DiscordClubEventExtension({});
+        this._gcalEventExtension = new GCalClubEventExtension([]);
+        this.events.addExtension(this._discordEventExtension);
+        this.events.addExtension(this._gcalEventExtension);
     }
+
+    public async init() {
+        // Configure Discord events
+        var guilds: Record<string, string | null> = {}
+        let bot = await payload.findGlobal({ slug: "bot" })
+        let guildId = bot.guild?.guildId;
+        let eventChannel = bot.guild?.channels?.events;
+
+        if (guildId) {
+            guilds[guildId] = eventChannel ?? null;
+        }
+
+        console.log(guilds)
+        this._discordEventExtension.setGuilds(guilds);
+
+        // Configure Google Calendar
+        let gapi = await payload.findGlobal({
+            slug: "gapi"
+        })
+
+        if (gapi.eventsCalendarId) {
+            this._gcalEventExtension.setCalendarIds([gapi.eventsCalendarId])
+        } else {
+            this._gcalEventExtension.setCalendarIds([])
+        }
+    }
+
 
 }
 

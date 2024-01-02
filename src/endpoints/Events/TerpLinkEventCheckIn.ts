@@ -31,7 +31,7 @@ const EventCheckIn: Endpoint = {
     let tlEvent = await XRC.terplink.getEvent(accessCode);
     if (tlEvent) {
       let member = await resolveMember(resolveMethod as any, resolveContent);
-      if (!member || !member.umd.terplink.accountId) return;
+      if (!member || !member.umd?.terplink?.accountId) return;
 
       res.status(200).send();
 

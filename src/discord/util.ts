@@ -53,6 +53,14 @@ export async function sendGuildMessage(
   }
 }
 
+export async function getGuildId() {
+  let { guild } = await payload.findGlobal({
+    slug: "bot",
+  });
+
+  return guild?.guildId;
+}
+
 /**
  * Fetches the Guild that is currently specified within Payload.
  *
@@ -62,12 +70,10 @@ export async function getGuild(): Promise<Guild | null> {
   let client = getDiscordClient();
   if (!client) return null;
 
-  let { guild } = await payload.findGlobal({
-    slug: "bot",
-  });
+  let guildId = await getGuildId();
 
-  if (guild.guildId) {
-    return await client.guilds.fetch(guild.guildId);
+  if (guildId) {
+    return await client.guilds.fetch(guildId);
   } else {
     return null;
   }
@@ -80,7 +86,7 @@ export async function getGuildChannel(
     slug: "bot",
   });
 
-  let channelId: string | undefined = guild.channels[channelType];
+  let channelId: string | undefined = (guild?.channels ?? {})[channelType];
 
   // Check to see that a channel was successfully retrieved.
   if (channelId) {
@@ -128,8 +134,8 @@ export async function registerCommands() {
   if (
     client &&
     client.token &&
-    discordConfig.auth.clientId &&
-    discordConfig.guild.guildId
+    discordConfig.auth?.clientId &&
+    discordConfig.guild?.guildId
   ) {
     // Create the REST handler.
     const rest = new REST({ version: "9" }).setToken(client.token);

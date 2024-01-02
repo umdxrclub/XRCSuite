@@ -31,6 +31,11 @@ import TrelloConfig from "./globals/Trello";
 import { Experiences } from "./collections/Experiences";
 import { Opportunities } from "./collections/Opportunities";
 import { webpackIgnore } from "./webpack-ignore";
+import { mongooseAdapter } from '@payloadcms/db-mongodb';
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { webpackBundler } from '@payloadcms/bundler-webpack'
+import GApi from "./globals/GApi";
+
 
 const fallbackModules = ["util"];
 
@@ -46,6 +51,7 @@ const emptyObjPath = path.resolve(__dirname, "./mocks/EmptyObject.ts");
 
 export default buildConfig({
   admin: {
+    bundler: webpackBundler(),
     user: Admins.slug,
     components: {
       beforeDashboard: [XRCBeforeDashboard],
@@ -53,12 +59,11 @@ export default buildConfig({
       graphics: {
         Icon: XRCLogo,
       },
-      routes: [LabGatekeeperRoute, EventGatekeeperRoute],
     },
     webpack: webpackIgnore(
       emptyObjPath,
       aliasDirectories,
-      fallbackModules,
+      fallbackModules, 
       (config) => ({
         ...config,
         module: {
@@ -76,6 +81,13 @@ export default buildConfig({
         }
       })
     ),
+  },
+  db: mongooseAdapter({
+    url: process.env.MONGO_URL!
+  }),
+  editor: lexicalEditor({}),
+  routes: {
+
   },
   collections: [
     Admins,
@@ -97,7 +109,7 @@ export default buildConfig({
     Experiences,
     Opportunities,
   ],
-  globals: [Lab, Bot, CAS, Wishlist, Odoo, TrelloConfig],
+  globals: [Lab, Bot, CAS, Wishlist, Odoo, TrelloConfig, GApi],
   typescript: {
     outputFile: path.resolve(__dirname, "./types/PayloadSchema.ts"),
   },

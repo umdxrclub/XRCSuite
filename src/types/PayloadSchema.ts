@@ -26,6 +26,8 @@ export interface Config {
     integrations: Integration;
     experiences: Experience;
     opportunities: Opportunity;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
   };
   globals: {
     lab: Lab;
@@ -34,57 +36,60 @@ export interface Config {
     wishlist: Wishlist;
     odoo: Odoo;
     trello: Trello;
+    gapi: Gapi;
   };
 }
 export interface Admin {
   id: string;
-  casManager?: boolean;
+  casManager?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  enableAPIKey?: boolean;
-  apiKey?: string;
-  apiKeyIndex?: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
-  resetPasswordToken?: string;
-  resetPasswordExpiration?: string;
-  salt?: string;
-  hash?: string;
-  loginAttempts?: number;
-  lockUntil?: string;
-  password?: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
 }
 export interface Member {
   id: string;
   name: string;
-  nickname?: string;
-  birthday?: string;
-  email?: string;
-  isClubMember?: boolean;
-  roles?: string[] | Role[];
+  nickname?: string | null;
+  birthday?: string | null;
+  email?: string | null;
+  isClubMember?: boolean | null;
+  roles?: (string | Role)[] | null;
   profile?: {
-    picture?: string | Media;
-    links?: {
-      type: string | Integration;
-      url: string;
-      id?: string;
-    }[];
-    bio?: string;
+    picture?: string | Media | null;
+    links?:
+      | {
+          type: string | Integration;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    bio?: string | null;
   };
   umd?: {
-    directoryId?: string;
-    cardSerial?: string;
+    directoryId?: string | null;
+    cardSerial?: string | null;
     terplink?: {
-      accountId?: string;
-      issuanceId?: string;
-      communityId?: string;
+      accountId?: string | null;
+      issuanceId?: string | null;
+      communityId?: string | null;
     };
   };
   integrations?: {
-    discord?: string;
-    oculus?: string;
-    steam?: string;
-    scoresaber?: string;
-    trello?: string;
+    discord?: string | null;
+    oculus?: string | null;
+    steam?: string | null;
+    scoresaber?: string | null;
+    trello?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -92,58 +97,60 @@ export interface Member {
 export interface Role {
   id: string;
   name: string;
-  color?: string;
+  color?: string | null;
   priority: number;
-  discordRoleId?: string;
-  discordEmoji?: string;
+  discordRoleId?: string | null;
+  discordEmoji?: string | null;
   isLeadership: boolean;
   isSelfAssignable: boolean;
 }
 export interface Media {
   id: string;
-  isPublic?: boolean;
+  isPublic?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  url?: string;
-  filename?: string;
-  mimeType?: string;
-  filesize?: number;
-  width?: number;
-  height?: number;
+  url?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 export interface Integration {
   id: string;
-  name?: string;
-  discordEmoji?: string;
+  name?: string | null;
+  discordEmoji?: string | null;
 }
 export interface Device {
   id: string;
   name: string;
-  description?: string | Description;
+  description?: (string | null) | Description;
   public: boolean;
   status: 'inLab' | 'checkedOut';
-  serial?: string;
-  mac?: string;
-  departmentTag?: string;
-  xrTag?: string;
-  dateReceived?: string;
-  lastAudited?: string;
-  items?: {
-    name: string;
-    quantity: number;
-    serialNumber?: string;
-    departmentTag?: string;
-    xrTag?: string;
-    notes?: string;
-    id?: string;
-  }[];
+  serial?: string | null;
+  mac?: string | null;
+  departmentTag?: string | null;
+  xrTag?: string | null;
+  dateReceived?: string | null;
+  lastAudited?: string | null;
+  items?:
+    | {
+        name: string;
+        quantity: number;
+        serialNumber?: string | null;
+        departmentTag?: string | null;
+        xrTag?: string | null;
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Description {
   id: string;
   name: string;
-  image?: string | Media;
+  image?: string | Media | null;
   type:
     | 'h_vr'
     | 'h_ar'
@@ -162,31 +169,33 @@ export interface Description {
 }
 export interface Heartbeat {
   id: string;
-  device?: string | Device;
-  date?: string;
+  device?: (string | null) | Device;
+  date?: string | null;
   /**
    * @minItems 2
    * @maxItems 2
    */
-  location?: [number, number];
+  location?: [number, number] | null;
   battery?: {
-    level?: number;
-    charging?: boolean;
+    level?: number | null;
+    charging?: boolean | null;
   };
   network?: {
-    ipAddress?: string;
+    ipAddress?: string | null;
     wifi?: {
       current?: {
-        ssid?: string;
-        bssid?: string;
-        level?: number;
+        ssid?: string | null;
+        bssid?: string | null;
+        level?: number | null;
       };
-      nearbyNetworks?: {
-        ssid?: string;
-        bssid?: string;
-        level?: number;
-        id?: string;
-      }[];
+      nearbyNetworks?:
+        | {
+            ssid?: string | null;
+            bssid?: string | null;
+            level?: number | null;
+            id?: string | null;
+          }[]
+        | null;
     };
   };
   updatedAt: string;
@@ -194,32 +203,57 @@ export interface Heartbeat {
 }
 export interface Attendance {
   id: string;
-  member?: string | Member;
-  date?: string;
-  event?: string | Event;
-  type?: 'in' | 'out';
+  member?: (string | null) | Member;
+  date?: string | null;
+  event?: (string | null) | Event;
+  type?: ('in' | 'out') | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Event {
   id: string;
+  isPublished: boolean;
   name: string;
-  type?: string;
-  location: {
-    isDiscordChannel: boolean;
-    name: string;
+  type?: string | null;
+  location?: {
+    irl?: string | null;
+    online?: string | null;
   };
   startDate: string;
   endDate: string;
-  description?: string;
-  imageUrl?: string;
-  terplink?: {
-    eventId?: string;
-    accessCode?: string;
+  description?: string | null;
+  thumbnail?: string | null;
+  discord: {
+    createGuildEvent: boolean;
+    createEmbedMessage: boolean;
+    eventMessages?:
+      | {
+          messageId: string;
+          channelId: string;
+          id?: string | null;
+        }[]
+      | null;
+    guildEvents?:
+      | {
+          eventId: string;
+          guildId: string;
+          id?: string | null;
+        }[]
+      | null;
   };
-  discord?: {
-    eventId?: string;
-    messageId?: string;
+  gcal?: {
+    publishOnGCal?: boolean | null;
+    events?:
+      | {
+          eventId: string;
+          calendarId: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  terplink?: {
+    eventId?: string | null;
+    accessCode?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -228,150 +262,63 @@ export interface Message {
   id: string;
   name: string;
   useMessageContent: boolean;
-  content?: (
+  channels?:
     | {
-        body: {
-          [k: string]: unknown;
-        }[];
-        id?: string;
-        blockName?: string;
-        blockType: 'message';
-      }
-    | {
-        title: string;
-        type: 'medium' | 'large';
-        id?: string;
-        blockName?: string;
-        blockType: 'banner';
-      }
-    | {
-        id?: string;
-        blockName?: string;
-        blockType: 'roleSelect';
-      }
-    | {
-        member?: string | Member;
-        id?: string;
-        blockName?: string;
-        blockType: 'profile';
-      }
-    | {
-        device: string | Device;
-        id?: string;
-        blockName?: string;
-        blockType: 'device';
-      }
-    | {
-        poll: string | Poll;
-        allowVoting: boolean;
-        id?: string;
-        blockName?: string;
-        blockType: 'poll';
-      }
-    | {
-        event: string | Event;
-        id?: string;
-        blockName?: string;
-        blockType: 'event';
-      }
-    | {
-        buttons?: {
-          title: string;
-          url: string;
-          emoji?: string;
-          id?: string;
-        }[];
-        id?: string;
-        blockName?: string;
-        blockType: 'linkButtons';
-      }
-    | {
-        image: string | Media;
-        id?: string;
-        blockName?: string;
-        blockType: 'image';
-      }
-    | {
-        title?: string;
-        description?: {
-          [k: string]: unknown;
-        }[];
-        color?: string;
-        timestamp?: string;
-        url?: string;
-        thumbnail?: string;
-        image?: string;
-        fields?: {
-          name: string;
-          value: string;
-          inline: boolean;
-          id?: string;
-        }[];
-        id?: string;
-        blockName?: string;
-        blockType: 'embed';
-      }
-  )[];
-  channels?: {
-    channelId: string;
-    alwaysResendMessages: boolean;
-    messages?: {
-      messageId: string;
-      id?: string;
-    }[];
-    id?: string;
-  }[];
-  publish?: boolean;
-  updatedAt: string;
-  createdAt: string;
-}
-export interface Poll {
-  id: string;
-  title: string;
-  open: boolean;
-  allowRevote?: boolean;
-  author: string;
-  messages?: {
-    channel: string;
-    msg: string;
-    id?: string;
-  }[];
-  choices?: {
-    name: string;
-    voters?: {
-      id: string;
-    }[];
-    id?: string;
-  }[];
+        channelId: string;
+        alwaysResendMessages: boolean;
+        messages?:
+          | {
+              messageId: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  publish?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Software {
   id: string;
-  type?: string | Description;
-  availableOn?: string[] | Device[];
-  publish?: boolean;
+  type?: (string | null) | Description;
+  availableOn?: (string | Device)[] | null;
+  publish?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Project {
   id: string;
-  name?: string;
-  status?: 'Proposed' | 'Active' | 'Inactive' | 'Finished';
-  projectLeads?: string[] | Member[];
-  members?: string[] | Member[];
-  logo?: string | Media;
-  banner?: string | Media;
-  gallery?: {
-    image?: string | Media;
-    description?: string;
-    id?: string;
-  }[];
-  startDate?: string;
-  endDate?: string;
+  name?: string | null;
+  status?: ('Proposed' | 'Active' | 'Inactive' | 'Finished') | null;
+  projectLeads?: (string | Member)[] | null;
+  members?: (string | Member)[] | null;
+  logo?: string | Media | null;
+  banner?: string | Media | null;
+  gallery?:
+    | {
+        image?: string | Media | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  startDate?: string | null;
+  endDate?: string | null;
   description?: {
+    root: {
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      type: string;
+      version: number;
+    };
     [k: string]: unknown;
-  }[];
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -379,194 +326,235 @@ export interface Schedule {
   id: string;
   name: string;
   schedule?: {
-    sunday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
-    monday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
-    tuesday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
-    wednesday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
-    thursday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
-    friday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
-    saturday?: (
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          staff?: string[] | Member[];
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'opening';
-        }
-      | {
-          time: {
-            allDay: boolean;
-            from?: string;
-            to?: string;
-          };
-          note?: string;
-          id?: string;
-          blockName?: string;
-          blockType: 'closing';
-        }
-    )[];
+    sunday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
+    monday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
+    tuesday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
+    wednesday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
+    thursday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
+    friday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
+    saturday?:
+      | (
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              staff?: (string | Member)[] | null;
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'opening';
+            }
+          | {
+              time: {
+                allDay: boolean;
+                from?: string | null;
+                to?: string | null;
+              };
+              note?: string | null;
+              id?: string | null;
+              blockName?: string | null;
+              blockType: 'closing';
+            }
+        )[]
+      | null;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Poll {
+  id: string;
+  title: string;
+  open: boolean;
+  allowRevote?: boolean | null;
+  author: string;
+  messages?:
+    | {
+        channel: string;
+        msg: string;
+        id?: string | null;
+      }[]
+    | null;
+  choices?:
+    | {
+        name: string;
+        voters?:
+          | {
+              id: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Stat {
   id: string;
-  date?: string;
+  date?: string | null;
   count?: {
-    discord?: number;
-    terplink?: number;
-    youtube?: number;
-    instagram?: number;
-    twitter?: number;
+    discord?: number | null;
+    terplink?: number | null;
+    youtube?: number | null;
+    instagram?: number | null;
+    twitter?: number | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -574,120 +562,162 @@ export interface Stat {
 export interface Experience {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Opportunity {
   id: string;
   name: string;
-  url?: string;
-  description?: string;
+  url?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface PayloadPreference {
+  id: string;
+  user: {
+    relationTo: 'admins';
+    value: string | Admin;
+  };
+  key?: string | null;
+  value?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface PayloadMigration {
+  id: string;
+  name?: string | null;
+  batch?: number | null;
   updatedAt: string;
   createdAt: string;
 }
 export interface Lab {
   id: string;
   open: boolean;
-  event?: string | Event;
-  members?: string[] | Member[];
-  schedule?: string | Schedule;
+  event?: (string | null) | Event;
+  members?: (string | Member)[] | null;
+  schedule?: (string | null) | Schedule;
   odoo?: {
-    contractId?: number;
+    contractId?: number | null;
   };
   media?: {
     gatekeeper?: {
-      acceptSound?: string | Media;
-      rejectSound?: string | Media;
+      acceptSound?: string | Media | null;
+      rejectSound?: string | Media | null;
     };
-    labOpenImage?: string | Media;
-    labClosedImage?: string | Media;
-    tvBanner?: string | Media;
+    labOpenImage?: string | Media | null;
+    labClosedImage?: string | Media | null;
+    tvBanner?: string | Media | null;
   };
   discord?: {
-    labMessage?: string | Message;
-    labControlMessage?: string | Message;
-    inventoryMessage?: string | Message;
-    labNotificationsRole?: string | Role;
+    labMessage?: (string | null) | Message;
+    labControlMessage?: (string | null) | Message;
+    inventoryMessage?: (string | null) | Message;
+    labNotificationsRole?: (string | null) | Role;
   };
   settings?: {
-    startupLabWhenFirstCheckIn?: boolean;
-    shutdownLabWhenAllCheckedOut?: boolean;
-    notifyStatus?: boolean;
-    notifyLeadershipCheckInOut?: boolean;
-    rolesToAnnounce?: string[] | Role[];
+    startupLabWhenFirstCheckIn?: boolean | null;
+    shutdownLabWhenAllCheckedOut?: boolean | null;
+    notifyStatus?: boolean | null;
+    notifyLeadershipCheckInOut?: boolean | null;
+    rolesToAnnounce?: (string | Role)[] | null;
   };
-  updatedAt?: string;
-  createdAt?: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 export interface Bot {
   id: string;
-  enabled?: boolean;
+  enabled?: boolean | null;
   auth?: {
-    clientId?: string;
-    clientSecret?: string;
-    token?: string;
+    clientId?: string | null;
+    clientSecret?: string | null;
+    token?: string | null;
   };
   media?: {
-    banner?: string | Media;
+    banner?: string | Media | null;
   };
   guild?: {
-    guildId?: string;
+    guildId?: string | null;
     channels?: {
-      announcements?: string;
-      lab?: string;
-      notifications?: string;
-      inventory?: string;
-      audit?: string;
-      events?: string;
-      leadership?: string;
+      announcements?: string | null;
+      lab?: string | null;
+      notifications?: string | null;
+      inventory?: string | null;
+      audit?: string | null;
+      events?: string | null;
+      leadership?: string | null;
     };
-    defaultRole?: string;
+    defaultRole?: string | null;
     notificationRoles?: {
-      lab?: string | Role;
-      workshop?: string | Role;
-      project?: string | Role;
+      lab?: (string | null) | Role;
+      workshop?: (string | null) | Role;
+      project?: (string | null) | Role;
     };
   };
   processDms: boolean;
-  updatedAt?: string;
-  createdAt?: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 export interface CAS {
   id: string;
-  username?: string;
-  password?: string;
-  duoDeviceName?: string;
-  hotpSecret?: string;
+  username?: string | null;
+  password?: string | null;
+  duoDeviceName?: string | null;
+  hotpSecret?: string | null;
   hotpCounter: number;
-  updatedAt?: string;
-  createdAt?: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 export interface Wishlist {
   id: string;
-  wishlist?: {
-    type?: string | Description;
-    quantity?: number;
-    id?: string;
-  }[];
-  updatedAt?: string;
-  createdAt?: string;
+  wishlist?:
+    | {
+        type?: (string | null) | Description;
+        quantity?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 export interface Odoo {
   id: string;
-  url?: string;
-  db?: string;
-  uid?: number;
-  password?: string;
-  updatedAt?: string;
-  createdAt?: string;
+  url?: string | null;
+  db?: string | null;
+  uid?: number | null;
+  password?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 export interface Trello {
   id: string;
-  key?: string;
-  secret?: string;
-  token?: string;
-  organization?: string;
-  updatedAt?: string;
-  createdAt?: string;
+  key?: string | null;
+  secret?: string | null;
+  token?: string | null;
+  organization?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+export interface Gapi {
+  id: string;
+  clientId?: string | null;
+  clientSecret?: string | null;
+  refreshToken?: string | null;
+  eventsCalendarId?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+
+
+declare module 'payload' {
+  export interface GeneratedTypes extends Config {}
 }
