@@ -35,6 +35,7 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { webpackBundler } from '@payloadcms/bundler-webpack'
 import GApi from "./globals/GApi";
+import TV from "./components/tv/TV";
 
 
 const fallbackModules = ["util"];
@@ -59,6 +60,12 @@ export default buildConfig({
       graphics: {
         Icon: XRCLogo,
       },
+      views: {
+        TV: {
+          Component: TV,
+          path: '/tv'
+        }
+      }
     },
     webpack: webpackIgnore(
       emptyObjPath,
