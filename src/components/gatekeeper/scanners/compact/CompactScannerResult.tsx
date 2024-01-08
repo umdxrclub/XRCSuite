@@ -1,0 +1,91 @@
+import React, { useState, useEffect } from "react";
+import {
+  GatekeeperResultStatus,
+  useGatekeeperContext,
+  useGatekeeperResultStatus,
+} from "../Gatekeeper";
+import "./compact-scanner-result.css";
+import ErrorSVG from "../error.svg";
+import ProceedSVG from "../proceed.svg";
+import ProcessingSVG from "../processing.svg";
+import StopSVG from "../stop.svg";
+
+function resultStatusToClass(resultStatus: GatekeeperResultStatus) {
+  var className: string = "";
+  switch (resultStatus) {
+    case "checkin":
+    case "checkout":
+      className = "compact-scanner-result-success";
+      break;
+
+    case "error":
+      className = "compact-scanner-result-error";
+      break;
+
+    case "processing":
+      className = "compact-scanner-result-processing";
+      break;
+  }
+
+  return className;
+}
+
+function resultStatusToIcon(resultStatus: GatekeeperResultStatus) {
+  var imgSrc: string | undefined = undefined;
+  switch (resultStatus) {
+    case "checkin":
+    case "checkout":
+      imgSrc = ProceedSVG;
+      break;
+
+    case "error":
+      imgSrc = ErrorSVG;
+      break;
+  }
+
+  return imgSrc;
+}
+
+type CompactScannerResultProps = {};
+
+const CompactScannerResult: React.FC<CompactScannerResultProps> = ({}) => {
+  let gatekeeper = useGatekeeperContext();
+  let resultStatus = useGatekeeperResultStatus(10000);
+  let [resultText, setResultText] = useState<string>("");
+  let isShowingResult =
+    resultStatus == "checkin" ||
+    resultStatus == "checkout" ||
+    resultStatus == "error";
+
+  useEffect(() => {
+    var newText = resultText;
+    if (resultStatus == "checkin") {
+      newText = `Welcome,\n${gatekeeper.result?.member?.name}!`;
+    } else if (resultStatus == "checkout") {
+      newText = `See you later,\n${gatekeeper.result?.member?.name}!`;
+    } else if (resultStatus == "error") {
+      newText = `You could not be checked in!\n${gatekeeper.result?.error}`;
+    }
+
+    setResultText(newText);
+  }, [resultStatus]);
+
+  return (
+    <div
+      className={`compact-scanner-result ${
+        isShowingResult ? "compact-scanner-result-showing" : ""
+      }`}
+    >
+      <div
+        className={`compact-scanner-result-content ${resultStatusToClass(
+          resultStatus
+        )}`}
+      >
+        <img className="compact-scanner-result-icon" src={resultStatusToIcon(resultStatus)} />
+        {resultText}
+      </div>
+    </div>
+  );
+};
+
+export default CompactScannerResult;

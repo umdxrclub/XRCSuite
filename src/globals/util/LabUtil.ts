@@ -205,9 +205,9 @@ export async function createLabStatusEmbedMessages(): Promise<
 
   // Determine whether an image banner can be added
   var bannerMedia: Media | string | undefined = undefined;
-  if (lab.open && lab.media.labOpenImage) {
+  if (lab.open && lab.media?.labOpenImage) {
     bannerMedia = lab.media.labOpenImage;
-  } else if (!lab.open && lab.media.labClosedImage) {
+  } else if (!lab.open && lab.media?.labClosedImage) {
     bannerMedia = lab.media.labClosedImage;
   } else {
     embed.setTitle("XR Lab Status");
@@ -233,7 +233,7 @@ export async function createLabStatusEmbedMessages(): Promise<
   let row = new ActionRowBuilder<ButtonBuilder>();
 
   // Add "notify me" button
-  if (lab.discord.labNotificationsRole) {
+  if (lab.discord?.labNotificationsRole) {
     let role = await resolveDocument(lab.discord.labNotificationsRole, "roles");
     if (role.discordRoleId) {
       row.addComponents(

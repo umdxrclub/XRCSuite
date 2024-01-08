@@ -1,15 +1,3 @@
-:root {
-    --font-primary: 'Bahnschrift', sans-serif;
-    --font-secondary: 'Lato', sans-serif;
-    --xr-red: #e61a31;
-    --xr-purple: #661556;
-    --xr-cool-red: #a52256;
-    --xr-indigo: #4d1798;
-    --background-color: #000000;
-    --text-color: #ffffff;
-    --discord-blue: #5865F2;
-}
-
 @keyframes gradient {
     0% {
         background-position: 0% 50%;
@@ -24,7 +12,7 @@
 
 .gradient-card {
     animation: gradient 2s ease infinite;
-    background: linear-gradient(-45deg, var(--xr-red), var(--xr-cool-red), var(--xr-purple), var(--xr-indigo));
+    background: var(--xr-gradient);
     border-radius: 16px;
     justify-content: stretch;
     align-items: center;

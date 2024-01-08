@@ -5,8 +5,8 @@ import { useRouteMatch } from "react-router-dom";
 import { RobotoLink } from "../../util/RobotoLink";
 import {
   GatekeeperResolver,
-  GatekeeperScanner,
-} from "../scanner/GatekeeperScanner";
+  Gatekeeper,
+} from "../scanners/Gatekeeper";
 import "./EventGatekeeper.css";
 
 export const EventGatekeeper: React.FC = ({}) => {
@@ -73,7 +73,7 @@ export const EventGatekeeper: React.FC = ({}) => {
           </Box>
         ) : null}
       </Box>
-      <GatekeeperScanner
+      <Gatekeeper
         config={{ statusDisplayTime: 2000 }}
         resolver={EventGatekeeperResolver}
       />

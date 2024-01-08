@@ -257,7 +257,7 @@ export async function resolveMember(
     // event.
     let tlEvent = await getLabTerpLinkEvent();
     console.log("Trying to resolve with issuance id: ", value);
-    let tlMember = await tlEvent.getMemberFromIssuanceId(value);
+    let tlMember = await tlEvent?.getMemberFromIssuanceId(value);
 
     // If we couldn't find a TerpLink member by their issuance id, then
     // something sus happened and we cannot resolve them.
@@ -276,7 +276,7 @@ export async function resolveMember(
     for (var i = 0; i < roster.length && !foundRosterMember; i++) {
       let rosterMember = roster[i];
       let rosterMemberEmail = await rosterMember.fetchEmail();
-      let tlMembers = await tlEvent.lookupMembers(rosterMemberEmail);
+      let tlMembers = await tlEvent?.lookupMembers(rosterMemberEmail) ?? [];
       if (tlMembers.length == 1) {
         let rosterTerpLinkMember = tlMembers[0];
 

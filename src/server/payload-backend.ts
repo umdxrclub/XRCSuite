@@ -31,7 +31,7 @@ export async function resolveDocument<T extends Collections>(doc: string | Colle
     return resolvedDoc;
 }
 
-export async function resolveDocuments<T extends Collections>(docs: string[] | CollectionData<T>[], collection: T, forceResolve: boolean = false) {
+export async function resolveDocuments<T extends Collections>(docs: (string | CollectionData<T>)[], collection: T, forceResolve: boolean = false) {
     let docPromises = docs.map(d => resolveDocument(d, collection, forceResolve))
     let resolvedDocs = await Promise.all(docPromises)
 

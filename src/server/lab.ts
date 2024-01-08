@@ -9,7 +9,7 @@ var LabTerpLinkEvent: TerpLinkEvent | null;
 /**
  * Fetches the TerpLink event for the specified lab event in Payload.
  */
-export async function getLabTerpLinkEvent(): Promise<TerpLinkEvent> {
+export async function getLabTerpLinkEvent(): Promise<TerpLinkEvent | null> {
   if (!LabTerpLinkEvent) {
     // First retrieve the lab event from payload.
     let lab = await payload.findGlobal({
@@ -18,15 +18,15 @@ export async function getLabTerpLinkEvent(): Promise<TerpLinkEvent> {
 
     if (lab.event) {
       let event = await resolveDocument(lab.event, "events");
-      let accessCode = event.terplink.accessCode;
+      let accessCode = event.terplink?.accessCode;
       if (accessCode) {
         LabTerpLinkEvent = await XRC.terplink.getEvent(accessCode);
       } else {
         // TODO: Don't throw errors, return null/undefined instead.
-        throw new Error("Could not find access code for the lab event!");
+        payload.logger.warn("Cannot find access code for lab event.")
       }
     } else {
-      throw new Error("No TerpLink event defined!");
+      payload.logger.warn("No Lab event is currently defined.")
     }
   }
 

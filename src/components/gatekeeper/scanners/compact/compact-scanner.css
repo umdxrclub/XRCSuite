@@ -1,0 +1,60 @@
+.compact-scanner {
+  position: relative;
+  min-width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-primary);
+  font-size: 1.25em;
+}
+
+.compact-scanner,
+.compact-scanner-scanning-pill::before {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-radius: 1000px;
+}
+
+@property --a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes rotate-gradient {
+  from {
+    --a: 0deg;
+  }
+
+  to {
+    --a: 360deg;
+  }
+}
+
+@keyframes spin {
+}
+
+.compact-scanner-scanning-pill {
+  position: relative;
+  background: linear-gradient(#a5225620, #66155620);
+}
+
+.compact-scanner-scanning-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 6px solid transparent;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: rotate-gradient 10s linear infinite;
+  background: border-box conic-gradient(from var(--a), var(--xr-red), var(--xr-cool-red), var(--xr-purple), var(--xr-indigo), var(--xr-purple), var(--xr-red));
+}
+
+.compact-scanner-off {
+  background-color: #333333;
+}

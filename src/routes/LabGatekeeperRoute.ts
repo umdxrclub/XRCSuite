@@ -1,5 +1,5 @@
 import { AdminRoute } from "payload/dist/config/types";
-import { LabGatekeeper } from "../components/gatekeeper/lab/lab-gatekeeper";
+import { LabGatekeeper } from "../components/gatekeeper/lab/LabGatekeeper";
 
 const LabGatekeeperRoute: AdminRoute = {
     path: "/gatekeeper",

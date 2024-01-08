@@ -18,7 +18,7 @@ const LabCheckIn: Endpoint = {
         // Ensure all the required parameters are provided.
         for (var p of requiredParameters) {
             if (!req.query[p]) {
-                res.status(400).json({err: 'Missing query parameter: ' + p});
+                res.status(400).json({error: 'Missing query parameter: ' + p});
                 return;
             }
         }

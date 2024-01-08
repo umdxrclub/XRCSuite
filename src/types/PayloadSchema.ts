@@ -26,6 +26,7 @@ export interface Config {
     integrations: Integration;
     experiences: Experience;
     opportunities: Opportunity;
+    carousels: Carousel;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
@@ -571,6 +572,22 @@ export interface Opportunity {
   name: string;
   url?: string | null;
   description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface Carousel {
+  id: string;
+  name: string;
+  interval: number;
+  slides: {
+    title?: string | null;
+    text?: string | null;
+    image?: string | Media | null;
+    fit: 'cover' | 'contain';
+    id?: string | null;
+    blockName?: string | null;
+    blockType: 'imageAndText';
+  }[];
   updatedAt: string;
   createdAt: string;
 }

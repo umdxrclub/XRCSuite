@@ -26,7 +26,7 @@ import Roles from "./collections/Roles";
 import Integrations from "./collections/Integrations";
 import DiscordGuildProvider from "./components/providers/DiscordGuildProvider";
 import EventGatekeeperRoute from "./routes/EventGatekeeperRoute";
-import { MUIThemeProvider } from "./components/providers/MUIThemeProvider";
+import { MUIThemeProvider } from "./components/providers/ThemeProvider";
 import TrelloConfig from "./globals/Trello";
 import { Experiences } from "./collections/Experiences";
 import { Opportunities } from "./collections/Opportunities";
@@ -36,6 +36,8 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { webpackBundler } from '@payloadcms/bundler-webpack'
 import GApi from "./globals/GApi";
 import TV from "./components/tv/TV";
+import { LabGatekeeper } from "./components/gatekeeper/lab/LabGatekeeper";
+import Carousels from "./collections/Carousels";
 
 
 const fallbackModules = ["util"];
@@ -64,6 +66,10 @@ export default buildConfig({
         TV: {
           Component: TV,
           path: '/tv'
+        },
+        LabGatekeeper: {
+          Component: LabGatekeeper,
+          path: '/gatekeeper'
         }
       }
     },
@@ -115,6 +121,7 @@ export default buildConfig({
     Integrations,
     Experiences,
     Opportunities,
+    Carousels
   ],
   globals: [Lab, Bot, CAS, Wishlist, Odoo, TrelloConfig, GApi],
   typescript: {

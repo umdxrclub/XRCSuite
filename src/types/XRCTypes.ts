@@ -10,13 +10,19 @@ export type XRClubDiscordRole = {
     title: string
 }
 
-export type ResolveResult = {
-    error?: string,
-    member?: {
+export type MemberResolve = {
+    member: {
         name: string,
         type: "checkin" | "checkout"
     }
 }
+
+export type ResolveFailure = {
+    error: string,
+}
+
+export type ResolveResult = Partial<MemberResolve & ResolveFailure>
+
 export type ResolveMethod = "id" | "terplink" | "card"
 export type LabMediaType = "accept-sound" | "reject-sound" | "tv"
 
