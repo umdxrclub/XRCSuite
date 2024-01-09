@@ -42,10 +42,6 @@ const XRLabResolver: GatekeeperResolver = async (method, value) => {
       checkInType = "checkout";
     }
 
-    var msg = new SpeechSynthesisUtterance();
-    msg.text = `${checkInType == "checkin" ? "Welcome" : "Goodbye"}, ${j.name}`;
-    window.speechSynthesis.speak(msg);
-
     return {
       error: undefined,
       member: {

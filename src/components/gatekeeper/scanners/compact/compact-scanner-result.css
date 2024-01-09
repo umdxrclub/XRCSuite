@@ -1,6 +1,6 @@
 .compact-scanner-result {
   position: absolute;
-  top: 0;
+  top: -200%;
   display: flex;
   width: 300px;
   opacity: 0;
@@ -21,7 +21,7 @@
 .compact-scanner-result-icon {
   width: 150px;
   height: 150px;
-  /* filter: invert(1); */
+  filter: invert(1);
 }
 
 .compact-scanner-result-content {

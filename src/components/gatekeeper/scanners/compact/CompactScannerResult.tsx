@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
   GatekeeperResultStatus,
+  GatekeeperState,
+  isResultStatus,
   useGatekeeperContext,
   useGatekeeperResultStatus,
 } from "../Gatekeeper";
@@ -51,38 +53,45 @@ type CompactScannerResultProps = {};
 const CompactScannerResult: React.FC<CompactScannerResultProps> = ({}) => {
   let gatekeeper = useGatekeeperContext();
   let resultStatus = useGatekeeperResultStatus(10000);
-  let [resultText, setResultText] = useState<string>("");
-  let isShowingResult =
-    resultStatus == "checkin" ||
-    resultStatus == "checkout" ||
-    resultStatus == "error";
+  let [result, setResult] = useState<
+    { resultStatus: GatekeeperResultStatus; state: GatekeeperState; text: string } | undefined
+  >();
 
   useEffect(() => {
-    var newText = resultText;
-    if (resultStatus == "checkin") {
-      newText = `Welcome,\n${gatekeeper.result?.member?.name}!`;
-    } else if (resultStatus == "checkout") {
-      newText = `See you later,\n${gatekeeper.result?.member?.name}!`;
-    } else if (resultStatus == "error") {
-      newText = `You could not be checked in!\n${gatekeeper.result?.error}`;
-    }
+    if (isResultStatus(resultStatus)) {
+      var newText = "";
+      if (resultStatus == "checkin") {
+        newText = `Welcome,\n${gatekeeper.result?.member?.name}!`;
+      } else if (resultStatus == "checkout") {
+        newText = `See you later,\n${gatekeeper.result?.member?.name}!`;
+      } else if (resultStatus == "error") {
+        newText = `You could not be checked in!\n${gatekeeper.result?.error}`;
+      }
 
-    setResultText(newText);
+      setResult({
+        resultStatus,
+        state: gatekeeper,
+        text: newText
+      });
+    }
   }, [resultStatus]);
 
   return (
     <div
       className={`compact-scanner-result ${
-        isShowingResult ? "compact-scanner-result-showing" : ""
+        isResultStatus(resultStatus) ? "compact-scanner-result-showing" : ""
       }`}
     >
       <div
         className={`compact-scanner-result-content ${resultStatusToClass(
-          resultStatus
+          result?.resultStatus ?? "off"
         )}`}
       >
-        <img className="compact-scanner-result-icon" src={resultStatusToIcon(resultStatus)} />
-        {resultText}
+        <img
+          className="compact-scanner-result-icon"
+          src={resultStatusToIcon(result?.resultStatus ?? "off")}
+        />
+        {result?.text}
       </div>
     </div>
   );

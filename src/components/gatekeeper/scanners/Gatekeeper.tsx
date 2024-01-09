@@ -100,6 +100,12 @@ export function useGatekeeperResultStatus(
   return resultStatus;
 }
 
+export function isResultStatus(resultStatus: GatekeeperResultStatus) {
+  return resultStatus == "checkin" ||
+  resultStatus == "checkout" ||
+  resultStatus == "error"
+}
+
 export const Gatekeeper: React.FC<GatekeeperProps> = ({
   resolver,
   children,
