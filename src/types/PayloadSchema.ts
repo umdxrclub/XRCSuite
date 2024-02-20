@@ -621,11 +621,9 @@ export interface Lab {
   id: string;
   open: boolean;
   event?: (string | null) | Event;
+  carousel?: (string | null) | Carousel;
   members?: (string | Member)[] | null;
   schedule?: (string | null) | Schedule;
-  odoo?: {
-    contractId?: number | null;
-  };
   media?: {
     gatekeeper?: {
       acceptSound?: string | Media | null;
@@ -638,7 +636,6 @@ export interface Lab {
   discord?: {
     labMessage?: (string | null) | Message;
     labControlMessage?: (string | null) | Message;
-    inventoryMessage?: (string | null) | Message;
     labNotificationsRole?: (string | null) | Role;
   };
   settings?: {

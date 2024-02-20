@@ -3,17 +3,17 @@ import { AttachmentBuilder } from "discord.js";
 import payload from "payload";
 import { GlobalAfterChangeHook } from "payload/types";
 import {
-  createAttachmentFromMedia,
-  sendGuildMessage,
+  sendGuildMessage
 } from "../../discord/util";
 import {
   updateLabControlMessage,
   updateLabStatusMessage,
 } from "../../globals/util/LabUtil";
-import { getDocumentId } from "../../util/payload";
-import { Lab } from "../../types/PayloadSchema";
 import { resolveDocument } from "../../server/payload-backend";
+import { Lab } from "../../types/PayloadSchema";
+import { getDocumentId } from "../../util/payload";
 import { Throttle } from "../../util/throttle";
+import { sendLabUpdateNotification } from "../../ws/XRCStatus";
 
 function createLabNotificationEmbed(): EmbedBuilder {
   let embed = new EmbedBuilder();
@@ -49,7 +49,6 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
   let removedMemberIds = prevMembers.filter(
     (id) => !currentMembers.includes(id)
   );
-  let announceRoles = doc.settings.rolesToAnnounce?.map(getDocumentId) ?? [];
 
   // Create an array of all changed members with their id and a checked in/out flag.
   var changedMemberIds: { id: string; type: "in" | "out" }[] = newMemberIds.map(
@@ -85,50 +84,9 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     embeds.push(statusChangeEmbed);
   }
 
-  if (doc.open) {
-    // Process the newly checked-in members.
-    if (newMemberIds.length > 0) {
-      let newMembers = await Promise.all(
-        newMemberIds.map(
-          async (id) =>
-            await payload.findByID({
-              collection: "members",
-              id: id,
-            })
-        )
-      );
-
-      let membersToAnnounce = newMembers.filter((m) =>
-        (m.roles ?? []).some((r) => announceRoles.includes(getDocumentId(r)))
-      );
-
-      membersToAnnounce.forEach(async (m) => {
-        // Send Discord notification.
-        let embed = createLabNotificationEmbed();
-        let name = m.nickname ?? m.name;
-        embed.setDescription(`${name} has checked into the XR Lab!`);
-        embed.setColor([133, 212, 49]);
-
-        var profileFile: AttachmentBuilder | undefined;
-        if (m.profile.picture) {
-          let profileAttachment = await createAttachmentFromMedia(
-            m.profile.picture
-          );
-          if (profileAttachment) {
-            profileFile = profileAttachment.attachment;
-            embed.setThumbnail(profileAttachment.url);
-            files.push(profileFile);
-          }
-        }
-
-        embeds.push(embed);
-      });
-    }
-  }
-
   // If there is a role to ping, add it.
   var notificationMessageContent: string | undefined = undefined;
-  let notificationRole = doc.discord.labNotificationsRole;
+  let notificationRole = doc.discord?.labNotificationsRole;
   if (shouldNotify && notificationRole) {
     let role = await resolveDocument(notificationRole, "roles");
     if (role.discordRoleId) {
@@ -136,7 +94,8 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
     }
   }
 
-  if (notificationMessageContent && notificationMessageContent.length > 0 ||
+  if (
+    (notificationMessageContent && notificationMessageContent.length > 0) ||
     embeds.length > 0 ||
     files.length > 0
   ) {
@@ -146,6 +105,8 @@ const LabStatusHook: GlobalAfterChangeHook = async (args) => {
       files: files,
     });
   }
+
+  sendLabUpdateNotification();
 };
 
 export default LabStatusHook;

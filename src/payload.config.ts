@@ -1,43 +1,43 @@
+import { webpackBundler } from '@payloadcms/bundler-webpack';
+import { mongooseAdapter } from '@payloadcms/db-mongodb';
+import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from "path";
 import { buildConfig } from "payload/config";
-import Devices from "./collections/Devices";
-import Members from "./collections/Members";
 import Admins from "./collections/Admins";
-import Events from "./collections/Events";
 import Attendances from "./collections/Attendances";
-import Heartbeats from "./collections/Heartbeats";
-import Lab from "./globals/Lab";
-import Bot from "./globals/Discord";
-import Wishlist from "./globals/Wishlist";
-import CAS from "./globals/CAS";
-import XRCLogo from "./components/XRCLogo";
-import Descriptions from "./collections/Descriptions";
-import Messages from "./collections/Messages";
-import Software from "./collections/Software";
-import Projects from "./collections/Projects";
-import Media from "./collections/Media";
-import Schedules from "./collections/Schedules";
-import Polls from "./collections/Polls";
-import LabGatekeeperRoute from "./routes/LabGatekeeperRoute";
-import XRCBeforeDashboard from "./components/dashboard/XRCBeforeDashboard";
-import Stats from "./collections/Stats";
-import Odoo from "./globals/Odoo";
-import Roles from "./collections/Roles";
-import Integrations from "./collections/Integrations";
-import DiscordGuildProvider from "./components/providers/DiscordGuildProvider";
-import EventGatekeeperRoute from "./routes/EventGatekeeperRoute";
-import { MUIThemeProvider } from "./components/providers/ThemeProvider";
-import TrelloConfig from "./globals/Trello";
-import { Experiences } from "./collections/Experiences";
-import { Opportunities } from "./collections/Opportunities";
-import { webpackIgnore } from "./webpack-ignore";
-import { mongooseAdapter } from '@payloadcms/db-mongodb';
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { webpackBundler } from '@payloadcms/bundler-webpack'
-import GApi from "./globals/GApi";
-import TV from "./components/tv/TV";
-import { LabGatekeeper } from "./components/gatekeeper/lab/LabGatekeeper";
 import Carousels from "./collections/Carousels";
+import Descriptions from "./collections/Descriptions";
+import Devices from "./collections/Devices";
+import Events from "./collections/Events";
+import { Experiences } from "./collections/Experiences";
+import Heartbeats from "./collections/Heartbeats";
+import Integrations from "./collections/Integrations";
+import Media from "./collections/Media";
+import Members from "./collections/Members";
+import Messages from "./collections/Messages";
+import { Opportunities } from "./collections/Opportunities";
+import Polls from "./collections/Polls";
+import Projects from "./collections/Projects";
+import Roles from "./collections/Roles";
+import Schedules from "./collections/Schedules";
+import Software from "./collections/Software";
+import Stats from "./collections/Stats";
+import XRCLogo from "./components/XRCLogo";
+import XRCBeforeDashboard from "./components/dashboard/XRCBeforeDashboard";
+import DiscordGuildProvider from "./components/providers/DiscordGuildProvider";
+import { MUIThemeProvider } from "./components/providers/ThemeProvider";
+import XRCStatusProvider from "./components/providers/XRCStatusProvider";
+import TV from "./components/tv/TV";
+import CAS from "./globals/CAS";
+import Bot from "./globals/Discord";
+import GApi from "./globals/GApi";
+import Lab from "./globals/Lab";
+import Odoo from "./globals/Odoo";
+import TrelloConfig from "./globals/Trello";
+import Wishlist from "./globals/Wishlist";
+import EventGatekeeperRoute from './routes/EventGatekeeperRoute';
+import LabGatekeeperRoute from './routes/LabGatekeeperRoute';
+import { webpackIgnore } from "./webpack-ignore";
 
 
 const fallbackModules = ["util"];
@@ -58,7 +58,7 @@ export default buildConfig({
     user: Admins.slug,
     components: {
       beforeDashboard: [XRCBeforeDashboard],
-      providers: [DiscordGuildProvider, MUIThemeProvider],
+      providers: [XRCStatusProvider, DiscordGuildProvider, MUIThemeProvider],
       graphics: {
         Icon: XRCLogo,
       },
@@ -67,10 +67,8 @@ export default buildConfig({
           Component: TV,
           path: '/tv'
         },
-        LabGatekeeper: {
-          Component: LabGatekeeper,
-          path: '/gatekeeper'
-        }
+        LabGatekeeper: LabGatekeeperRoute,
+        EventGatekeeper: EventGatekeeperRoute
       }
     },
     webpack: webpackIgnore(

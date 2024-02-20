@@ -46,12 +46,10 @@ function renderSlide(s: CarouselSlide) {
 
 type CarouselLoaderProps = {
   carouselId: string;
-  interval: number;
 };
 
 const CarouselLoader: React.FC<CarouselLoaderProps> = ({
-  carouselId,
-  interval,
+  carouselId
 }) => {
   let [carousel, setCarousel] = useState<CarouselType | undefined>();
   useEffect(() => {

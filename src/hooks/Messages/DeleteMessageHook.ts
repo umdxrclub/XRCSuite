@@ -5,7 +5,7 @@ import { Message } from "../../types/PayloadSchema";
 
 const DeleteMessageHook: CollectionAfterDeleteHook = async (args) => {
   let message = args.doc as Message;
-  for (var channel of message.channels) {
+  for (var channel of message?.channels ?? []) {
     if (channel.messages && channel.messages.length > 0) {
       let discordChannel = await getGuildChannelById(channel.channelId);
       if (

@@ -47,7 +47,7 @@ function resultStatusToString(resultStatus: GatekeeperResultStatus) {
 const CompactScanner: React.FC = () => {
   let gatekeepr = useGatekeeperContext();
   return (
-    <div>
+    <div className="compact-scanner-container">
       <div className={"compact-scanner compact-scanner-scanning-pill"}>
         <CompactScannerResult />
         {resultStatusToString(gatekeepr.status)}

@@ -21,18 +21,18 @@ const Carousel: React.FC<CarouselProps> = ({ interval, children }) => {
     : [];
 
   function nextSlide() {
-    if (slides.length < 2) return;
     setIndex((i) => (i + 1) % (slides.length ?? 0));
+    if (slides.length < 2) return;
     if (progressBarRef.current) {
       progressBarRef.current.animate([{ width: "0%" }, { width: "100%" }], {
         duration: interval,
-        iterations: 1
+        iterations: 1,
       });
     }
   }
 
   useEffect(() => {
-    console.log("init")
+    console.log("init");
     let id = setInterval(nextSlide, interval);
     nextSlide();
 
@@ -61,12 +61,14 @@ const Carousel: React.FC<CarouselProps> = ({ interval, children }) => {
           );
         })}
       </div>
-      <div className="carousel-progress-bar">
-        <div
-          ref={progressBarRef}
-          className={"carousel-progress-bar-indicator"}
-        />
-      </div>
+      {slides.length > 1 ? (
+        <div className="carousel-progress-bar">
+          <div
+            ref={progressBarRef}
+            className={"carousel-progress-bar-indicator"}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

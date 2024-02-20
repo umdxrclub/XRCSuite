@@ -28,8 +28,14 @@ import { Throttle } from "../util/throttle";
 import { getDiscordClient } from "./bot";
 import { BotCommands } from "./commands/Command";
 
-export type DiscordCreatableMessage = string | MessagePayload | MessageCreateOptions;
-export type DiscordEditableMessage = string | MessagePayload | MessageEditOptions;
+export type DiscordCreatableMessage =
+  | string
+  | MessagePayload
+  | MessageCreateOptions;
+export type DiscordEditableMessage =
+  | string
+  | MessagePayload
+  | MessageEditOptions;
 export type DiscordMessage = DiscordCreatableMessage & DiscordEditableMessage;
 
 /**
@@ -86,7 +92,8 @@ export async function getGuildChannel(
     slug: "bot",
   });
 
-  let channelId: string | undefined = (guild?.channels ?? {})[channelType];
+  let channelId: string | undefined =
+    (guild?.channels ?? {})[channelType] ?? undefined;
 
   // Check to see that a channel was successfully retrieved.
   if (channelId) {

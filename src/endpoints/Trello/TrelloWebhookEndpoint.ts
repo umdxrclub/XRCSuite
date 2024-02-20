@@ -97,7 +97,7 @@ async function sendCardPrompt(cardId: string, memberId: string) {
   if (result.totalDocs != 1) return;
 
   let member = result.docs[0];
-  let discordId = member.integrations.discord;
+  let discordId = member?.integrations?.discord;
 
   // Need to make sure that the discord id actually exists.
   if (!discordId) return;

@@ -1,12 +1,12 @@
 import { Axios } from 'axios';
-import { ClubEventData } from "club.js/dist/events/event";
+import { ClubEventData } from "@xrclub/club.js/dist/events/event";
 import {
     DiscordClubEventData, DiscordClubEventExtension
-} from "club.js/dist/events/extensions/discord";
+} from "@xrclub/club.js/dist/events/extensions/discord";
 import {
     GCalClubEventData, GCalClubEventExtension
-} from "club.js/dist/events/extensions/gcal";
-import { ModelManager } from 'club.js/dist/util/model-manager';
+} from "@xrclub/club.js/dist/events/extensions/gcal";
+import { Transformer } from "@xrclub/club.js/dist/util/transformer";
 import payload from 'payload';
 import { UMDVerificationManager } from '../endpoints/Members/UMDVerification';
 import { useAxios } from "./axios";
@@ -23,7 +23,7 @@ class XRCManager
     public umd: UMDVerificationManager
     public terplink: TerpLink
     public odoo: Odoo
-    public events: ModelManager<XRCEvent>
+    public events: Transformer<XRCEvent>
     private _discordEventExtension: DiscordClubEventExtension<XRCEvent>
     private _gcalEventExtension: GCalClubEventExtension<XRCEvent>
 
@@ -35,7 +35,7 @@ class XRCManager
         this.umd = new UMDVerificationManager();
 
         // Initialize events
-        this.events = new ModelManager();
+        this.events = new Transformer();
         this._discordEventExtension = new DiscordClubEventExtension({});
         this._gcalEventExtension = new GCalClubEventExtension([]);
         this.events.addExtension(this._discordEventExtension);

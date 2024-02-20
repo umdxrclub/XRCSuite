@@ -102,8 +102,8 @@ export async function isDiscordMemberLeadership(id: string): Promise<boolean> {
 }
 
 export function createMemberProfile(member: Member): MemberProfile {
-  var profilePic: string | undefined = undefined;
-  switch (typeof member.profile.picture) {
+  var profilePic: string | null | undefined = undefined;
+  switch (typeof member?.profile?.picture) {
     case "string":
       profilePic = member.profile.picture;
 
@@ -113,10 +113,10 @@ export function createMemberProfile(member: Member): MemberProfile {
 
   return {
     name: member.name,
-    nickname: member.nickname,
+    nickname: member.nickname ?? undefined,
     leadershipRoles: [], // member.roles,
-    profilePictureUrl: profilePic,
-    bio: member.profile.bio,
+    profilePictureUrl: profilePic ?? undefined,
+    bio: member?.profile?.bio ?? undefined,
     links: [], //member.profile.links.map(l => ({ type: l.type, url: l.url }))
   };
 }
@@ -133,7 +133,7 @@ export async function createMemberEmbedMessage(
     name = `"${member.nickname}" - ${name}`;
   }
   embed.setTitle(name);
-  if (member.profile.picture) {
+  if (member?.profile?.picture) {
     let profileAttachment = await createAttachmentFromMedia(
       member.profile.picture
     );
@@ -142,7 +142,7 @@ export async function createMemberEmbedMessage(
       embed.setThumbnail(profileAttachment.url);
       files.push(profileAttachment.attachment);
     }
-  } else if (member.integrations.discord) {
+  } else if (member?.integrations?.discord) {
     let client = await getDiscordClient();
     if (client) {
       let discordMember = await client.users.fetch(member.integrations.discord);
@@ -152,7 +152,7 @@ export async function createMemberEmbedMessage(
     }
   }
 
-  if (member.profile.bio) {
+  if (member?.profile?.bio) {
     embed.setDescription(member.profile.bio);
   }
 

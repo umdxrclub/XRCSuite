@@ -2,8 +2,6 @@ import child_process from "child_process"
 import path from "path"
 import payload from "payload"
 import { MediaDirectory } from "../collections/Media"
-import { CollectionSlugs, GlobalSlugs } from "../slugs"
-import { Bot } from "../types/PayloadSchema"
 import { resolveDocument } from "./payload-backend"
 
 // Why is it necessary to run all of these image functions through a fork?
@@ -46,7 +44,7 @@ async function execFunction<T extends keyof ImageFunctions>(name: T, ...args: Im
 
 export async function createImageBanner(text: string): Promise<string | undefined> {
     let discord = await payload.findGlobal({ slug: "bot" })
-    if (discord.media.banner) {
+    if (discord?.media?.banner) {
         let banner = await resolveDocument(discord.media.banner, "media")
         if (!banner.filename) return;
         

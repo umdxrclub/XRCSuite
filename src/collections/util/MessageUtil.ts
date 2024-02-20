@@ -1,13 +1,9 @@
-import { ButtonStyle, EmbedBuilder, NewsChannel, TextChannel } from "discord.js";
 import payload from "payload";
-import { createAttachmentFromImageData, createAttachmentFromMedia, createButtonRowComponents, DiscordMessage, getGuildChannelById } from "../../discord/util";
-import { rgbToNumber } from "../../util/payload";
-import { CollectionSlugs } from "../../slugs";
-import { Message } from "../../types/PayloadSchema";
-import { createImageBanner } from "../../server/image";
+import { DiscordMessage, getGuildChannelById } from "../../discord/util";
 import { resolveDocument } from "../../server/payload-backend";
+import { Message } from "../../types/PayloadSchema";
+import { NewsChannel, TextChannel } from "discord.js";
 import { Throttle } from "../../util/throttle";
-import { createRoleSelectMessage } from "./RolesUtil";
 
 function wrap(text: string, wrapper: string) {
     return wrapper + text + wrapper
@@ -55,51 +51,51 @@ function convertRichTextToDiscordString(richText: any[]) {
 export async function createDiscordMessages(message: Message): Promise<DiscordMessage[]> {
     let messages: DiscordMessage[] = []
 
-    for (var block of message.content) {
-        switch (block.blockType) {
-            case "linkButtons":
-                let buttonRows = createButtonRowComponents(block.buttons.map(b => ({
-                    label: b.title,
-                    url: b.url,
-                    emoji: b.emoji,
-                    style: ButtonStyle.Link
-                })))
+    // for (var block of message.content) {
+    //     switch (block.blockType) {
+    //         case "linkButtons":
+    //             let buttonRows = createButtonRowComponents(block.buttons.map(b => ({
+    //                 label: b.title,
+    //                 url: b.url,
+    //                 emoji: b.emoji,
+    //                 style: ButtonStyle.Link
+    //             })))
 
-                messages.push({ components: buttonRows })
-                break;
-            case "image":
-                let attachment = await createAttachmentFromMedia(block.image)
-                if (attachment) messages.push({ files: [attachment.attachment]})
-                break;
-            case "banner":
-                let banner = await createImageBanner(block.title)
-                if (banner) {
-                    let bannerAttachment = await createAttachmentFromImageData(banner)
-                    messages.push({ files: [ bannerAttachment ]})
-                }
-                break;
-            case "roleSelect":
-                let roles = await createRoleSelectMessage();
-                messages.push(roles);
-                break;
-            case "message":
-                let richText = block.body;
-                let convertedRichText = convertRichTextToDiscordString(richText);
-                messages.push({content: convertedRichText})
-                break;
-            case "embed":
-                let embed = new EmbedBuilder();
-                if (block.title) embed.setTitle(block.title)
-                if (block.timestamp) embed.setTimestamp(new Date(block.timestamp))
-                if (block.description) embed.setDescription(convertRichTextToDiscordString(block.description))
-                if (block.color) embed.setColor(rgbToNumber(block.color))
-                if (block.fields.length > 0) embed.setFields(block.fields.map(b => ({name: b.name, value: b.value, inline: b.inline })))
-                if (block.url) embed.setURL(block.url)
+    //             messages.push({ components: buttonRows })
+    //             break;
+    //         case "image":
+    //             let attachment = await createAttachmentFromMedia(block.image)
+    //             if (attachment) messages.push({ files: [attachment.attachment]})
+    //             break;
+    //         case "banner":
+    //             let banner = await createImageBanner(block.title)
+    //             if (banner) {
+    //                 let bannerAttachment = await createAttachmentFromImageData(banner)
+    //                 messages.push({ files: [ bannerAttachment ]})
+    //             }
+    //             break;
+    //         case "roleSelect":
+    //             let roles = await createRoleSelectMessage();
+    //             messages.push(roles);
+    //             break;
+    //         case "message":
+    //             let richText = block.body;
+    //             let convertedRichText = convertRichTextToDiscordString(richText);
+    //             messages.push({content: convertedRichText})
+    //             break;
+    //         case "embed":
+    //             let embed = new EmbedBuilder();
+    //             if (block.title) embed.setTitle(block.title)
+    //             if (block.timestamp) embed.setTimestamp(new Date(block.timestamp))
+    //             if (block.description) embed.setDescription(convertRichTextToDiscordString(block.description))
+    //             if (block.color) embed.setColor(rgbToNumber(block.color))
+    //             if (block.fields.length > 0) embed.setFields(block.fields.map(b => ({name: b.name, value: b.value, inline: b.inline })))
+    //             if (block.url) embed.setURL(block.url)
 
-                messages.push({ embeds: [embed] })
-                break;
-        }
-    }
+    //             messages.push({ embeds: [embed] })
+    //             break;
+    //     }
+    // }
 
     return messages;
 }
@@ -113,19 +109,20 @@ export async function sendMessage(message: string | Message) {
 export async function sendDiscordMessages(message: string | Message, messages: DiscordMessage[]) {
     let resolvedMessage = await resolveDocument(message, "messages", true);
 
-    let messageChannels = resolvedMessage.channels;
+    let messageChannels = resolvedMessage.channels ?? [];
     let newMessageChannels: Message["channels"] = []
     for (var channel of messageChannels) {
         let discordChannel = await getGuildChannelById(channel.channelId);
+        let channelMessages = channel.messages ?? [];
 
         if (discordChannel && (discordChannel instanceof TextChannel || discordChannel instanceof NewsChannel)) {
             // Determine whether new messages are needed.
             let shouldCreateNewMessages = channel.alwaysResendMessages || channel.messages == undefined || channel.messages.length != messages.length;
 
             // Delete previous messages.
-            if (shouldCreateNewMessages && channel.messages?.length > 0) {
+            if (shouldCreateNewMessages && channelMessages.length > 0) {
                 try {
-                    await discordChannel.bulkDelete(channel.messages.map(m => m.messageId));
+                    await discordChannel.bulkDelete(channelMessages.map(m => m.messageId));
                 } catch { }
             }
 
@@ -137,7 +134,7 @@ export async function sendDiscordMessages(message: string | Message, messages: D
                     let newMessage = await discordChannel.send(content);
                     updatedMessageId = newMessage.id;
                 } else {
-                    let prevMessage = await discordChannel.messages.fetch(channel.messages[i].messageId)
+                    let prevMessage = await discordChannel.messages.fetch(channelMessages[i].messageId)
                     let editedMessage = await prevMessage.edit(content)
                     updatedMessageId = editedMessage.id;
                 }

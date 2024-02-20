@@ -1,5 +1,5 @@
 import { GlobalConfig } from "payload/types";
-import { setGApiAuthentication } from "club.js/dist/gapi/auth";
+import { setGApiAuthentication } from "@xrclub/club.js/dist/gapi/auth";
 
 const GApi: GlobalConfig = {
     slug: "gapi",

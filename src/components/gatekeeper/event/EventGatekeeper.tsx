@@ -62,7 +62,7 @@ export const EventGatekeeper: React.FC = ({}) => {
           <Box margin={4} flex={1}>
             <div
               style={{
-                background: `url(${event.imageUrl})`,
+                background: `url(${event.thumbnail})`,
                 backgroundSize: "contain",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
@@ -73,10 +73,10 @@ export const EventGatekeeper: React.FC = ({}) => {
           </Box>
         ) : null}
       </Box>
-      <Gatekeeper
+      {/* <Gatekeeper
         config={{ statusDisplayTime: 2000 }}
         resolver={EventGatekeeperResolver}
-      />
+      /> */}
     </Box>
   );
 };

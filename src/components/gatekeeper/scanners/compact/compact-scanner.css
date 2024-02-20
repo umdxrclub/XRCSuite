@@ -1,6 +1,18 @@
+.compact-scanner-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .compact-scanner {
   position: relative;
   min-width: 200px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;

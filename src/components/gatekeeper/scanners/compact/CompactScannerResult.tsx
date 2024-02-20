@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   GatekeeperResultStatus,
   GatekeeperState,
@@ -6,11 +6,10 @@ import {
   useGatekeeperContext,
   useGatekeeperResultStatus,
 } from "../Gatekeeper";
-import "./compact-scanner-result.css";
 import ErrorSVG from "../error.svg";
-import ProceedSVG from "../proceed.svg";
-import ProcessingSVG from "../processing.svg";
-import StopSVG from "../stop.svg";
+import ExitSVG from "../exit-run.svg";
+import HandWaveSVG from "../hand-wave.svg";
+import "./compact-scanner-result.css";
 
 function resultStatusToClass(resultStatus: GatekeeperResultStatus) {
   var className: string = "";
@@ -36,8 +35,10 @@ function resultStatusToIcon(resultStatus: GatekeeperResultStatus) {
   var imgSrc: string | undefined = undefined;
   switch (resultStatus) {
     case "checkin":
+      imgSrc = HandWaveSVG;
+      break;
     case "checkout":
-      imgSrc = ProceedSVG;
+      imgSrc = ExitSVG;
       break;
 
     case "error":

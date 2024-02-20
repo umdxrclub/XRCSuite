@@ -11,7 +11,7 @@ const DiscordAvatarEndpoint: Endpoint = {
       id: req.params.id,
     });
 
-    if (member.integrations.discord) {
+    if (member?.integrations?.discord) {
       let client = await getDiscordClient();
       if (!client) {
         res.status(501).send()

@@ -27,6 +27,7 @@
 }
 
 .lab-header {
+    position: relative;
     display: flex;
     background-color: #222222;
     border: 0;
@@ -43,12 +44,12 @@
     z-index: 1;
 }
 
-.lab-status {
+.lab-status-block {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 16px;
 }
 
 .lab-open-status {
@@ -89,19 +90,19 @@
     font-size: large;
 }
 
-.lab-member-count *{
-    margin: 0;
+.lab-time {
+    font-size: 3em;
+    line-height: 100%;
 }
 
-.lab-cool-text {
-    background: linear-gradient(90deg, #E21755, #5F0080);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: bold;
-    font-size: 20vh;
+.lab-date {
+    color:gray;
+    font-size: 1.5em;
+    line-height: 100%;
+}
+
+.lab-member-count *{
     margin: 0;
-    line-height: 1;
 }
 
 .lab-gk-root h2 {

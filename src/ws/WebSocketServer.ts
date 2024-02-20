@@ -1,13 +1,13 @@
 import http, { IncomingMessage } from "http";
 import https from "https";
 import { Server, WebSocket } from "ws";
-import LabWebSocket from "./Lab/LabWebSocket";
+import XRCStatusWebSocket from "./XRCStatus";
 
 /**
  * A list of all WebSocket endpoints to be hosted.
  */
 const WebSocketEndpoints: WebSocketEndpoint[] = [
-    LabWebSocket
+    XRCStatusWebSocket
 ]
 
 export type WebSocketEndpoint = {
@@ -28,7 +28,7 @@ export type WebSocketEndpoint = {
  * @param server The server to broadcast on
  * @param data The data to send
  */
-export function broadcast(server: Server<WebSocket>, data: string | Buffer | ArrayBuffer | Array<any>) {
+export function wsBroadcast(server: Server<WebSocket>, data: string | Buffer | ArrayBuffer | Array<any>) {
     server.clients.forEach(c => c.send(data))
 }
 

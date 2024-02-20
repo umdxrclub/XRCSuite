@@ -1,7 +1,7 @@
-import { AdminRoute } from "payload/config";
+import { AdminView } from "payload/config";
 import { EventGatekeeper } from "../components/gatekeeper/event/EventGatekeeper";
 
-const EventGatekeeperRoute: AdminRoute = {
+const EventGatekeeperRoute: AdminView = {
     path: "/gatekeeper/event/:id",
     Component: EventGatekeeper
 }

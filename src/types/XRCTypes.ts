@@ -2,7 +2,7 @@ import { FieldBase, Option } from "payload/dist/fields/config/types"
 import { Bot, Message } from "./PayloadSchema"
 
 export type XRCSuiteChannelType = keyof Required<Required<Bot>["guild"]>["channels"]
-export type DiscordMessageBlockArray = Message["content"]
+// export type DiscordMessageBlockArray = Message["content"]
 export type FieldBaseNoType = Omit<FieldBase, "type">
 
 export type XRClubDiscordRole = {

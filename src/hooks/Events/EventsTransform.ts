@@ -1,4 +1,4 @@
-import { PayloadModelTransformer } from "club.js/dist/payload/model-hooks";
+import { PayloadModelTransformer } from "@xrclub/club.js/dist/payload/model-hooks";
 import XRC from "../../server/XRC";
 
 let transformer = new PayloadModelTransformer(
@@ -6,7 +6,7 @@ let transformer = new PayloadModelTransformer(
   "events",
   (e) => {
     return {
-      isPublished: e.isPublished,
+      isPublished: e.published,
       name: e.name,
       description: e.description,
       startDate: e.startDate.toISOString(),
@@ -28,7 +28,7 @@ let transformer = new PayloadModelTransformer(
   (pe) => {
     return {
       id: pe.id,
-      isPublished: pe.isPublished,
+      published: pe.isPublished,
       name: pe.name,
       description: pe.description,
       startDate: new Date(pe.startDate),

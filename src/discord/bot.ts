@@ -7,7 +7,7 @@ import BotInteractions from "./interactions/interactions";
 import { createAndUpdateStatusChannelManagers } from "./multi/multi";
 import { rejectInteractionIfNotLeadership } from "./util";
 import { BotCommands } from "./commands/Command";
-import { setClient } from "club.js/dist/discord/bot"
+import { setClient } from "@xrclub/club.js/dist/discord/bot"
 
 const BOT_INTENTS = [
   GatewayIntentBits.Guilds,
