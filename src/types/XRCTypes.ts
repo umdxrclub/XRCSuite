@@ -1,8 +1,8 @@
 import { FieldBase, Option } from "payload/dist/fields/config/types"
 import { Bot, Message } from "./PayloadSchema"
 
-export type XRCSuiteChannelType = keyof Bot["guild"]["channels"]
-export type DiscordMessageBlockArray = Message["content"]
+export type XRCSuiteChannelType = keyof Required<Required<Bot>["guild"]>["channels"]
+// export type DiscordMessageBlockArray = Message["content"]
 export type FieldBaseNoType = Omit<FieldBase, "type">
 
 export type XRClubDiscordRole = {
@@ -10,13 +10,19 @@ export type XRClubDiscordRole = {
     title: string
 }
 
-export type ResolveResult = {
-    error?: string,
-    member?: {
+export type MemberResolve = {
+    member: {
         name: string,
         type: "checkin" | "checkout"
     }
 }
+
+export type ResolveFailure = {
+    error: string,
+}
+
+export type ResolveResult = Partial<MemberResolve & ResolveFailure>
+
 export type ResolveMethod = "id" | "terplink" | "card"
 export type LabMediaType = "accept-sound" | "reject-sound" | "tv"
 

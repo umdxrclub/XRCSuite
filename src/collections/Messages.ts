@@ -29,12 +29,12 @@ const Messages: CollectionConfig = {
             defaultValue: true,
             required: true
         },
-        createDiscordMessageField({
-            name: 'content',
-            admin: {
-                condition: data => data.useMessageContent
-            }
-        }),
+        // createDiscordMessageField({
+        //     name: 'content',
+        //     admin: {
+        //         condition: data => data.useMessageContent
+        //     }
+        // }),
         {
             name: 'channels',
             type: 'array',

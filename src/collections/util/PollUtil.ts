@@ -28,8 +28,8 @@ export async function createPollEmbedAndRow(poll: Poll) {
     
     // Extract info from the poll
     let title = poll.title;
-    let choices = poll.choices;
-    let totalVotes = choices.reduce((acc, c) => acc + c.voters.length, 0)
+    let choices = poll.choices ?? [];
+    let totalVotes = choices.reduce((acc, c) => acc + (c.voters?.length ?? 0), 0)
     let author = await client.users.fetch(poll.author)
 
     // Create the embed
@@ -37,9 +37,10 @@ export async function createPollEmbedAndRow(poll: Poll) {
     embed.setTitle(title)
     embed.setFields(...[...choices] // copy array to prevent sorting the buttons
         .map((c, i) => {
-            let percentage = c.voters.length/totalVotes;
+            let numVoters = c.voters?.length ?? 0;
+            let percentage = numVoters/totalVotes;
             let displayPercentage = totalVotes == 0 ? 0 : Math.round(100*percentage)
-            let text = `**${c.voters.length}** \u200b \u200b \u200b ${createProgressBar(percentage)} (${displayPercentage}%)`;
+            let text = `**${numVoters}** \u200b \u200b \u200b ${createProgressBar(percentage)} (${displayPercentage}%)`;
 
             // If the poll is closed and this choice won, bold it and add trophy.
             if (!poll.open && i == 0) {

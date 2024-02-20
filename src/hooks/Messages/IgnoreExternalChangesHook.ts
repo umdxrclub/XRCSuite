@@ -14,7 +14,7 @@ const IgnoreExternalChangesHook: FieldHook = async (args) => {
       id: args.originalDoc.id,
       showHiddenFields: true,
     })) as Message;
-    let channel = doc.channels.find((c) => c.channelId === channelId);
+    let channel = doc.channels?.find((c) => c.channelId === channelId);
     if (channel) {
       newValue = channel.messages;
     }

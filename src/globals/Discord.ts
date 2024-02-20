@@ -1,6 +1,6 @@
 import { GlobalConfig } from "payload/types";
 import { createPostActionButton } from "../components/PostActionButton";
-import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpiont";
+import DiscordUserEndpoint from "../endpoints/Discord/DiscordUserEndpoint";
 import GuildStatsEndpoint from "../endpoints/Discord/GuildStats";
 import RegisterSlashCommandsEndpoint from "../endpoints/Discord/RegisterSlashCommands";
 import { createDiscordChannelField } from "../fields/discord/ChannelField";

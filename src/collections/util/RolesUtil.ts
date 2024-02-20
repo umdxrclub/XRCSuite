@@ -40,30 +40,30 @@ export async function isMemberLeadership(member: Member) {
     return roles.some(r => r.isLeadership)
 }
 
-export async function createRoleSelectMessage(): Promise<DiscordMessage> {
-    let roleDocs = await payload.find({
-        collection: "roles", limit: 100, where: {
-            and: [
-                {
-                    isSelfAssignable: {
-                        equals: true
-                    }
-                },
-                {
-                    discordRoleId: {
-                        not_equals: undefined
-                    }
-                }
-            ]
+// export async function createRoleSelectMessage(): Promise<DiscordMessage> {
+//     let roleDocs = await payload.find({
+//         collection: "roles", limit: 100, where: {
+//             and: [
+//                 {
+//                     isSelfAssignable: {
+//                         equals: true
+//                     }
+//                 },
+//                 {
+//                     discordRoleId: {
+//                         not_equals: undefined
+//                     }
+//                 }
+//             ]
             
-        }
-    })
-    let roles = roleDocs.docs;
-    let rows = createButtonRowComponents(roles.map(doc => ({
-        style: ButtonStyle.Primary,
-        emoji: doc.discordEmoji,
-        label: doc.name,
-        customId: `Roles-${doc.id}`
-    })))
-    return { components: rows }
-}
+//         }
+//     })
+//     let roles = roleDocs.docs;
+//     let rows = createButtonRowComponents(roles.map(doc => ({
+//         style: ButtonStyle.Primary,
+//         emoji: doc.discordEmoji,
+//         label: doc.name,
+//         customId: `Roles-${doc.id}`
+//     })))
+//     return { components: rows }
+// }

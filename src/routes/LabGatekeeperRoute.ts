@@ -1,10 +1,9 @@
-import { AdminRoute } from "payload/dist/config/types";
-import { LabGatekeeper } from "../components/gatekeeper/lab/lab-gatekeeper";
+import { AdminView } from "payload/dist/config/types";
+import { LabGatekeeper } from "../components/gatekeeper/lab/LabGatekeeper";
 
-const LabGatekeeperRoute: AdminRoute = {
+const LabGatekeeperRoute: AdminView = {
     path: "/gatekeeper",
     Component: LabGatekeeper,
-    exact: true
 }
 
 export default LabGatekeeperRoute;

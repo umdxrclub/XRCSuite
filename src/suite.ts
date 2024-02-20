@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import { createWebSocketEndpoints } from "./ws/WebSocketServer";
 import { serveDiscordBot } from "./discord/bot";
 import { scheduleJobs } from "./jobs/Scheduler";
+import XRC from "./server/XRC";
 
 export type ExpressRequestHandler = (req: Request, res: Response, next: NextFunction) => void;
 
@@ -28,7 +29,7 @@ export default async function startXRCSuite(light?: boolean) {
 
     const app = express();
 
-    // Enable JSON parsing for requests.
+// Enable JSON parsing for requests.
     app.use(express.json());
 
     // Create logger
@@ -44,9 +45,10 @@ export default async function startXRCSuite(light?: boolean) {
     // Start payload
     await payload.init({
         secret: process.env.MONGO_SECRET,
-        mongoURL: process.env.MONGO_URL,
         express: app
     })
+
+    await XRC.init();
 
     // Create HTTP(S) server
     var server: http.Server | https.Server;

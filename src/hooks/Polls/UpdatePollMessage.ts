@@ -17,7 +17,7 @@ const UpdatedPollMessageHook: CollectionAfterChangeHook = async (args) => {
   if (!pollEmbed) return;
   let { embed, row } = pollEmbed;
 
-  let messages = doc.messages;
+  let messages = doc.messages ?? [];
   messages.forEach(async (msg) => {
     let channelId = msg.channel;
     let messageId = msg.msg;

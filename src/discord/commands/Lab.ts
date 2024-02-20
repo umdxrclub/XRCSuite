@@ -23,7 +23,6 @@ async function onLabInvoke(
         await payload.updateGlobal({
           slug: "lab",
           data: {
-            ...lab,
             open: true,
           },
           depth: 0,
@@ -48,7 +47,6 @@ async function onLabInvoke(
         await payload.updateGlobal({
           slug: "lab",
           data: {
-            ...lab,
             members: checkOutEveryone ? [] : lab.members,
             open: false,
           },

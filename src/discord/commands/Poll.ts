@@ -185,16 +185,16 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
         return;
       }
 
-      if (poll) {
+      if (poll && poll.choices) {
         let choices = poll.choices;
         let choice = poll.choices[choiceNumber];
 
         if (poll.allowRevote) {
           // Remove all of their previous votes
           choices.forEach(
-            (c) => (c.voters = c.voters.filter((v) => v.id != user.id))
+            (c) => (c.voters = c.voters?.filter((v) => v.id != user.id))
           );
-        } else if (choices.some((c) => c.voters.some((v) => v.id == user.id))) {
+        } else if (choices.some((c) => c.voters?.some((v) => v.id == user.id))) {
           // If here, a user has already voted for another option.
           await interaction.reply({
             content: "You have already voted on this poll!",
@@ -204,7 +204,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
         }
 
         // Add voter
-        choice.voters.push({ id: interaction.user.id });
+        choice.voters?.push({ id: interaction.user.id });
 
         // Update poll
         await payload.update({
@@ -239,7 +239,7 @@ async function onInteractionCreate(interaction: Interaction<CacheType>) {
 
         // Add the new poll to the messages.
         let messages = poll.messages;
-        messages.push({
+        messages?.push({
           channel: interaction.channelId,
           msg: replyId,
         });

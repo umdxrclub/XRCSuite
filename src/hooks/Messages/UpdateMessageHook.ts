@@ -1,6 +1,5 @@
 import {
-  CollectionAfterChangeHook,
-  CollectionBeforeChangeHook,
+  CollectionAfterChangeHook
 } from "payload/types";
 import { sendMessage } from "../../collections/util/MessageUtil";
 import { Message } from "../../types/PayloadSchema";
@@ -58,24 +57,24 @@ const UpdateMessageHook: CollectionAfterChangeHook = async (args) => {
   let [message, prevMessage] = [args.doc, args.previousDoc] as Message[];
   if (!message.useMessageContent) return;
 
-  if (args.operation == "update") {
-    let channelsAreSame = areSetsEqual(
-      prevMessage.channels,
-      message.channels,
-      (x) => x.channelId
-    );
-    if (channelsAreSame) {
-      let contentIsSame = deepEquality(message.content, prevMessage.content);
-      if (contentIsSame) {
-        return;
-      } else {
-        console.log(JSON.stringify(prevMessage.content));
-        console.log(JSON.stringify(message.content));
-      }
-    }
-  }
+  // if (args.operation == "update") {
+  //   let channelsAreSame = areSetsEqual(
+  //     prevMessage.channels,
+  //     message.channels,
+  //     (x) => x.channelId
+  //   );
+  //   if (channelsAreSame) {
+  //     let contentIsSame = deepEquality(message.content, prevMessage.content);
+  //     if (contentIsSame) {
+  //       return;
+  //     } else {
+  //       console.log(JSON.stringify(prevMessage.content));
+  //       console.log(JSON.stringify(message.content));
+  //     }
+  //   }
+  // }
 
-  await sendMessage(message.id);
+  // await sendMessage(message.id);
 };
 
 export default UpdateMessageHook;

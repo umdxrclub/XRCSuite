@@ -16,7 +16,6 @@ const LabControlInteractionHandler: InteractionHandler = async interaction => {
         switch (action) {
             case "Open":
                 await payload.updateGlobal({ slug: "lab", depth: 0, data: {
-                    ...lab,
                     open: true
                 }})
                 await interaction.reply({ content: "The XR Lab is now open!", ephemeral: true })
@@ -24,7 +23,6 @@ const LabControlInteractionHandler: InteractionHandler = async interaction => {
 
             case "Close":
                 await payload.updateGlobal({ slug: "lab", depth: 0, data: {
-                    ...lab,
                     open: false
                 }})
                 await interaction.reply({ content: "The XR Lab is now closed!", ephemeral: true })
@@ -32,7 +30,6 @@ const LabControlInteractionHandler: InteractionHandler = async interaction => {
 
             case "CheckOutAll":
                 await payload.updateGlobal({ slug: "lab", depth: 0, data: {
-                    ...lab,
                     members: []
                 }})
                 await interaction.reply({ content: "All members have been checked out!", ephemeral: true })

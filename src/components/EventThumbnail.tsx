@@ -2,7 +2,7 @@ import React from "react";
 import { useFormFields } from 'payload/components/forms';
 
 export const EventThumbnail: React.FC<{ path: string }> = ({ path }) => {
-    const imageUrl = useFormFields(([fields, dispatch]) => fields.imageUrl)
+    const imageUrl = useFormFields(([fields, dispatch]) => fields.thumbnail)
 
     return (
         imageUrl.valid ?

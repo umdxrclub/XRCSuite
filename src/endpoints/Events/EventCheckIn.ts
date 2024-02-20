@@ -1,10 +1,10 @@
 import { Endpoint } from "payload/dist/config/types";
 import { Event } from "payload/generated-types";
 import { resolveMember } from "../../collections/util/MembersUtil";
-import XRC from "../../server/XRC";
 import { ResolveMethod, ResolveResult } from "../../types/XRCTypes";
-import { makeAdminHandler, RejectIfNoUserHandler } from "../RejectIfNoUser";
+import { RejectIfNoUserHandler } from "../RejectIfNoUser";
 import { validateQueryParameters } from "../ValidateQueryParams";
+
 /**
  * The required parameters for event check in:
  *
@@ -34,7 +34,6 @@ const EventCheckIn: Endpoint = {
 
         let member = await resolveMember(resolveMethod, resolveContent);
         if (member) {
-            
             // Create attendance event
             await req.payload.create({
                 collection: "attendances",
@@ -46,9 +45,9 @@ const EventCheckIn: Endpoint = {
                 }
             })
 
-            response = { 
+            response = {
                 member: {
-                    name: member.name, 
+                    name: member.name,
                     type: "checkin"
                 }
             }

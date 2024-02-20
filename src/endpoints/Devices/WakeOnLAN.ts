@@ -1,6 +1,6 @@
 import { Endpoint } from "payload/config";
 import { Device } from "payload/generated-types";
-import { sendWakeOnLAN } from "../../ws/Lab/LabWebSocket";
+// import { sendWakeOnLAN } from "../../ws/Lab/LabWebSocket";
 import { makeAdminHandler } from "../RejectIfNoUser";
 
 const WakeOnLANEndpoint: Endpoint = {
@@ -22,7 +22,7 @@ const WakeOnLANEndpoint: Endpoint = {
     }
 
     if (device.mac) {
-      sendWakeOnLAN(device.mac);
+      // sendWakeOnLAN(device.mac);
       res.status(200).send({ message: "Send WOL packet!" });
     } else {
       res.status(400).send({ error: "Device does not have a MAC address!" });

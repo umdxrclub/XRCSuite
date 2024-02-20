@@ -8,6 +8,7 @@ import LabMediaEndpoint from "../endpoints/Lab/LabMedia";
 import LabStatusEndpoint from "../endpoints/Lab/LabStatus";
 import LabStatusHook from "../hooks/Lab/LabStatus";
 import { CollectionSlugs } from "../slugs";
+import Carousels from "../collections/Carousels";
 
 const Lab: GlobalConfig = {
     slug: 'lab',
@@ -28,6 +29,11 @@ const Lab: GlobalConfig = {
             relationTo: Events.slug
         },
         {
+            name: 'carousel',
+            type: 'relationship',
+            relationTo: Carousels.slug
+        },
+        {
             name: 'members',
             type: 'relationship',
             relationTo: Members.slug,
@@ -37,16 +43,6 @@ const Lab: GlobalConfig = {
             name: 'schedule',
             type: 'relationship',
             relationTo: Schedules.slug
-        },
-        {
-            name: 'odoo',
-            type: 'group',
-            fields: [
-                {
-                    name: 'contractId',
-                    type: 'number'
-                }
-            ]
         },
         {
             name: 'media',
@@ -111,11 +107,6 @@ const Lab: GlobalConfig = {
                 },
                 {
                     name: 'labControlMessage',
-                    type: 'relationship',
-                    relationTo: CollectionSlugs.Messages
-                },
-                {
-                    name: 'inventoryMessage',
                     type: 'relationship',
                     relationTo: CollectionSlugs.Messages
                 },
