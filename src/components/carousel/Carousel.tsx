@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import "./carousel.css";
 
 function mod(n: number, m: number) {
@@ -14,32 +19,33 @@ const Carousel: React.FC<CarouselProps> = ({ interval, children }) => {
   let progressBarRef = useRef<HTMLDivElement>(null);
   let [index, setIndex] = useState<number>(-1);
 
-  let slides = children
-    ? Array.isArray(children)
-      ? children
-      : [children]
-    : [];
+  // The slides to display on the carousel
+  const slides = useMemo(
+    () => (children ? (Array.isArray(children) ? children : [children]) : []),
+    [children]
+  );
 
-  function nextSlide() {
-    setIndex((i) => (i + 1) % (slides.length ?? 0));
-    if (slides.length < 2) return;
-    if (progressBarRef.current) {
-      progressBarRef.current.animate([{ width: "0%" }, { width: "100%" }], {
-        duration: interval,
-        iterations: 1,
-      });
-    }
-  }
-
+  // Create a function that cycles between slides and is updated whenever the
+  // slides or interval changes.
   useEffect(() => {
-    console.log("init");
+    let nextSlide = () => {
+      setIndex((i) => (i + 1) % (slides.length ?? 0));
+      if (slides.length < 2) return;
+      if (progressBarRef.current) {
+        progressBarRef.current.animate([{ width: "0%" }, { width: "100%" }], {
+          duration: interval,
+          iterations: 1,
+        });
+      }
+    };
+
     let id = setInterval(nextSlide, interval);
     nextSlide();
 
     return () => {
       clearInterval(id);
     };
-  }, [interval]);
+  }, [slides.length, interval]);
 
   return (
     <div className="carousel">

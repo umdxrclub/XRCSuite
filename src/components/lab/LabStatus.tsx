@@ -1,5 +1,5 @@
 import React from "react";
-import { useXRCStatus } from "../../providers/XRCStatusProvider";
+import { useXRCStatus } from "../providers/XRCStatusProvider";
 import "./lab-status.css";
 
 type LabStatusProps = {};

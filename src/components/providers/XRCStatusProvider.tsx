@@ -39,6 +39,21 @@ const XRCStatusProvider: React.FC<XRCStatusProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const createLabWs = useCallback(() => {
+    var retry = () => {
+        setTimeout(createLabWs, 5000);
+    }
+
+    // Create Web Socket
+    const wsProtocol = location.protocol.replace("http", "ws");
+    const wsUrl = `${wsProtocol}//${window.location.host}/api/status`;
+    const ws = new WebSocket(wsUrl);
+    ws.onmessage = onNewMessage;
+    ws.onerror = retry;
+    ws.onclose = retry;
+    wsRef.current = ws;
+  }, [])
+
   const fetchLab = useCallback(() => {
     fetch("/api/globals/lab")
       .then((r) => r.json())
@@ -54,12 +69,7 @@ const XRCStatusProvider: React.FC<XRCStatusProviderProps> = ({ children }) => {
     // Get lab status
     fetchLab();
 
-    // Create Web Socket
-    const wsProtocol = location.protocol.replace("http", "ws");
-    const wsUrl = `${wsProtocol}//${window.location.host}/api/status`;
-    const ws = new WebSocket(wsUrl);
-    ws.onmessage = onNewMessage;
-    wsRef.current = ws;
+    createLabWs();
   }, []);
 
   return (

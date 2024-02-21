@@ -1,4 +1,4 @@
-.lab-gk-root {
+.lab-dashboard-root {
     display: flex;
     flex-direction: row;
     height: 100vh;
@@ -7,7 +7,7 @@
     overflow: hidden;
 }
 
-.lab-gk-root .scanner-bar {
+.lab-dashboard-root .scanner-bar {
     flex: 1;
 }
 
@@ -105,16 +105,11 @@
     margin: 0;
 }
 
-.lab-gk-root h2 {
+.lab-dashboard-root h2 {
     margin: 0;
     font-size: 3em;
     line-height: 100%;
 }
-
-/* .lab-gk-root h3 {
-    font-size: 2em;
-    margin-bottom: 8px;
-} */
 
 .lab-welcome {
     flex: 1;
@@ -123,24 +118,6 @@
     justify-content: center;
     align-items:flex-start;
     margin-top: 16pxg;
-}
-
-.lab-rules-group {
-    display: flex;
-    text-align: center;
-    font-size: 2em;
-    max-height: 35vh;
-    gap: 2%
-}
-
-.lab-rules-group > .gradient-card {
-    width: 25%;
-    display: flex;
-}
-
-.lab-rules-group img {
-    max-height: 35%;
-    margin: 6%;
 }
 
 #lab-title {

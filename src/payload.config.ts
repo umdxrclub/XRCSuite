@@ -24,10 +24,10 @@ import Software from "./collections/Software";
 import Stats from "./collections/Stats";
 import XRCLogo from "./components/XRCLogo";
 import XRCBeforeDashboard from "./components/dashboard/XRCBeforeDashboard";
+import LabTV from './components/lab/LabTV';
 import DiscordGuildProvider from "./components/providers/DiscordGuildProvider";
 import { MUIThemeProvider } from "./components/providers/ThemeProvider";
 import XRCStatusProvider from "./components/providers/XRCStatusProvider";
-import TV from "./components/tv/TV";
 import CAS from "./globals/CAS";
 import Bot from "./globals/Discord";
 import GApi from "./globals/GApi";
@@ -63,8 +63,8 @@ export default buildConfig({
         Icon: XRCLogo,
       },
       views: {
-        TV: {
-          Component: TV,
+        LabTV: {
+          Component: LabTV,
           path: '/tv'
         },
         LabGatekeeper: LabGatekeeperRoute,

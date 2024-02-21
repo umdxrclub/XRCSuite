@@ -36,7 +36,6 @@ function renderImageAndText(
 }
 
 function renderSlide(s: CarouselSlide) {
-    console.log("render")
   return (
     <div key={s.id} className="carousel-slide">
       {SlideRenderers[s.blockType](s)}
