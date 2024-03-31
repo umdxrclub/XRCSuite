@@ -9,6 +9,7 @@
 export interface Config {
   collections: {
     admins: Admin;
+    articles: Article;
     members: Member;
     devices: Device;
     heartbeats: Heartbeat;
@@ -23,7 +24,6 @@ export interface Config {
     polls: Poll;
     stats: Stat;
     roles: Role;
-    integrations: Integration;
     experiences: Experience;
     opportunities: Opportunity;
     carousels: Carousel;
@@ -38,6 +38,7 @@ export interface Config {
     odoo: Odoo;
     trello: Trello;
     gapi: Gapi;
+    website: Website;
   };
 }
 export interface Admin {
@@ -57,6 +58,28 @@ export interface Admin {
   lockUntil?: string | null;
   password?: string | null;
 }
+export interface Article {
+  id: string;
+  title: string;
+  authors?: (string | Member)[] | null;
+  content?: {
+    root: {
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      type: string;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
 export interface Member {
   id: string;
   name: string;
@@ -64,13 +87,15 @@ export interface Member {
   birthday?: string | null;
   email?: string | null;
   isClubMember?: boolean | null;
+  title?: string | null;
   roles?: (string | Role)[] | null;
   profile?: {
     picture?: string | Media | null;
+    secondaryPicture?: string | Media | null;
     links?:
       | {
-          type: string | Integration;
-          url: string;
+          type: 'github' | 'linkedIn' | 'website' | 'youtube' | 'email';
+          value: string;
           id?: string | null;
         }[]
       | null;
@@ -116,11 +141,6 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
-}
-export interface Integration {
-  id: string;
-  name?: string | null;
-  discordEmoji?: string | null;
 }
 export interface Device {
   id: string;
@@ -215,7 +235,12 @@ export interface Event {
   id: string;
   isPublished: boolean;
   name: string;
-  type?: string | null;
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
   location?: {
     irl?: string | null;
     online?: string | null;
@@ -227,6 +252,7 @@ export interface Event {
   discord: {
     createGuildEvent: boolean;
     createEmbedMessage: boolean;
+    mentionNotificationRoles: boolean;
     eventMessages?:
       | {
           messageId: string;
@@ -242,8 +268,8 @@ export interface Event {
         }[]
       | null;
   };
-  gcal?: {
-    publishOnGCal?: boolean | null;
+  gcal: {
+    publishOnGCal: boolean;
     events?:
       | {
           eventId: string;
@@ -677,6 +703,13 @@ export interface Bot {
       project?: (string | null) | Role;
     };
   };
+  roles?:
+    | {
+        tag: string;
+        role: string;
+        id?: string | null;
+      }[]
+    | null;
   processDms: boolean;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -727,6 +760,23 @@ export interface Gapi {
   clientSecret?: string | null;
   refreshToken?: string | null;
   eventsCalendarId?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+export interface Website {
+  id: string;
+  members?:
+    | {
+        member: string | Member;
+        id?: string | null;
+      }[]
+    | null;
+  legacyMembers?:
+    | {
+        member: string | Member;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }

@@ -11,7 +11,6 @@ import Devices from "./collections/Devices";
 import Events from "./collections/Events";
 import { Experiences } from "./collections/Experiences";
 import Heartbeats from "./collections/Heartbeats";
-import Integrations from "./collections/Integrations";
 import Media from "./collections/Media";
 import Members from "./collections/Members";
 import Messages from "./collections/Messages";
@@ -38,7 +37,8 @@ import Wishlist from "./globals/Wishlist";
 import EventGatekeeperRoute from './routes/EventGatekeeperRoute';
 import LabGatekeeperRoute from './routes/LabGatekeeperRoute';
 import { webpackIgnore } from "./webpack-ignore";
-
+import Website from './globals/Website';
+import Articles from './collections/Articles';
 
 const fallbackModules = ["util"];
 
@@ -102,6 +102,7 @@ export default buildConfig({
   },
   collections: [
     Admins,
+    Articles,
     Members,
     Devices,
     Heartbeats,
@@ -116,12 +117,11 @@ export default buildConfig({
     Polls,
     Stats,
     Roles,
-    Integrations,
     Experiences,
     Opportunities,
     Carousels
   ],
-  globals: [Lab, Bot, CAS, Wishlist, Odoo, TrelloConfig, GApi],
+  globals: [Lab, Bot, CAS, Wishlist, Odoo, TrelloConfig, GApi, Website],
   typescript: {
     outputFile: path.resolve(__dirname, "./types/PayloadSchema.ts"),
   },

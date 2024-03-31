@@ -1,20 +1,16 @@
-import {
-  Client,
-  GatewayIntentBits, Partials
-} from "discord.js";
+import { Client, GatewayIntentBits, Partials } from "discord.js";
 import payload from "payload";
 import BotInteractions from "./interactions/interactions";
-import { createAndUpdateStatusChannelManagers } from "./multi/multi";
 import { rejectInteractionIfNotLeadership } from "./util";
 import { BotCommands } from "./commands/Command";
-import { setClient } from "@xrclub/club.js/dist/discord/bot"
+import { setClient } from "@xrclub/club.js/dist/discord/bot";
 
 const BOT_INTENTS = [
   GatewayIntentBits.Guilds,
   GatewayIntentBits.GuildMessages,
   GatewayIntentBits.GuildMessageReactions,
   GatewayIntentBits.MessageContent,
-  GatewayIntentBits.GuildMembers
+  GatewayIntentBits.GuildMembers,
 ];
 
 // Create the bot client.
@@ -24,18 +20,21 @@ function onCreateClient(guildId: string, processDms: boolean) {
   if (discordClient) {
     discordClient.once("ready", async (client) => {
       console.log("Logged in as " + client.user.username);
-      await createAndUpdateStatusChannelManagers();
       setClient(discordClient);
     });
 
     // Add slash command handlers
     discordClient.on("interactionCreate", async (interaction) => {
       // Make sure that the interaction comes from the configured guild.
-      if (interaction.guildId !== guildId && !(processDms && interaction.channel?.isDMBased())) return;
+      if (
+        interaction.guildId !== guildId &&
+        !(processDms && interaction.channel?.isDMBased())
+      )
+        return;
 
-      BotInteractions.forEach(i => i(interaction))
+      BotInteractions.forEach((i) => i(interaction));
 
-      BotCommands.forEach(c => {
+      BotCommands.forEach((c) => {
         if (c.onInteractionCreate) {
           c.onInteractionCreate(interaction);
         }
@@ -51,8 +50,11 @@ function onCreateClient(guildId: string, processDms: boolean) {
 
       if (command) {
         // If the command requires leadership, ensure that they are leadership.
-        if (command.leadershipOnly && await rejectInteractionIfNotLeadership(interaction)) {
-            return;
+        if (
+          command.leadershipOnly &&
+          (await rejectInteractionIfNotLeadership(interaction))
+        ) {
+          return;
         }
 
         // Run command
@@ -83,7 +85,7 @@ export async function serveDiscordBot() {
       try {
         await discordClient.login(token);
       } catch (error) {
-        console.error("Error while logging into Discord: " + error)
+        console.error("Error while logging into Discord: " + error);
       }
     } else {
       console.error("No config available!");
@@ -92,6 +94,6 @@ export async function serveDiscordBot() {
     console.log("Disabling Discord Bot");
     discordClient.destroy();
     discordClient = undefined;
-    setClient(undefined)
+    setClient(undefined);
   }
 }

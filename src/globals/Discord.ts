@@ -100,6 +100,21 @@ const Bot: GlobalConfig = {
             ]
         },
         {
+            name: 'roles',
+            type: 'array',
+            fields: [
+                {
+                    name: 'tag',
+                    type: 'text',
+                    required: true
+                },
+                createDiscordRoleField({
+                    name: "role",
+                    required: true
+                })
+            ]
+        },
+        {
             name: "processDms",
             type: "checkbox",
             required: true,

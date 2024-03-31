@@ -8,6 +8,7 @@ import UMDVerificationEndpoint from "../endpoints/Members/UMDVerification";
 import { CollectionSlugs } from "../slugs";
 import Media from "./Media";
 import ApproveRosterEndpoint from "../endpoints/Members/ApproveRoster";
+import { XRCLinkTypes } from "../types/XRCTypes";
 
 const Members: CollectionConfig = {
   slug: CollectionSlugs.Members,
@@ -49,6 +50,10 @@ const Members: CollectionConfig = {
       type: "checkbox",
     },
     {
+      name: "title",
+      type: "text",
+    },
+    {
       name: "roles",
       type: "relationship",
       relationTo: CollectionSlugs.Roles,
@@ -64,17 +69,22 @@ const Members: CollectionConfig = {
           relationTo: Media.slug,
         },
         {
+          name: "secondaryPicture",
+          type: "upload",
+          relationTo: Media.slug,
+        },
+        {
           name: "links",
           type: "array",
           fields: [
             {
               name: "type",
-              type: "relationship",
-              relationTo: CollectionSlugs.Integrations,
+              type: "select",
               required: true,
+              options: XRCLinkTypes
             },
             {
-              name: "url",
+              name: "value",
               type: "text",
               required: true,
             },

@@ -4350,10 +4350,10 @@
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-1.7.0.tgz#e1993689ac42d2b16e9194376cfb6753f6254db1"
   integrity sha512-oxnCNGj88fL+xzV+dacXs44HcDwf1ovs3AuEzvP7mqXw7fQntqIhQ1BRmynh4qEKQSSSRSWVyXRjmTbZIX9V2Q==
 
-"@xrclub/club.js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@xrclub/club.js/-/club.js-1.0.0.tgz#67f846b13af66d096c8aa5718471111e51dbc629"
-  integrity sha512-b0eNOEWOI5kYT+LrTWK3cOPwQv5UcVSdAb4PpTow0XlFZoozRh5+DUndVvQW+VXIhy6oIjiVva/W/msgzjn94A==
+"@xrclub/club.js@^1.0.2":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@xrclub/club.js/-/club.js-1.0.3.tgz#9dab30f9a6fe237e1d542a368b3a8677559fe1e9"
+  integrity sha512-97u+8P2+bLm67J1fAe8RT0ZROqBZa3BqwLGcf4wS+yCJ36NU74itrZeyrTJ6v5qND9vPEhR0tOHNEBhLWwY4zA==
   dependencies:
     date-fns "^2.30.0"
     deepmerge "^4.3.1"

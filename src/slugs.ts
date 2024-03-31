@@ -1,5 +1,6 @@
 export const CollectionSlugs = {
     Admins: 'admins',
+    Articles: 'articles',
     Messages: 'messages',
     Attendances: 'attendances',
     Descriptions: 'descriptions',

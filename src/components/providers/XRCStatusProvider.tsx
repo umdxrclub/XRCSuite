@@ -49,7 +49,6 @@ const XRCStatusProvider: React.FC<XRCStatusProviderProps> = ({ children }) => {
     const wsUrl = `${wsProtocol}//${window.location.host}/api/status`;
     const ws = new WebSocket(wsUrl);
     ws.onmessage = onNewMessage;
-    ws.onerror = retry;
     ws.onclose = retry;
     wsRef.current = ws;
   }, [])

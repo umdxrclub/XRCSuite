@@ -53,8 +53,15 @@ const Events: CollectionConfig = {
       required: true,
     },
     {
-      name: "type",
-      type: "text",
+      name: "tags",
+      type: "array",
+      fields: [
+        {
+          name: "tag",
+          type: "text",
+          required: true
+        }
+      ]
     },
     {
       name: "location",
@@ -130,6 +137,12 @@ const Events: CollectionConfig = {
           defaultValue: true,
         },
         {
+          type: "checkbox",
+          name: "mentionNotificationRoles",
+          required: true,
+          defaultValue: true,
+        },
+        {
           name: "eventMessages",
           type: "array",
           fields: [
@@ -170,6 +183,8 @@ const Events: CollectionConfig = {
         {
           name: "publishOnGCal",
           type: "checkbox",
+          required: true,
+          defaultValue: true,
         },
         {
           name: "events",
